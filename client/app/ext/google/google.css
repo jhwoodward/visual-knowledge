@@ -1,0 +1,12 @@
+﻿
+
+
+.nodeSearch {
+    position:relative;top:-30px;padding:3px;left:660px;
+   /*position:fixed;top:10px;left:10px;z-index:1000*/
+}
+
+.dropdown-menu {
+
+    min-width:250px;
+}

@@ -1,0 +1,48 @@
+  <div class="tabbable propertyTabs"   >
+
+            <!-- tab headers-->
+            <ul class="nav nav-tabs">
+                <li ng-repeat="tab in tabs" ng-class="{active:selectedTab==tab}">
+                    <a href ng-click="selectTab(tab)"><span class="hidden-xs">{{tab}}</span><span class="visible-xs">{{tab.charAt(0)}}</span></a>
+                </li>
+            
+            </ul>
+
+            <div class="tab-pane clearfix" ng-repeat="tab in tabs" ng-switch="tab" style="position: absolute; visibility: {{selectedTab==tab ? 'visible':'hidden' }}">
+
+
+                <div class="tab-content" ng-switch-when="Properties"  >
+                    <ui-view name="editnode"></ui-view>
+                    <ui-view name="viewnode"></ui-view>
+                </div>
+
+                <!-- relationships - shows links to graphs or related images (if selected node is a picture)-->
+                <div class="tab-content" ng-switch-when="Relationships">
+                    <graph-types  node="selection.selectedNode">
+                    </graph-types>
+                    <image-relationships  ng-if="selection.selectedNode.temp.isPicture || selection.selectedNode.temp.isFavourite" node="selection.selectedNode"></image-relationships>
+                </div>
+                <nodegraphpanel ng-switch-when="Graph" active="selectedTab==='Graph'"
+                                node="selection.selectedNode"
+                                class="tab-content"></nodegraphpanel>
+
+                <nodeimages ng-switch-when="Images" active="selectedTab==='Images'"
+                            node="selection.selectedNode"
+                         
+                            class="tab-content" ></nodeimages>
+
+                <freebase ng-switch-when="Freebase" active="selectedTab==='Freebase'" node="selection.selectedNode"
+                          class="tab-content" ></freebase>
+
+                <wikipedia ng-switch-when="Wikipedia" active="selectedTab==='Wikipedia'" node="selection.selectedNode"
+                           class="tab-content" ></wikipedia>
+
+                <favourites class="tab-content" ng-switch-when="Favourites" node="selection.selectedNode"></favourites>
+
+                <div class="tab-content" ng-switch-when="Notes">
+                    <textarea></textarea>
+                </div>
+
+            </div>
+
+        </div>

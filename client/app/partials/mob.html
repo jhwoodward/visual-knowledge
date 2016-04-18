@@ -1,0 +1,133 @@
+﻿
+<div style="height: {{window.height}}px"  resizable window="window"  class="scroll-y">
+
+    <div class="grad1 clearfix" style="padding-top: 10px;padding-bottom:37px;">
+
+        <!-- node search box-->
+        <div class="row form-inline">
+            <div class="col-xs-8">
+                <typeahead choice="nodeLookup" text="nodeLookupText" placeholder="Search..." clearonselect="true"></typeahead>
+            </div>
+            <!--<label class="col-xs-4 checkbox-inline">
+
+                <input type="checkbox" ng-model="addToGraphOnLookup" />Add to graph
+            </label>-->
+            <div class="col-xs-4">
+                <!-- new node button -->
+                <button style="float: right" class="btn btn-default" ng-click="newNode()">New Node...</button>
+            </div>
+        </div>
+
+        <!-- header for selected node-->
+        <div ng-show="selection.selectedNode">
+
+            <!--title: node name-->
+            <h2 style="margin-top: 10px;">
+                {{selection.selectedNode.temp.isPicture ? selection.selectedNode.Title: selection.selectedNode.Lookup}} <button class="btn pull-right" ng-show='enableAddToGraph' ng-click='addNodeToGraph(selection.selectedNode)'>Add to graph</button>
+            </h2>
+            <!-- add to graph button-->
+            <!-- node labels-->
+            <div>
+                <labels navpath="/label/" labels="selection.selectedNode.labels" highlight="{{selection.selectedNode.Type}}"></labels>
+            </div>
+
+
+
+
+        </div>
+
+        <!-- header for selected edge-->
+        <div ng-show="selection.selectedEdge">
+            <!--title: source predicate target-->
+            <div class="selectionHeader">
+                {{selection.selectedEdge.start.Lookup}} <span style="color: #999999">{{selection.selectedEdge.type.toLowerCase().replace('_',' ')}}</span> {{selection.selectedEdge.end.Lookup}}
+            </div>
+        </div>
+
+        <!-- header for multiple selection-->
+        <div ng-show="selection.multiple">
+            <!-- title: n items-->
+            <div class="selectionHeader" style="color: #999999">({{selection.multiple.nodes.length}} items)</div>
+            <!-- multiple labels-->
+            <labels style="padding-top: 10px; float: left; clear: both;" node="selection.selectedNode" labels="selection.multiple.labels"></labels>
+
+        </div>
+    </div>
+
+
+    <div class="tabbable propertyTabs">
+
+        <!-- tab headers-->
+        <ul class="nav nav-tabs">
+            <li ng-repeat="tab in tabs" style="overflow-x:hidden" ng-class="{active:selectedTab==tab}">
+                <a href="" ng-click="selectTab(tab)">
+                    <span class="hidden-xs">{{tab}}</span>
+                    <span class="visible-xs">
+                        {{tab.charAt(0)}}
+                        <!--<span class="glyphicon" ng-class="{'glyphicon glyphicon-edit':tab=='Properties','glyphicon-picture':tab=='Images'}"></span>-->
+                    </span>
+
+                </a>
+            </li>
+
+            <li class="pull-right">
+
+                <button class="btn btn-default" ng-show="selectedTab==='Properties'" ng-click="toggleEditSelectedTab()">Edit</button>
+
+
+            </li>
+            <!-- history navigator-->
+            <!--<li ><span ng-click="navigateBack()"  class="btn pull-right" ng-disabled="!history.length">Back</span></li>-->
+        </ul>
+
+        <div class="tab-pane" ng-repeat="tab in tabs" ng-switch="tab" style="display: {{selectedTab==tab ? 'inline':'none' }}">
+
+
+            <div class="tab-content" ng-switch-when="Properties">
+
+                <editnode node='selection.selectedNode' editable="tabSettings[tab].editable"></editnode>
+                <edge edge='selection.selectedEdge'></edge>
+                <multiple nodes="selection.multiple"></multiple>
+
+            </div>
+
+            <!-- relationships - shows links to graphs or related images (if selected node is a picture)-->
+            <!--<div class="tab-content" ng-switch-when="Relationships">
+                <graph-types window="window" node="selection.selectedNode">
+                </graph-types>
+                <image-relationships window="window" ng-if="selection.selectedNode.temp.isPicture || selection.selectedNode.temp.isFavourite" node="selection.selectedNode"></image-relationships>
+            </div>-->
+
+
+
+
+            <nodegraphpanel ng-switch-when="Graph" active="selectedTab==='Graph'"
+                       node="selection.selectedNode" window="window"
+                       class="tab-content"></nodegraphpanel>
+
+
+            <nodeimages ng-switch-when="Images" active="selectedTab==='Images'"
+                        node="selection.selectedNode" updatemasonry="window.width"
+                        class="tab-content"></nodeimages>
+
+            <freebase ng-switch-when="Freebase" active="selectedTab==='Freebase'" node="selection.selectedNode"
+                      class="tab-content"></freebase>
+
+            <wikipedia ng-switch-when="Wikipedia" active="selectedTab==='Wikipedia'" node="selection.selectedNode"
+                       class="tab-content"></wikipedia>
+
+            <favourites class="tab-content" ng-switch-when="Favourites" node="selection.selectedNode"></favourites>
+
+            <div class="tab-content" ng-switch-when="Notes">
+                <textarea></textarea>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+
+</div>

@@ -1,0 +1,10 @@
+﻿<div class="labelEdit scroll-y" >
+    <div class="label" ng-class="getClass(n)" ng-repeat="n in nodes track by $index" style="margin-top:1px">
+        <span ng-click="nodeClicked(n)" ng-style="{'cursor':clickable ? 'pointer':'default'}">{{n.Label || n.Lookup}} </span>
+        <span ng-click="removeNode(n)"><i class="glyphicon glyphicon-remove icon-white" style="margin:0;opacity:0.6"></i></span>
+    </div>
+    <div style="float:left" ng-style="{'margin-left':nodes.length ? '5px' : '0'}">
+        <typeahead placeholder="Add..." style="height:24px" autosize="true" onselected="addNode(item)" clearonselect="true" restrict="Label"></typeahead>
+    </div>
+
+</div>

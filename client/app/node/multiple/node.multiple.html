@@ -1,0 +1,18 @@
+﻿<div ng-show="nodes" style="width: 550px">
+
+    <label>Labels</label>
+    <div node-array items="labels"></div>
+
+    <div ng-show="labels.indexOf('Deleted')===-1">
+        <button class="btn" ng-click="save()">Save</button>
+        <button class="btn" ng-click="delete()">Delete</button>
+    </div>
+
+    <div ng-show="labels.indexOf('Deleted')>-1">
+        <button class="btn" ng-click="restore()">Restore</button>
+        <button class="btn" ng-click="destroy()">Destroy</button>
+    </div>
+
+</div>
+
+

@@ -1,0 +1,105 @@
+{
+    "manifest_version": 2,
+
+    "name": "Neograph",
+    "description": "Enables collection of data from the web into Finarty",
+    "version": "1.0",
+     "background": {
+      "scripts": ["ext/lib/jquery.js","ext/background.js"]
+   // ,"persistent": false
+  },
+    "content_scripts": [
+        {
+            "matches": [ "https://www.google.co.uk/*" ],
+            "css": [ "ext/lib/bootstrap-button.css", "ext/lib/bootstrap-dropdown.css", "ext/google/google.css" ],
+            "js": [ "ext/lib/jquery.js", "ext/lib/bootstrap.js", "ext/lib/angular.min.js", "ext/lib/angular-resource.min.js", "ext/lib/angular-sanitize.min.js", "modules.js", "filters/filters.js", "factories/neoHelper.js", "factories/utils.js", "factories/neo.js", "directives/typeahead.js", "ext/google/google.js" ]
+        },
+         {
+            "matches": [ "http://www.google.com/*" ],
+            "css": [ "ext/lib/bootstrap-button.css","ext/lib/bootstrap-dropdown.css", "ext/google/google.css"],
+            "js": [  "ext/lib/jquery.js","ext/lib/bootstrap.js","ext/lib/angular.min.js","ext/lib/angular-resource.min.js","ext/lib/angular-sanitize.min.js" ,"modules.js","filters/filters.js","factories/neoHelper.js","factories/utils.js","factories/neo.js","directives/typeahead.js" ,"ext/google/google.js" ]
+        },
+        {
+            "matches": [ "http://www.tate.org.uk/art/search*" ],
+            "css": [ "ext/lib/bootstrap-button.css", "ext/lib/bootstrap-dropdown.css", "ext/tate/tate.css" ],
+            "js": [ "ext/lib/jquery.js", "ext/lib/bootstrap.js", "ext/lib/angular.min.js", "ext/lib/angular-resource.min.js", "ext/lib/angular-sanitize.min.js", "modules.js", "filters/filters.js", "factories/neoHelper.js", "factories/utils.js", "factories/neo.js", "directives/typeahead.js", "ext/tate/tate.js" ]
+        }
+        ,
+        {
+            "matches": [ "http://www.nationalgallery.org.uk/artists/*" ],
+            "css": [ "ext/lib/bootstrap-button.css", "ext/lib/bootstrap-dropdown.css", "ext/natgal/natgal.css" ],
+            "js": [ "ext/lib/jquery.js", "ext/lib/bootstrap.js", "ext/lib/angular.min.js", "ext/lib/angular-resource.min.js", "ext/lib/angular-sanitize.min.js", "modules.js", "filters/filters.js", "factories/neoHelper.js", "factories/utils.js", "factories/neo.js", "directives/typeahead.js", "ext/natgal/natgal.js" ]
+        }
+            ,
+        {
+            "matches": [ "http://www.wga.hu/*" ],
+            "css": [ "ext/lib/bootstrap-button.css", "ext/lib/bootstrap-dropdown.css", "ext/wga/wga.css" ],
+            "js": [ "ext/lib/jquery.js", "ext/lib/bootstrap.js", "ext/lib/angular.min.js", "ext/lib/angular-resource.min.js", "ext/lib/angular-sanitize.min.js", "modules.js", "filters/filters.js", "factories/neoHelper.js", "factories/utils.js", "factories/neo.js", "directives/typeahead.js", "ext/wga/wga.js" ],
+            "all_frames": true
+        }
+              ,
+         {
+            "matches": [ "http://www.abcgallery.com/*" ],
+            "css": [ "ext/lib/bootstrap-button.css","ext/lib/bootstrap-dropdown.css", "ext/olga/olga.css"],
+            "js": [  "ext/lib/jquery.js","ext/lib/bootstrap.js","ext/lib/angular.min.js","ext/lib/angular-resource.min.js","ext/lib/angular-sanitize.min.js" ,"modules.js","filters/filters.js","factories/neoHelper.js","factories/utils.js","factories/neo.js","directives/typeahead.js" ,"ext/olga/olga.js" ]
+         } ,
+        {
+            "matches": [ "https://www.artsy.net/artist/*" ],
+            "css": [ "ext/lib/bootstrap-button.css", "ext/lib/bootstrap-dropdown.css", "ext/artsy/artsy.css" ],
+            "js": [ "ext/lib/jquery.js", "ext/lib/bootstrap.js", "ext/lib/angular.min.js", "ext/lib/angular-resource.min.js", "ext/lib/angular-sanitize.min.js", "modules.js", "filters/filters.js", "factories/neoHelper.js", "factories/utils.js", "factories/neo.js", "directives/typeahead.js", "ext/artsy/artsy.js" ]
+        }
+         ,
+        {
+            "matches": [ "http://www.getty.edu/art/collection/search/*" ],
+            "css": [ "ext/lib/bootstrap-button.css", "ext/lib/bootstrap-dropdown.css", "ext/getty/getty.css" ],
+            "js": [ "ext/lib/jquery.js", "ext/lib/bootstrap.js", "ext/lib/angular.min.js", "ext/lib/angular-resource.min.js", "ext/lib/angular-sanitize.min.js", "modules.js", "filters/filters.js", "factories/neoHelper.js", "factories/utils.js", "factories/neo.js", "directives/typeahead.js", "ext/getty/gettySearch.js" ]
+        }
+             ,
+         {
+            "matches": [ "http://www.getty.edu/art/collection/objects/*" ],
+            "css": [ "ext/lib/bootstrap-button.css","ext/lib/bootstrap-dropdown.css", "ext/getty/getty.css"],
+            "js": [  "ext/lib/jquery.js","ext/lib/bootstrap.js","ext/lib/angular.min.js","ext/lib/angular-resource.min.js","ext/lib/angular-sanitize.min.js" ,"modules.js","filters/filters.js","factories/neoHelper.js","factories/utils.js","factories/neo.js","directives/typeahead.js" ,"ext/getty/gettyItem.js" ]
+         }
+		     ,
+        {
+            "matches": [ "http://www.vangoghmuseum.nl/en/search/*" ],
+            "css": [ "ext/lib/bootstrap-button.css", "ext/lib/bootstrap-dropdown.css", "ext/vangogh/vangogh.css" ],
+            "js": [ "ext/lib/jquery.js", "ext/lib/bootstrap.js", "ext/lib/angular.min.js", "ext/lib/angular-resource.min.js", "ext/lib/angular-sanitize.min.js", "modules.js", "filters/filters.js", "factories/neoHelper.js", "factories/utils.js", "factories/neo.js", "directives/typeahead.js", "ext/vangogh/vangogh.js" ]
+        }
+            ,
+        {
+            "matches": [ "https://www.museodelprado.es/index.php*" ],
+            "css": [ "ext/lib/bootstrap-button.css", "ext/lib/bootstrap-dropdown.css", "ext/prado/prado.css" ],
+            "js": [ "ext/lib/jquery.js", "ext/lib/bootstrap.js", "ext/lib/angular.min.js", "ext/lib/angular-resource.min.js", "ext/lib/angular-sanitize.min.js", "modules.js", "filters/filters.js", "factories/neoHelper.js", "factories/utils.js", "factories/neo.js", "directives/typeahead.js", "ext/prado/pradoSearch.js" ]
+        }   
+            ,
+        {
+            "matches": [ "https://www.museodelprado.es/en/the-collection/online-gallery/*" ],
+            "css": [ "ext/lib/bootstrap-button.css", "ext/lib/bootstrap-dropdown.css", "ext/prado/prado.css" ],
+            "js": [ "ext/lib/jquery.js", "ext/lib/bootstrap.js", "ext/lib/angular.min.js", "ext/lib/angular-resource.min.js", "ext/lib/angular-sanitize.min.js", "modules.js", "filters/filters.js", "factories/neoHelper.js", "factories/utils.js", "factories/neo.js", "directives/typeahead.js", "ext/prado/pradoSearch.js" ]
+        }
+          ,
+        {
+            "matches": [ "http://sammlungenonline.albertina.at/*" ],
+            "css": [ "ext/lib/bootstrap-button.css", "ext/lib/bootstrap-dropdown.css", "ext/albertina/albertina.css" ],
+            "js": [ "ext/lib/jquery.js", "ext/lib/bootstrap.js", "ext/lib/angular.min.js", "ext/lib/angular-resource.min.js", "ext/lib/angular-sanitize.min.js", "modules.js", "filters/filters.js", "factories/neoHelper.js", "factories/utils.js", "factories/neo.js", "directives/typeahead.js", "ext/albertina/albertina.js" ]
+        }      ,
+        {
+            "matches": [ "http://collections.britishart.yale.edu/vufind/Search/*" ],
+         //   "css": [ "ext/lib/bootstrap-button.css", "ext/lib/bootstrap-dropdown.css", "ext/yale/yale.css" ],
+            "js": [ "ext/lib/jquery.js","ext/lib/jquery-comments.js", "ext/lib/bootstrap.js", "ext/lib/angular.min.js", "ext/lib/angular-resource.min.js", "ext/lib/angular-sanitize.min.js", "modules.js", "filters/filters.js", "factories/neoHelper.js", "factories/utils.js", "factories/neo.js", "directives/typeahead.js", "ext/yale/yale.js" ]
+        }
+
+    ],
+
+    "browser_action": {
+
+        "default_icon": "ext/img/icon.png",
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "activeTab",
+        "https://ajax.googleapis.com/",
+        "http://*/"
+    ]
+}

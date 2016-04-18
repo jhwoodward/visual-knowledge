@@ -1,0 +1,27 @@
+﻿<div>
+   <input type="text" ng-model="importQuery" style="width:500px" /> <button class="btn" ng-click="importFreebaseData()">Import Data</button>
+    <div style="width:100%;height:800px;; overflow:auto">
+    <div ng-repeat="node in nodes" style="float:left;clear:both;">
+
+        <div style="width:300px;float:left;padding:20px;">
+            {{node.Lookup}} ({{node.Name}})
+        </div>
+
+        <div style="width:300px;float:left;padding:20px;">
+            <div ng-repeat="d in node.disambiguation" style="cursor:pointer" ng-click="reselect(node,d.mid,d.name)" ng-class="{ 'selected':d.mid==node.FreebaseID }">{{d.mid}} - {{d.name}}</div>
+            <input type="text" ng-model="d.mid" /><button ng-click="reselect(node,d.mid)">Override</button><button ng-click="clear(node)">Clear</button>
+        </div>
+
+        <div style="width:500px;float:left;padding:20px;">
+            <strong>{{node.FB_blurb}}</strong>
+            <br />
+            {{node.FB_blurb_full}}
+            </div>
+
+        </div>
+        
+    </div>
+
+    <button class="btn" ng-click="fixNames()">Fix Names</button>
+  <button class="btn" ng-click="quotesToNodes()">quotesToNodes</button>
+</div>

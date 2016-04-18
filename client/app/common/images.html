@@ -1,0 +1,52 @@
+﻿
+<div style="width:1500px">
+
+    <span class="linkbutton" style="position:absolute;top:0" ng-show="editing" ng-click="selectAll()">Select All</span>
+
+    <ul class="images" selectable selected="selected"  ng-class="{'noanimation':!updatemasonry}" >
+
+
+        <li  ng-repeat="value in items" title="{{value.Title}}" nodeid="{{value.id}}" nodeindex="{{$index}}" ng-class="{'hover':hover,'noanimation':!updatemasonry}" ng-mouseenter="hover=true" ng-mouseleave="hover=false">
+
+            <img  ng-if="value.temp.thumbUrl" ng-src="{{value.temp.thumbUrl}}" style="width: {{value.temp.thumbWidth}}px; height: {{value.temp.thumbHeight}}px" />
+            <!--<h4 style="opacity:0.6;padding-left:15px;padding-right:15px;" ng-if="!value.temp.isPicture" >{{value.Name || value.Lookup || value.Label}}</h4>-->
+            <div ng-if="!session.user.favourites[value.id]" class="hoverIcon badge" ng-click="makeFavourite(value);$event.stopPropagation();"><i class="glyphicon glyphicon-heart"></i></div>
+            <div ng-if="!session.user.favourites[value.id]" class="hoverIcon badge" style="left:160px;" ><a ng-href="/picture/{{value.id}}"><span class="glyphicon glyphicon-circle-arrow-right"></span></a></div>
+            <div ng-if="session.user.favourites[value.id]" class="fixedIcon badge" ng-click="unFavourite(value);$event.stopPropagation();"><i class="glyphicon glyphicon-heart"></i></div>
+            <div ng-if="value.ImageZoomLink" class="fixedIcon badge fixedIcon-left"><a target="ngimgzoom" href="{{value.ImageZoomLink.replace('z/1','z/4')}}"><i class="glyphicon glyphicon-zoom-in"></i></a></div>
+
+
+            <div style="padding: 10px 16px;">
+                {{value.Title || value.Name || value.Lookup || value.Label}}
+            </div>
+
+            <div ng-if="editing" style="padding: 10px 16px;border-top:1px solid #e7e7e7 ">
+                <div class="label label-info pointer" ng-click="event.stopPropagation();navigate(label)" ng-repeat="label in value.labels">{{label}}</div>
+            </div>
+
+
+
+        </li>
+
+        <!--<li ng-repeat="rel in rels" style="float: left; clear: left; width: 90%">
+
+            <div style="float: left; width: 250px;">
+                <img ng-src="{{rel.from.ImageUrl}}" style="width: 250px" />
+                <div style="margin-top: 2px;">
+                    <div class="label label-info" ng-repeat="label in rel.from.labels">{{label}}</div>
+                </div>
+            </div>
+
+            <div style="float: right; width: 250px">
+                <img ng-src="{{rel.to.ImageUrl}}" style="width: 250px" />
+                <div style="margin-top: 2px;">
+                    <div class="label label-info" ng-repeat="label in rel.to.labels">{{label}}</div>
+                </div>
+            </div>
+
+        </li>-->
+
+    </ul>
+
+
+</div>

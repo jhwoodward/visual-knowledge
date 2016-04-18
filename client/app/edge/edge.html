@@ -1,0 +1,45 @@
+﻿<div ng-form name="edgeForm" >
+
+    <div style="float: left; width: 125px">
+        <label>From</label>
+        <input type="text" class="input-small" value="{{edge.start.Lookup}}" disabled>
+    </div>
+
+    <div style="float: left; width: 250px">
+        <label>Predicate</label>
+        <typeahead placeholder="Predicate..." choice="predicateType" restrict="Predicate"></typeahead>
+    </div>
+
+    <div style="float: left; width: 125px">
+        <label>To</label>
+        <input type="text" class="input-small" value="{{edge.end.Lookup}}" disabled>
+    </div>
+
+
+    <div style="margin-top: 20px; margin-bottom: 20px">
+
+        <div style="float: left; width: 125px">
+            <label>Weight</label>
+            <input type="text" class="input-small" ng-model="edge.properties.Weight" />
+        </div>
+        <div style="float: left; width: 456px">
+            <label>Text</label>
+            <textarea style="width: 456px; height: 40px" ng-model="edge.properties.Text" />
+        </div>
+    </div>
+
+    <div style="float: left; clear: left; width: 540px; margin-bottom: 30px; margin-top: 10px;">
+
+        <div ng-show="edge.id">
+            <button class="btn" ng-click="saveEdge({edge:edge})">Save</button>
+            <button class="btn" ng-click="deleteEdge({edge:edge})">Delete</button>
+        </div>
+
+        <div ng-show="!edge.id">
+            <button class="btn" ng-click="saveEdge({edge:edge})">Create</button>
+
+        </div>
+    </div>
+
+</div>
+

@@ -1,0 +1,9 @@
+﻿<div >
+    <div ng-show="options.allowChangeNode">
+        <typeahead choice="node" watchvalue="node.Label" placeholder="Node..." required></typeahead>
+        <button class="btn btn-default" ng-click="openNode()">Open</button>
+    </div>
+    <select class="form-control" style="float: right"  ng-model="selected" ng-options="q as q.name for q in querys">
+        <option value="">Query type...</option>
+    </select>
+</div>

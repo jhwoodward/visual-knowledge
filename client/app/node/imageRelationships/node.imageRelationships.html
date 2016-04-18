@@ -1,0 +1,14 @@
+﻿<div >
+
+    <div ng-repeat="query in querys" ng-show="query.hasData">
+
+
+        <div ng-if="!query.isLabel" ng-click="publish('query',query)" class="linkbutton">{{query.name}}</div>
+
+         <label ng-if="query.isLabel"  class="label label-info" ng-click="publish('query',query)" class="linkbutton">{{query.name}}</label>
+
+        <images active="true" user="user" view="Properties" nodes="query.data.nodeArray" innerwidth="window.tabsWidth-20" editing="false"></images>
+
+
+    </div>
+</div>

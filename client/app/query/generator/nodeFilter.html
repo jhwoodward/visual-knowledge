@@ -1,0 +1,8 @@
+﻿<div>
+    <!--<node-lookup placeholder='Node...' node="node" keepnodeinbox="true"></node-lookup>-->
+    <typeahead   choice="node" watchvalue="node.Label"  placeholder="Node..." required></typeahead>
+        <button class="btn btn-default" ng-click="openNode()">Open</button>
+        <div style="margin-top: 10px;max-height:55px;overflow:auto;">
+            <filter init="filters" enabled="enabledFilters" process="process(labels)"></filter>
+        </div>
+</div>

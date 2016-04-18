@@ -1,0 +1,4 @@
+﻿<div style="line-height: 17px;">
+    <div ng-if="!navpath" class="label functional" ng-class="getClass(lab)" ng-click="navigate(lab)" ng-repeat="lab in labels  track by $index | orderBy:'lab'">{{lab}}</div>
+    <a ng-if="navpath" class="label" ng-repeat=" lab in labels track by $index | orderBy:'lab'" ng-href="{{navpath + lab}}" ng-class="getClass(lab)">{{lab}}</a>
+</div>

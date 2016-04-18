@@ -1,0 +1,53 @@
+﻿<div>
+
+    <!-- show the node image and image info if selected node is a picture -->
+    <div ng-if="node.temp.isPicture || node.temp.isImage">
+        <a target="{{node.temp.imageSource.name}}" href="{{node.temp.imageSource.ref || node.temp.imageSource.url}}">
+            <img ng-src="{{node.temp.imageUrl}}" class="img-responsive"   />
+        </a>
+        <div ng-if="node.ImageZoomLink" class="fixedIcon badge fixedIcon-left">
+            <a target="ngimgzoom" href="{{node.ImageZoomLink.replace('z/1','z/4')}}">
+                <i class="glyphicon glyphicon-zoom-in"></i>
+            </a>
+        </div>
+        <div>
+            Source:
+            <a href="{{node.temp.imageSource.ref}}" target="_blank">
+                {{node.temp.imageSource.name}}
+            </a>
+        </div>
+        <div ng-if="node.temp.imageSource.url">
+            <a href="{{node.temp.imageSource.url}}" target="_blank">
+                Direct Link
+            </a>
+        </div>
+        <div>
+            Aspect Ratio: {{node.ImageWidth/node.ImageHeight | number:2}} {{node.ImageWidth}}x{{node.ImageHeight}}
+            <span ng-if="node.ImageSize">({{node.ImageSize/1000 | number:1 }}k)</span>
+        </div>
+    </div>
+
+    <div ng-if="(node.temp.isPicture || node.temp.isImage)" >
+
+        <div ng-if="(key.indexOf('Image')===0 && key !='ImageSize' && key !='ImageWidth' && key !='ImageHeight')"
+             class="form-group" ng-repeat="(key, value) in node"
+             ng-switch="key">
+            <label>{{key}}</label>
+            <input name="{{key}}" class="form-control" ng-switch-default type="text" ng-model="node[key]" />
+        </div>
+
+    </div>
+
+    <!-- selected node as label which opens grid showing items that have this label-->
+    <!--<label ng-if="!node.temp.isPicture" class="label label-info" ng-click="openGridTab(node)">{{node.Lookup}}</label>-->
+
+
+    <!-- ? -->
+    <!--<div ng-if="node.temp.isPicture">{{node.Lookup}}</div>-->
+
+    <!-- images for selected node-->
+    <images nodes="images" updatemasonry="updatemasonry" editing="false"></images>
+
+
+</div>
+

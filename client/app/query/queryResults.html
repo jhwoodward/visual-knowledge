@@ -1,0 +1,18 @@
+<!-- a tab for each view, shows either graph or images directive depending on view.type-->
+
+<tabs  selected="selectedTab">
+    <tab-pane ng-repeat="(key,value) in views" title="value.name" key="{{key}}" ng-switch="value.type" >
+
+        <graph ng-switch-when="Graph"
+                data="value.data"
+                active="activeView===value">
+        </graph>
+
+        <!-- editing = true makes this different from the images list display in tabs-->
+        <images ng-switch-when="Grid" style="padding-left:20px; overflow-y:auto;"
+                nodes="value.data.nodes"
+                active="activeView===value"
+                editing="true"></images>
+
+    </tab-pane>
+</tabs>
