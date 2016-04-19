@@ -1,0 +1,10 @@
+{
+  "version": false,
+  "dependencies": {},
+  "ambientDependencies": {
+    "angular": "registry:dt/angular#1.4.0+20160302143748",
+    "bootstrap": "registry:dt/bootstrap#3.3.5+20160215162030",
+    "jquery": "registry:dt/jquery#2.0.0+20160303223636",
+    "jqueryui": "registry:dt/jqueryui#1.9.0+20160215144148"
+  }
+}

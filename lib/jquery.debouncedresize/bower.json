@@ -1,0 +1,26 @@
+{
+  "name": "jquery.debouncedresize",
+  "version": "1.0.1",
+  "description": "Debounced Resize Event for jQuery",
+  "homepage": "https://github.com/AndrewDryga/jQuery.DebouncedResize",
+  "main": "js/jquery.debouncedresize.js",
+  "keywords": [
+    "jquery",
+    "jquery plugin",
+    "onresize",
+    "bouncing",
+    "event",
+    "resize"
+  ],
+  "dependencies": {
+    "jquery": ">= 1.7.1"
+  },
+  "authors": [
+    "Louis-Rémi Babé"
+  ],
+  "licenses": "MIT",
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ]
+}

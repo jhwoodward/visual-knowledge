@@ -1,0 +1,14 @@
+{
+  "name": "jquery.masonry",
+  "homepage": "https://github.com/tysoncadenhead/masonry",
+  "version": "2.1.0",
+  "_release": "2.1.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v2.1.0",
+    "commit": "5ff75c6457840946ea35bb2c0459295b42dc29f3"
+  },
+  "_source": "https://github.com/tysoncadenhead/masonry.git",
+  "_target": "2",
+  "_originalSource": "jquery.masonry"
+}
