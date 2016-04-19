@@ -2,7 +2,7 @@
     .directive('multiple', ['neo', 'utils', function (neo, utils) {
     return {
         restrict: 'E',
-        templateUrl: '/app/node/multiple/node.multiple.html',
+        templateUrl: 'app/node/multiple/node.multiple.html',
         scope: {
             nodes: '='
         },

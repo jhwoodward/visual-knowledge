@@ -3,7 +3,7 @@
         return {
             replace: true,
             restrict: 'E',
-            templateUrl: '/app/query/queryDirective.html',
+            templateUrl: 'app/query/queryDirective.html',
             scope: {
                 view: '=',
                 editable: '=?',

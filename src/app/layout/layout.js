@@ -72,7 +72,7 @@
 
 
         },
-        templateUrl: '/app/layout/tabs.html'
+        templateUrl: 'app/layout/tabs.html'
     };
 })
 .directive('tabPane', function () {
@@ -114,7 +114,7 @@
 
 
         },
-        templateUrl: '/app/layout/tabPane.html'
+        templateUrl: 'app/layout/tabPane.html'
     };
 })
 .directive('noBubble', function () {
@@ -130,7 +130,7 @@
             });
 
         },
-        templateUrl: '/app/layout/tabPane.html'
+        templateUrl: 'app/layout/tabPane.html'
     };
 
 

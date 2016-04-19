@@ -3,7 +3,7 @@
         return {
             replace: true,
             restrict: 'E',
-            templateUrl: '/app/node/graphpanel/node.graphpanel.html',
+            templateUrl: 'app/node/graphpanel/node.graphpanel.html',
             scope: {
                 node: '='
                 , active: '='

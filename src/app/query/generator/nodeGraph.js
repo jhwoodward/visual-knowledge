@@ -3,7 +3,7 @@
 
     return {
         restrict: 'E',
-        templateUrl: '/app/query/generator/nodeGraph.html',
+        templateUrl: 'app/query/generator/nodeGraph.html',
         scope: {
             options: '='
             ,

@@ -3,7 +3,7 @@
     return {
         replace: true,
         restrict: 'EA',
-        templateUrl: '/app/common/nodeArray.html',
+        templateUrl: 'app/common/nodeArray.html',
         scope: {
 
             items: '='//an array of string or  items with label property 

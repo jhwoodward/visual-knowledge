@@ -1,7 +1,7 @@
 ﻿angular.module('neograph.edge',['neograph.neo', 'neograph.utils','ui.router'])
     .config(function($stateProvider){
          $stateProvider.state('neograph.admin.edge',{
-            url:'/edge/:edge',
+            url:'edge/:edge',
             views:{
                       'edge@':{
                         controller:'controller.edge',

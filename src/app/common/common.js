@@ -6,5 +6,4 @@ angular.module('neograph.common',[
     'neograph.common.nodeArray',
    'neograph.common.typeahead',
    'neograph.common.typeaheadSimple'
-
     ]);

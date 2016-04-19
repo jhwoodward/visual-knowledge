@@ -3,7 +3,7 @@
     return {
         replace: true,
         restrict: 'E',
-        templateUrl: '/app/common/filter.html',
+        templateUrl: 'app/common/filter.html',
         scope: {
 
             init: '='//an array of labels

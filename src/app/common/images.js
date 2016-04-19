@@ -3,7 +3,7 @@
     return {
         replace: true,
         restrict: 'E',
-        templateUrl: '/app/common/images.html',
+        templateUrl: 'app/common/images.html',
         scope: {
             editing: '='
             , nodes: '=' //must be an array to preserve sort order

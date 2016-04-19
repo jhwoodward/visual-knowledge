@@ -3,7 +3,7 @@
     return {
         replace: true,
         restrict: 'E',
-        templateUrl: '/app/node/images/node.images.html',
+        templateUrl: 'app/node/images/node.images.html',
         scope: {
             node: '='
             , active: '='

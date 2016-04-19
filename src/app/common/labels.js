@@ -2,7 +2,7 @@
 .directive('labels', ['neo', 'utils', function (neo, utils) {
     return {
         restrict: 'E',
-        templateUrl: '/app/common/labels.html',
+        templateUrl: 'app/common/labels.html',
         scope: {
             node: '=?'
             ,

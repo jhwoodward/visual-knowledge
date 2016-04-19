@@ -254,7 +254,7 @@
     .directive('wikipedia', ['wikiservice', 'neo',function (wikiservice,neo) {
     return {
         restrict: 'E',
-        templateUrl: '/app/node/wikipedia/node.wikipedia.html',
+        templateUrl: 'app/node/wikipedia/node.wikipedia.html',
         scope: {
             node: '=',
             window: '=',

@@ -2,7 +2,7 @@
     .directive('favourites', function () {
     return {
         restrict: 'E',
-        templateUrl: '/app/node/favourites/node.favourites.html',
+        templateUrl: 'app/node/favourites/node.favourites.html',
         scope: {
             node: '=',
             query: '='

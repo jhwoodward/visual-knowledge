@@ -541,7 +541,7 @@
     .directive('freebase', ['freebase.service', 'neo', function (service, neo) {
     return {
         restrict: 'E',
-        templateUrl: '/app/node/freebase/node.freebase.html',
+        templateUrl: 'app/node/freebase/node.freebase.html',
         scope: {
             node: '=',
             active:'='

@@ -1,6 +1,8 @@
+angular.module("templates",[]);
 var app = angular
     .module("Neograph", 
     [
+    "templates",
     'publishSubscribe',
     'ui.router',
     'ngSanitize',

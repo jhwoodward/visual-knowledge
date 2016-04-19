@@ -2,7 +2,7 @@
     .directive('graph', ['utils','$state', function (utils,$state) {
     return {
         restrict: 'E',
-        templateUrl: '/app/graph/graph.html',
+        templateUrl: 'app/graph/graph.html',
         scope: {
             data: '=',
             active: '=',
@@ -100,7 +100,7 @@
                     
                     
                     if (params.nodes.length===1){
-                          $state.go('neograph.admin.node',{node:$scope.data.nodes[params.nodes[0]].Label});
+                          $state.go('admin.main.node.view',{node:$scope.data.nodes[params.nodes[0]].Label});
                     }
                     else if (params.edges.length===1){
                         
@@ -115,7 +115,7 @@
                             properties: $scope.data.edges[id].properties
                         }
                         
-                        $state.go('neograph.admin.edge',{edge:JSON.stringify(edge)});
+                        $state.go('admin.main.edge.view',{edge:JSON.stringify(edge)});
                     }
                     
 

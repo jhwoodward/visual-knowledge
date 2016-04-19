@@ -3,7 +3,7 @@
 
     return {
         restrict: 'E',
-        templateUrl: '/app/query/generator/favouritesFilter.html',
+        templateUrl: 'app/query/generator/favouritesFilter.html',
         scope: {
             options: '='
             ,

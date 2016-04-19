@@ -2,7 +2,7 @@
 .directive('graphTypes', function () {
     return {
         restrict: 'E',
-        templateUrl: '/app/node/graphtypes/node.graphTypes.html',
+        templateUrl: 'app/node/graphtypes/node.graphTypes.html',
         scope: {
             node: '=',
             window: '='

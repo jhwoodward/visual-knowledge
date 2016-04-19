@@ -1,6 +1,5 @@
-﻿
-
-controllers.controller("UtilsController", ['$scope', '$window', 'Neo', 'GraphPresets', 'Metadata', function ($scope, $window, neo, presets, metadata) {
+﻿angular.module('neograph.controller.mob',['neograph.neo','neograph.utils','neograph.session'])
+.controller("UtilsController", ['$scope', '$window', 'Neo', 'GraphPresets', 'Metadata', function ($scope, $window, neo, presets, metadata) {
 
 
     var getPersonData = function (node, callback) {
