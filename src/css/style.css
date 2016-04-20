@@ -2,10 +2,6 @@
     background:rgb(240,240,240)
 }
 
-body{
-    overflow:hidden;
-}
-
 /*.nav-tabs > .active > a, .nav-tabs > .active > a:hover, .nav-tabs > .active > a:focus {
  background: rgb(240,240,240);
 
@@ -45,6 +41,7 @@ body{
    border-bottom: 1px solid rgb(190,190,190);
 }
 
+.icon{font-size:20px;}
 
 ul
 {
@@ -193,33 +190,18 @@ ul
 
 
 
-div.network-manipulationDiv {
-    border:0;background:transparent;
-}
+
 .selected {
      background-color: #3a87ad;color:#FFF
 }
 
-.PhysicsConfiguration {
-    position: absolute;
-    top: 100px;
-    z-index: 50;
-}
+
 
 .selectionHeader {
-    float:left;font-size: 2em;padding-top:10px;width: 510px; overflow: hidden;white-space: nowrap; height:75px;
+    float:left;font-size: 2em;padding-top:10px;width: 510px; overflow: hidden;white-space: nowrap; height:25px;
 }
 
-/*.network-manipulationDiv
-{
-   
-    padding-left:450px
-}*/
 
-    .network-manipulationUI.edit.edge, .network-manipulationUI.delete
-    {
-        display:none;
-    }
 
 .linkbutton
 {

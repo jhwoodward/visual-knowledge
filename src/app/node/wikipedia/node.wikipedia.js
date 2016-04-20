@@ -184,7 +184,7 @@
 
                 $wikiDOM.find("h2").each(function (i, e) {
 
-                    $tab = $("<div></div>");
+                    let $tab = $("<div></div>");
                     $(e).nextUntil("h2").appendTo($tab);
                     if ($tab.html()) {
 

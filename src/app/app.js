@@ -17,7 +17,7 @@ var app = angular
     'neograph.controller.mob'
    
     ])
-    .config(function ($stateProvider, $urlRouterProvider) {
+    .config( ($stateProvider, $urlRouterProvider)=> {
 
 
         $stateProvider

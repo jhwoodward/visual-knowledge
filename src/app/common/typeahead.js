@@ -64,7 +64,7 @@ angular.module('neograph.common.typeahead',['neograph.utils','neograph.neo'])
                 }
                 ,
                 sorter: function (items) {
-                    var beginswith = [], caseSensitive = [], caseInsensitive = [], item;
+                    var beginswith = [], caseSensitive = [], caseInsensitive = [],aItem, item;
                     while (aItem = items.shift()) {
                         var item = JSON.parse(aItem);
                         if (!item.Lookup.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(JSON.stringify(item));
