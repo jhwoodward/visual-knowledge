@@ -1,7 +1,7 @@
 ﻿<div>
 
     <!-- show the node image and image info if selected node is a picture -->
-    <div ng-if="node.temp.isPicture || node.temp.isImage">
+    <div ng-if="node.isPicture() || node.temp.isImage">
         <a target="{{node.temp.imageSource.name}}" href="{{node.temp.imageSource.ref || node.temp.imageSource.url}}">
             <img ng-src="{{node.temp.imageUrl}}" class="img-responsive"   />
         </a>
@@ -38,14 +38,8 @@
 
     </div>
 
-    <!-- selected node as label which opens grid showing items that have this label-->
-    <!--<label ng-if="!node.temp.isPicture" class="label label-info" ng-click="openGridTab(node)">{{node.Lookup}}</label>-->
-
-
-    <!-- ? -->
-    <!--<div ng-if="node.temp.isPicture">{{node.Lookup}}</div>-->
-
-    <!-- images for selected node-->
+   
+   
     <images nodes="images" updatemasonry="active" editing="false"></images>
 
 

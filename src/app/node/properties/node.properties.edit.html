@@ -1,0 +1,120 @@
+﻿
+    <div ng-form  name="nodeForm" class="properties">
+
+       
+        <div class="row form-group">
+
+            <div class="col-sm-9">
+                <label>Labels</label>
+                <div node-array items="node.labels" directbinding="false" onselected="setType(item)" node="node" width="100%"></div>
+            </div>
+
+            <div ng-if="node.hasOwnProperty('class')" class="col-sm-3 form-group">
+                <label>Class</label>
+                <typeahead name="class" class="input-small" onselected="setType(item)" watchvalue="node.class" restrict="Type" placeholder="Type..." required></typeahead>
+            </div>
+
+        </div>
+
+        <div ng-if="node.hasOwnProperty('systemInfo')" class="form-group">
+            <label>System Info</label>
+            <textarea class="form-control" name="SystemInfo" no-bubble ng-model="node.systemInfo" />
+        </div>
+
+        <div class="row">
+            <div ng-if="node.hasOwnProperty('lookup')" class="col-xs-6 form-group">
+                <label>Lookup</label>
+                <input name="Lookup" class="form-control" type="text" ng-pattern="/^[A-Za-z][A-Za-z0-9-_]*$/" ng-model="node.lookup" required />
+            </div>
+            <div ng-if="node.hasOwnProperty('label')" class="col-xs-6 form-group" ng-style="{opacity:node.label === node.lookup ? 0.7 : 1}">
+                <label>
+                    Label
+                    <!--<span ng-show="node.Label === node.Lookup">(as lookup)</span>-->
+                </label>
+                <input name="Label" type="text" class="form-control" ng-pattern="/^[A-Za-z][A-Za-z0-9-_]*$/" ng-model="node.label" required />
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Name</label>
+            <input name="Name" type="text" class="form-control" ng-model="node.name" />
+        </div>
+
+        <div ng-if="node.hasOwnProperty('description')" class="form-group">
+            <label>Description</label>
+            <textarea name="Description" no-bubble class="form-control" ng-model="node.description" />
+        </div>
+
+
+        <div ng-if="node.hasOwnProperty('text')" class="form-group">
+            <label>Text</label>
+            <textarea name="Text" no-bubble class="form-control" ng-model="node.Text" />
+        </div>
+
+        <div class="row">
+            <div ng-repeat="(key, value) in node" class="col-xs-6 form-group"
+                 ng-if="node.isCustomField(key)"
+                 ng-switch="key"
+                 ng-class="{'col-xs-3' : key==='yearFrom' || key==='yearTo' || key==='status' }">
+                <label>{{key}}</label>
+
+                <input name="{{key}}" class="form-control" ng-switch-when="yearFrom" type="text" ng-model="node[key]" />
+                <input name="{{key}}" class="form-control" ng-switch-when="yearTo" type="text" ng-model="node[key]" />
+                <input name="{{key}}" class="form-control" ng-switch-when="status" type="text" ng-model="node[key]" />
+                <input name="{{key}}" class="form-control" ng-switch-default type="text" ng-model="node[key]" />
+
+            </div>
+        </div>
+
+        <label>Related web pages</label>
+        <div ng-click="node.links.push({name:'',url:'',editing:true})" class="hoverOpacity pointer" style="float:right">add web page...</div>
+
+        <div class="row" ng-repeat="link in node.links">
+
+            <div ng-if="link.editing">
+                <label>Link name</label>
+                <!--<input class="input" type="text"/>-->
+                <typeahead-simple class="input" ng-model="link.name" source="['Main Site', 'Google Art Project','Image Search']"></typeahead-simple>
+                <label>Link url</label>
+                <input class="input input-large" type="text" ng-model="link.url" />
+                <i class="icon icon-trash pull-right pointer hoverOpacity" style="margin:5px" ng-click="node.temp.links.splice(node.temp.links.indexOf($index),1)"></i>
+                <i style="margin:5px" class="icon icon-check pull-right pointer hoverOpacity" ng-click="link.editing=false"></i>
+
+            </div>
+
+            <div ng-if="!link.editing">
+                <a href="{{link.url}}" target="{{link.name}}">{{link.name}}</a><i class="icon icon-edit pull-right pointer hoverOpacity" ng-click="link.editing=true"></i>
+            </div>
+
+        </div>
+
+        <!--<div class="pull-right">
+            <button class="btn btn-default" ng-click="editable=!editable">Cancel Edit</button>
+        </div>-->
+
+        <div class="form-group">
+
+            <div style="float: right; margin-right: 20px; margin-top: 10px; color: #999999">id: {{node.id}} <span ng-show="node.created">created: {{node.created | date:'dd/MM/yyyy'}}</span></div>
+            <div ng-show="deleted">
+
+                <button class="btn btn-success" ng-click="restoreNode(node)">Restore</button>
+                <button style="margin-left: 20px" class="btn btn-danger" ng-click="destroyNode({node:node})">Destroy</button>
+            </div>
+
+            <div ng-show="!deleted && node.id >= 0">
+                <button class="btn btn-success" ng-click="saveNode(node)" ng-disabled="nodeForm.$invalid">Save</button>
+                <button style="margin-left: 20px" class="btn btn-danger" ng-click="deleteNode({node:node})">Delete</button>
+            </div>
+
+            <div ng-show="!deleted && node.id ==-1">
+                <button class="btn btn-success" ng-click="saveNode(node)" ng-disabled="nodeForm.$invalid">Create</button>
+            </div>
+
+          
+
+        </div>
+
+     
+    </div>
+
+
+

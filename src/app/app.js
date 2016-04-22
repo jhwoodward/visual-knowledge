@@ -31,7 +31,7 @@ var app = angular
                 views:{
                     'nodeSearch@admin':{
                         controller:'NodeSearchCtrl',
-                        templateUrl:'app/node/nodeSearch.html'
+                        templateUrl:'app/node/node.search.html'
                     }
                     ,
                     'query@admin':{

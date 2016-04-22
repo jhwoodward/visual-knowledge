@@ -42,7 +42,7 @@ gulp.task('app-js', function(cb){
      .pipe(babel({presets: ['es2015']}))
      .pipe(ngAnnotate())
      .pipe(concat('bundle.js'))
-     .pipe(uglify())
+  //   .pipe(uglify())
      .pipe(sourcemaps.write('./'))
      .pipe(gulp.dest('./build'))
      .pipe(browserSync.reload({

@@ -4,10 +4,11 @@ angular.module('neograph.node',[
     'neograph.node.freebase',
     'neograph.node.graphpanel',
     'neograph.node.images',
-    'neograph.node.edit',
     'neograph.node.wikipedia',
     'neograph.node.multiple',
-    'neograph.cache',
+    'neograph.node.service',
+    'neograph.node.properties',
+    'neograph.node.relationships',
     'ui.router'
     
 ])
@@ -19,7 +20,7 @@ angular.module('neograph.node',[
             views:{
                     'nodeHeader@admin':{
                         controller:'NodeHeaderCtrl',
-                        templateUrl:'app/node/nodeHeader.html'
+                        templateUrl:'app/node/node.header.html'
                     }
                      ,
                       'node@admin':{
@@ -33,12 +34,24 @@ angular.module('neograph.node',[
         .state('admin.main.node.view',{
             url:'/view',
             views:{
-                     'viewnode@admin.main.node':{
-                        templateUrl:'app/node/node.view.html',
-                        controller:function ($scope,$stateParams,cache) {
+                     'properties@admin.main.node':{
+                        templateUrl:'app/node/properties/node.properties.html',
+                        controller:function ($scope,$stateParams,nodeService) {
                             if ($stateParams.node){
-                                cache.getNode($stateParams.node).then(function(node){
+                                nodeService.get($stateParams.node,true).then(function(node){
                                         $scope.node = node;
+                                    }); 
+                            }
+                        }
+                    }
+                    ,
+                     'relationships@admin.main.node':{
+                        templateUrl:'app/node/relationships/node.relationships.html',
+                        controller:function ($scope,$stateParams,nodeService) {
+                            if ($stateParams.node){
+                                nodeService.get($stateParams.node,true).then(function(node){
+                                        $scope.node = node;
+                                        console.log(node);
                                     }); 
                             }
                         }
@@ -50,15 +63,20 @@ angular.module('neograph.node',[
             url:'/edit',
             views:{
           
-                      'editnode@admin.main.node':{
-                       templateUrl:'app/node/node.edit.html',
-                       controller:'EditNodeCtrl'
+                    'editproperties@admin.main.node':{
+                       templateUrl:'app/node/properties/node.properties.edit.html',
+                       controller:'EditPropertiesCtrl'
+                    },
+                       'editrelationships@admin.main.node':{
+                       templateUrl:'app/node/relationships/node.relationships.edit.html',
+                       controller:'EditRelationshipsCtrl'
                     }
+                    
             }
             
         });
 })
-.controller('NodeSearchCtrl',function($scope,$state,cache){
+.controller('NodeSearchCtrl',function($scope,$state,nodeService){
         
     $scope.selection = {
         selectedNode: null,
@@ -69,13 +87,36 @@ angular.module('neograph.node',[
      $scope.$watch('nodeLookup', function (n) {
 
         if (n && n.id) {
-             cache.getNode(n.Label).then(function(node){
+             nodeService.get(n.label,true).then(function(node){
                  $scope.selection.selectedNode = node;
-                 $state.go('admin.main.node.view',{node:n.Label});
+                 $state.go('admin.main.node.view',{node:n.label});
              })    
           
         }
     });
+    
+    $scope.newNode = function () {
+
+        var newNode = {
+            id: -1,
+            labels: [],
+            Type: "",
+            temp: {
+                tabs: ["Properties"]
+            }
+        }
+
+        if ($scope.nodeLookupText && (!$scope.selection.selectedNode || $scope.nodeLookupText != $scope.selection.selectedNode.Lookup)) {
+            newNode.Lookup = $scope.nodeLookupText;
+        }
+
+        $scope.selection.selectedNode = newNode;
+        $scope.tabs = $scope.selection.selectedNode.temp.tabs;
+
+        $scope.selectedTab = 'Properties';
+
+
+    }
     
     $scope.addNodeToGraph = function (node) {
         console.log('add node to graph');
@@ -113,7 +154,7 @@ angular.module('neograph.node',[
 
         
 })
-.controller('NodeHeaderCtrl',function($scope,$stateParams,cache){
+.controller('NodeHeaderCtrl',function($scope,$stateParams,nodeService){
         
     $scope.selection = {
         selectedNode: null,
@@ -123,7 +164,7 @@ angular.module('neograph.node',[
 
      if ($stateParams.node){
           
-           cache.getNode($stateParams.node).then(function(node){
+           nodeService.get($stateParams.node,true).then(function(node){
                  $scope.selection.selectedNode = node;
             });
                 
@@ -132,7 +173,7 @@ angular.module('neograph.node',[
 
         
 })
-.controller('NodeCtrl',function($scope,$stateParams,neo,cache){
+.controller('NodeCtrl',function($scope,$stateParams,nodeService){
 
        $scope.selection = {
             selectedNode: null,
@@ -143,35 +184,14 @@ angular.module('neograph.node',[
       
       if ($stateParams.node){
           
-           cache.getNode($stateParams.node).then(function(node){
+           nodeService.get($stateParams.node,true).then(function(node){
                  $scope.selection.selectedNode = node;
             });
                 
       }
       
 
-     $scope.newNode = function () {
-
-        var newNode = {
-            id: -1,
-            labels: [],
-            Type: "",
-            temp: {
-                tabs: ["Properties"]
-            }
-        }
-
-        if ($scope.nodeLookupText && (!$scope.selection.selectedNode || $scope.nodeLookupText != $scope.selection.selectedNode.Lookup)) {
-            newNode.Lookup = $scope.nodeLookupText;
-        }
-
-        $scope.selection.selectedNode = newNode;
-        $scope.tabs = $scope.selection.selectedNode.temp.tabs;
-
-        $scope.selectedTab = 'Properties';
-
-
-    }
+  
 
 /*
     //respond to published event from other component
@@ -228,40 +248,13 @@ angular.module('neograph.node',[
     });
     */
 
-    $scope.tabs = [];
+    $scope.tabs = ["Properties","Relationships"];
     $scope.selectedTab = "Properties";
     $scope.selectTab = function (tab) {
         $scope.selectedTab = tab;
     }
 
 
-    //update tabs & properties if labels change
-    var settingPropsAndTabs = false;
- 
-    //how can i stop this firing for newly loaded nodes ?
-    $scope.$watchCollection('selection.selectedNode.labels', function (labels) {
-     
-        if (labels && labels.length && !settingPropsAndTabs ) {
-
-            settingPropsAndTabs = true;
-
-            console.dir($scope.selection.selectedNode);
-            neo.getProps(labels).then(function (out) {
-
-                console.dir($scope.selection.selectedNode);
-                $scope.selection.selectedNode = $.extend(null,out.properties, $scope.selection.selectedNode);
-                $scope.selection.selectedNode.temp.tabs = out.tabs;
-                $scope.tabs = $scope.selection.selectedNode.temp.tabs;
-                /*
-                if (session.user.favourites[$scope.selection.selectedNode.id]) {
-                    $scope.tabs.push("Favourite");
-                }
-                */
-                settingPropsAndTabs = false;
-            })
-        }
-    });
-    
    
 
  

@@ -1,13 +1,13 @@
-angular.module('neograph.common.typeahead',['neograph.utils','neograph.neo'])
-    .directive('typeahead', ['utils', 'neo', function (utils, neo) {
+angular.module('neograph.common.typeahead',['neograph.utils','neograph.node.service'])
+    .directive('typeahead', ['utils', 'nodeService', function (utils, nodeService) {
     return {
         restrict: 'E',
         replace: true,
         scope: {
-            choice: '=?',   //the choice should be an object for 2 way binding with Lookup property
+            choice: '=?',   //the choice should be an object for 2 way binding with lookup property
             watchvalue: '=?',  //watchvalue should be a text string  -just for updating the textbox value when the value changes, not fed back
             text: '=?', //to feed back the text value when it changes (when no item has been selected)
-            restrict: '=?',//options to retrict the items that can be selected = Type,Predicate,User,custom object array with Lookup property
+            restrict: '=?',//options to retrict the items that can be selected = Type,Predicate,User,custom object array with lookup property
             onselected: '&?',
             autosize:'@?'
 
@@ -22,7 +22,7 @@ angular.module('neograph.common.typeahead',['neograph.utils','neograph.neo'])
 
             $scope.$watch('choice', function (n) {
                 if (n) {
-                    $input.val(n.Label || n.Lookup);
+                    $input.val(n.Label || n.lookup);
                 }
             })
 
@@ -60,15 +60,15 @@ angular.module('neograph.common.typeahead',['neograph.utils','neograph.neo'])
 
                     var item = JSON.parse(obj);
 
-                    return ~item.Lookup.toLowerCase().indexOf(this.query.toLowerCase())
+                    return ~item.lookup.toLowerCase().indexOf(this.query.toLowerCase())
                 }
                 ,
                 sorter: function (items) {
                     var beginswith = [], caseSensitive = [], caseInsensitive = [],aItem, item;
                     while (aItem = items.shift()) {
                         var item = JSON.parse(aItem);
-                        if (!item.Lookup.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(JSON.stringify(item));
-                        else if (~item.Lookup.indexOf(this.query)) caseSensitive.push(JSON.stringify(item));
+                        if (!item.lookup.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(JSON.stringify(item));
+                        else if (~item.lookup.indexOf(this.query)) caseSensitive.push(JSON.stringify(item));
                         else caseInsensitive.push(JSON.stringify(item));
                     }
 
@@ -81,16 +81,16 @@ angular.module('neograph.common.typeahead',['neograph.utils','neograph.neo'])
                     var out;
 
                     if (attrs["restrict"] == "Predicate") {
-                        out = new utils.Predicate(item.Lookup).ToString().replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+                        out = new utils.Predicate(item.lookup).ToString().replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
                             return '<strong>' + match + '</strong>'
                         });
 
                     }
                     else {
                       
-                        out = item.Lookup.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+                        out = item.lookup.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
                             return '<strong>' + match + '</strong>'
-                        }) + " <div style='float:right;margin-left:8px;color:#ccc'>" + item.Type + "</div>";
+                        }) + " <div style='float:right;margin-left:8px;color:#ccc'>" + item.class + "</div>";
                        
                     }
 
@@ -121,7 +121,7 @@ angular.module('neograph.common.typeahead',['neograph.utils','neograph.neo'])
 
                     if (!attrs["clearonselect"]) {
    
-                        return item.Lookup;
+                        return item.lookup;
                     }
 
                 }
@@ -179,29 +179,24 @@ angular.module('neograph.common.typeahead',['neograph.utils','neograph.neo'])
             //Globals & users or one or the other depending on value of restrict
             var nodeSource = function (query, process) {
 
-             
-
                 if ($scope.restrict && $.isArray($scope.restrict) && $scope.restrict.lenth > 0) {
 
-                    if ($scope.restrict[0].Lookup) {
+                    if ($scope.restrict[0].lookup) {
                         return $scope.restrict.map(function (d) { return JSON.stringify(d); });
                     }
                     else {
-                        return $scope.restrict.map(function (d) { return JSON.stringify({ Lookup: d }); });
+                        return $scope.restrict.map(function (d) { return JSON.stringify({ lookup: d }); });
                     }
                 }
                 else {
-                    neo.matchNodes(query, attrs["restrict"]).then(function (nodes) {
+                    nodeService.search(query, attrs["restrict"]).then(function (nodes) {
 
+                        console.log(nodes);
                         process(nodes.map(function (d) {
                             return JSON.stringify(d);
                         }));
-
                     });
-
-               
                 }
-
 
             }
 

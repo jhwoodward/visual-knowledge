@@ -1,0 +1,12 @@
+
+
+    <!--title: node name-->
+    <h2 style="margin-top: 10px;" >
+        {{selection.selectedNode.isPicture() ? selection.selectedNode.title: selection.selectedNode.lookup}} 
+        <button class="btn btn-default pull-right" ng-show='enableAddToGraph' ng-click='addNodeToGraph(selection.selectedNode)'>Add to graph</button>
+    </h2>
+    <!-- add to graph button-->
+    <!-- node labels-->
+
+    <labels node="selection.selectedNode" navpath="/admin/main/node/{label}/view" ></labels>
+

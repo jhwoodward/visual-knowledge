@@ -30,18 +30,24 @@
             $scope.$watch('items', function (items) {
 
                 if (items && items.length) {
+                     console.log(items);
+                    
 
-                    if (items[0] && (items[0].Label || items[0].Lookup)) {
-                      
+                    if (items[0] && (items[0].label || items[0].lookup)) {
+                     
                         $scope.nodes = items;
 
                     }
                     else {
                         directBinding = false;
-                        $scope.nodes = items.map(function (e) { return { Label: e } });
+                        $scope.nodes = items.map(function (e) { return { label: e } });
 
 
                     }
+                    
+                    console.log($scope.nodes);
+                    
+                    
                 }
                 else {
                     if (directBinding) {
@@ -78,7 +84,7 @@
             //}
 
             $scope.getClass = function (node) {
-                return utils.getLabelClass($scope.node, node.Label);
+                return utils.getLabelClass($scope.node, node.label);
             }
 
             $scope.clickable = $attrs["onselected"] != undefined;
@@ -98,7 +104,7 @@
 
                 $($scope.nodes).each(function (i, e) {
 
-                    if ((node.Label && e.Label === node.Label) || node.Lookup && e.Lookup == node.Lookup) {
+                    if ((node.label && e.label === node.label) || node.lookup && e.lookup == node.lookup) {
                         ind = i;
                         return;
                     }
@@ -117,7 +123,7 @@
   
                     if (!directBinding) {
                         console.log('item adding');
-                        $scope.items.push(node.Label)
+                        $scope.items.push(node.label)
 
                     }
 
@@ -137,7 +143,7 @@
                     $scope.nodes.splice(ind, 1);
 
                     if (!directBinding) {
-                        $scope.items.splice($scope.items.indexOf(node.Label||node.Lookup), 1);
+                        $scope.items.splice($scope.items.indexOf(node.label||node.lookup), 1);
                     }
 
                 }

@@ -10,7 +10,7 @@
             ,
             items: '=?'
             ,
-            navpath: '@?'
+            navpath: '@'
             ,
             highlight:'@?'
         },
@@ -18,56 +18,30 @@
 
             $scope.$watch('node', function (node) {
                 if (node) {
-                    setLabels();
+                    $scope.labels = $scope.node.labels;
                 }
           
             });
 
             $scope.$watch('items', function (items) {
                 if (items) {
-                    $scope.labels = $scope.items.map(function (x) {return x.Label });
+                    $scope.labels = $scope.items.map(function (x) {return x.label });
                 }
               
             });
 
 
-            //$scope.$watch('labels', function () {
-            //   setLabels()
-            //});
-
-            function setLabels() {
-
-                $scope.labels = $attrs["labels"] ? $scope.labels : $scope.node ? $scope.node.labels : [];
-
-            }
-
-            if ($attrs['node']) {
-
-                $scope.navigate = function (label) {
-                    //load full node including labels and relationships
-                    neo.getNodeByLabel(label,true)
-                        .then(function (node) {
-
-                            $scope.node = node;
-
-                        });
-
-                }
-            }
-
-            if ($attrs['navpath']) {
-                $scope.navpath = $attrs['navpath'];
-            }
-
-
+    
            
-                $scope.getClass = function (label) {
+            $scope.getClass = function (label) {
                     if (label === $attrs['highlight']) { 
                         return 'label-warning';
                     }
                     else
                 return utils.getLabelClass($scope.node, label);
             }
+
+
 
 
 

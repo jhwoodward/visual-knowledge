@@ -2,7 +2,7 @@
     <!--tab-header background-->
     <div class="row">
 
-
+<!--
         <div class="col-sm-6 ">
             <form class="form-inline">
                     <input type="text" class="form-control" ng-model="page" />
@@ -12,14 +12,15 @@
            
         </div>
         <div class="col-sm-6" >
+          
+        </div>
+          -->
             <a class="wikidropdown" ng-show="tabs && tabs.length">{{activeTab.header}} <b style="opacity: 0.5" class="caret"></b></a>
             <ul ng-show="tabs && tabs.length" class="dropdown-menu">
                 <li ng-repeat="tab in tabs" style="overflow: hidden;line-height: 1.8em;">
                     <a style="cursor: pointer; color: #666; font-size: 1.5em;" ng-click="setActiveTab(tab)">{{tab.header}}</a>
                 </li>
             </ul>
-        </div>
-          
       
      
            

@@ -12,21 +12,31 @@
 
 
                 <div class="tab-content" ng-switch-when="Properties"  >
-                    <ui-view name="editnode"></ui-view>
-                    <ui-view name="viewnode"></ui-view>
+                    <ui-view name="properties"></ui-view>
+                    <ui-view name="editproperties"></ui-view>
+                   
                 </div>
+                
 
                 <!-- relationships - shows links to graphs or related images (if selected node is a picture)-->
                 <div class="tab-content" ng-switch-when="Relationships">
+                    
+                    <ui-view name="relationships"></ui-view>
+                    <ui-view name="editrelationships"></ui-view>
+                    
+                    <!--
                     <graph-types  node="selection.selectedNode">
                     </graph-types>
                     <image-relationships  ng-if="selection.selectedNode.temp.isPicture || selection.selectedNode.temp.isFavourite" node="selection.selectedNode"></image-relationships>
+                -->
                 </div>
+                
+                
                 <nodegraphpanel ng-switch-when="Graph" active="selectedTab==='Graph'"
                                 node="selection.selectedNode"
                                 class="tab-content"></nodegraphpanel>
 
-                <nodeimages ng-switch-when="Images" active="selectedTab==='Images'"
+                <nodeimages ng-switch-when="Pictures" active="selectedTab==='Pictures'"
                             node="selection.selectedNode"
                          
                             class="tab-content" ></nodeimages>

@@ -2,7 +2,7 @@
 .factory("settings", function () {
 
     return {
-        apiRoot : 'http://ideas.api.visualsystems.org'
+        apiRoot : 'http://localhost:1337'
     }
 
 });

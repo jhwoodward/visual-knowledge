@@ -1,5 +1,5 @@
 ﻿angular.module('neograph.neo.client',['ngResource','neograph.settings'])
-.factory("neoClient", ['$http', '$resource','settings', function ($http, $resource,settings) {
+.factory("neoClient", ['$resource','settings', function ($resource,settings) {
     //return $resource('http://localhost:1337/node/match', {txt:'@txt',restrict:'@restrict'}, {
     //    matchNodes: {
     //        method: 'POST',
@@ -21,36 +21,26 @@
     return {
 
         node:$resource(null,null, {
-            match: {
-                url: root+'/node/match',
+            search: {
+                url: root+'/search',
             
                 method: 'POST',
                 isArray: true
             }
             ,
             get: {
-                url: root+'/node/:id',
+                url: root+'/node/get/:id',
+                method: 'GET',
+            }
+            ,
+            getWithRels: {
+                url: root + '/node/getWithRels/:id',
                 method: 'GET',
             }
                    ,
             getRelationships: {
                 url: root + '/node/relationships/:id',
                 method: 'GET',
-            }
-            ,
-            getWithRels: {
-                url: root + '/nodeWithRels/:id',
-                method: 'GET',
-            }
-            ,
-            getByLabel: {
-                url: root + '/nodeByLabel/:label',
-                method: 'GET',
-            }
-            ,
-            getWithRelsByLabel: {
-                url: root + '/nodeWithRelsByLabel/:label',
-                method: 'GET'
             }
             ,
             getOne: {
