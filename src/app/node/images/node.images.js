@@ -1,17 +1,14 @@
 ﻿angular.module('neograph.node.images',['neograph.neo'])
-    .directive('nodeimages', ['neo', function (neo) {
-    return {
-        replace: true,
-        restrict: 'E',
-        templateUrl: 'app/node/images/node.images.html',
-        scope: {
-            node: '='
-            , active: '='
-            , updatemasonry:'=' //required to pass on to images. if defined then masonry not used
-        },
-        link: function ($scope, $element, $attrs) {
+    .controller('NodeImagesCtrl', ['neo', function (neo) {
+  
 
             $scope.images = [];
+            
+            if ($stateParams.node){
+                nodeService.get($stateParams.node,true).then(function(node){
+                        $scope.node = node;
+                    }); 
+            }
 
             var loaded = false;
 
@@ -52,6 +49,5 @@
 
             }
 
-        }
-    }
-}])
+    
+}]);

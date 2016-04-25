@@ -12,6 +12,10 @@
             var rel = this.relationships[relKey];
             rel.predicate = predicateFactory.create(rel.predicate);
         }
+        
+        if (!this.label && this.lookup){
+            this.label = this.lookup;
+        }
                         
         
     }
@@ -21,6 +25,20 @@
         return this.labels.indexOf("Picture") > -1;
 
     };
+    
+     Node.prototype.isPerson = function(){
+        
+        return this.labels.indexOf("Person") > -1;
+
+    };
+    
+     Node.prototype.isProperty = function(){
+        
+        return this.labels.indexOf("Property") > -1;
+
+    };
+    
+     
     
     Node.prototype.isCustomField = function(key){
     

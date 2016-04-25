@@ -27,6 +27,11 @@ angular.module('neograph.node',[
                         controller:'NodeCtrl',
                         templateUrl:'app/node/node.html'
                     }
+                    ,
+                      'nodeimages@admin':{
+                        controller:'NodeImagesCtrl',
+                        templateUrl:'app/node/images/node.images.html'
+                    }
              
             }
             
@@ -248,19 +253,13 @@ angular.module('neograph.node',[
     });
     */
 
-    $scope.tabs = ["Properties","Relationships"];
+    $scope.tabs = ["Properties","Relationships","Images"];
     $scope.selectedTab = "Properties";
     $scope.selectTab = function (tab) {
         $scope.selectedTab = tab;
     }
 
 
-   
-
- 
-
-
-    
     
     
 }) 

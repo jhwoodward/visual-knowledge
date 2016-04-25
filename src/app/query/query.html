@@ -1,6 +1,27 @@
-  <div class="grad1" style='height:200px'>
+<!-- a tab for each view, shows either graph or images directive depending on view.type-->
 
-         <query ng-repeat="(key,value) in views"
-          ng-show="value==activeView" view="value" 
-          defaultpreset="defaultpreset"         editable="true" ></query>
-  </div>
+<tabs  selected="selectedTab">
+    <tab-pane ng-repeat="(key,value) in queries" title="value.name" key="{{key}}" >
+
+         <queryinput style="position:absolute;top:-50px;right:0;z-index:9999"
+          query="value" 
+          defaultpreset="defaultpreset" editable="false" >
+          </queryinput>
+        
+        <div  ng-switch="value.render">
+              
+            <graph ng-switch-when="Graph"
+                    data="value.data"
+                    active="active===value">
+            </graph>
+
+            <!-- editing = true makes this different from the images list display in tabs-->
+            <images ng-switch-when="Grid" style="padding-left:20px; overflow-y:auto;"
+                    nodes="value.data.nodes"
+                    active="active===value"
+                    editing="true"></images>
+                    
+       </div>     
+
+    </tab-pane>
+</tabs>

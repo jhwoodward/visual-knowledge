@@ -1,30 +1,62 @@
 ﻿angular.module('neograph.edge',['neograph.neo', 'neograph.utils','ui.router'])
     .config(function($stateProvider){
-         $stateProvider.state('neograph.admin.edge',{
-            url:'edge/:edge',
+         $stateProvider.state('admin.main.edge',{
+            url:'/edge/:edge',
+            //abstract:true,
             views:{
-                      'edge@':{
-                        controller:'controller.edge',
-                        templateUrl:'app/edge/edge.html'
+                    'edgeHeader@admin':{
+                        controller:function ($scope,$stateParams) {
+                            if ($stateParams.edge){
+                                $scope.edge=JSON.parse($stateParams.edge);
+                            }
+                        },
+                        templateUrl:'app/edge/edge.header.html'
                     }
                     ,
-                      'edgeHeader@':{
-                        controller:'controller.edgeHeader',
-                        templateUrl:'app/edge/edgeHeader.html'
+                      'edge@admin':{
+                        controller:function($scope){
+                             $scope.tabs = ["Properties"];
+                             $scope.selectedTab = "Properties";
+                             $scope.selectTab = function (tab) {
+                                    $scope.selectedTab = tab;
+                                }
+                        }
+                        ,
+                        templateUrl:'app/edge/edge.html'
                     }
             }
             
+        })
+        .state('admin.main.edge.view',{
+            url:'/view',
+            views:{
+                     'properties@admin.main.edge':{
+                        templateUrl:'app/edge/properties.html',
+                        controller:function ($scope,$stateParams) {
+                            if ($stateParams.edge){
+                                $scope.edge=JSON.parse($stateParams.edge);
+                            }
+                        }
+                    }
+            }
+            
+        })
+        .state('admin.main.edge.edit',{
+            url:'/edit',
+            views:{
+          
+                    'editproperties@admin.main.edge':{
+                       templateUrl:'app/edge/properties.edit.html',
+                       controller:'EditEdgeCtrl'
+                    }
+                    
+            }
+            
         });
+      
     })
-    .controller('controller.edgeHeader',function($scope,$stateParams){
-        
-           if ($stateParams.edge){
-                $scope.edge=JSON.parse($stateParams.edge);
-    
-           }
-           
-    })
-    .controller('controller.edge', function (neo, utils,$stateParams,$scope) {
+
+    .controller('EditEdgeCtrl', function (neo, utils,$stateParams,$scope) {
    
             
            if ($stateParams.edge){

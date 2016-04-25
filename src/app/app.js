@@ -8,14 +8,11 @@ var app = angular
     'ngSanitize',
     'neograph.common',
     'neograph.edge',
-    'neograph.graph',
     'neograph.interaction',
     'neograph.layout',
     'neograph.neo',
     'neograph.node',
-    'neograph.query',
-    'neograph.controller.mob'
-   
+    'neograph.query'
     ])
     .config( ($stateProvider, $urlRouterProvider)=> {
 
@@ -37,11 +34,6 @@ var app = angular
                     'query@admin':{
                         controller:'QueryCtrl',
                         templateUrl:'app/query/query.html'
-                    }
-                    ,
-                    'queryResults@admin':{
-                        controller:'QueryResultsCtrl',
-                        templateUrl:'app/query/queryResults.html'
                     }
                     
                 }

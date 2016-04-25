@@ -1,41 +1,82 @@
-angular.module('neograph.query',['neograph.utils','neograph.queryDirective'])
-    .factory('viewService',function(utils){
-        
-        var views = {};
+angular.module('neograph.query',['neograph.query.presets','neograph.queryInput','neograph.query.graph'])
+.factory("queryFactory",function(queryPresets){
+    
+     function Query (key, render) {
 
-        var newView = function (key, type) {
-            var view = utils.newView(key, type);
-            view.key = key;
-            views[key] = view;
-            return view;
+
+
+        this.key = key;
+        this.name = key;
+        this.render = render;
+
+        this.data = {
+            nodes: {},
+            edges: {}
+        }
+        
+        this.body = {q:"",connectAll:false}
+
+
+       this.presets = queryPresets;
+       this.generators = {};
+            
+        if (render === "Graph") {
+         
+            this.generators.nodeGraph = {
+                type: "nodeGraph",
+                options: {}
+            }
         }
 
-        var graphView = newView('Graph', 'Graph');
-        var defaultImageView = newView('Grid', 'Grid');
+        if (render === "Grid") {
+            this.generators.nodeFilter = {
+                type: "nodeFilter",
+                options: {}
+            }
+            this.generators.favouritesFilter = {
+                type: "favouritesFilter",
+                options: {}
+            }
+        }
+
+    }
+
+
+        return {
+              create : function (key, type) {
+                var query = new Query(key, type);
+                return query;
+            }
+        }
+      
+})
+    .factory('queryService',function(queryFactory){
         
-        var activeView = defaultImageView;
-        
-        var cloneView = function () {
-            views[$scope.views[activeView].queryGenerators.nodeFilter.options.node.Lookup] = angular.copy(views[activeView]);
+        var active = queryFactory.create("Query","Graph");
+        var queries = {};
+        queries[active.key] = active;
+
+        var clonequery = function () {
+            queries[$scope.queries[active].generators.nodeFilter.options.node.lookup] = angular.copy(queries[active]);
         }
         
         var listeners = [];
         
         
-        function publishViewChange(){
+        function publishChange(){
             
             for (var i =0;i<listeners.length;i++){
-                listeners[i](activeView);
+                listeners[i](active);
             }
         }
         
         
         return {
-            views:views,
-            activeView:activeView,
-            updateView:function(key){
-                activeView = views[key];
-                publishViewChange();
+            queries:queries,
+            active:active,
+            update:function(key){
+                active = queries[key];
+                publishChange();
             }
             ,
             subscribe:function(callback){
@@ -43,90 +84,21 @@ angular.module('neograph.query',['neograph.utils','neograph.queryDirective'])
             }
         }
         
-    })
-    .controller('QueryCtrl',function($scope,viewService,$stateParams){
-        
-        console.log($stateParams);
-        
-        //todo - should be per view
-        if ($stateParams.querypreset){
-            $scope.defaultpreset = $stateParams.querypreset;
-        }
-        
-        viewService.subscribe(function(activeView){
-            $scope.activeView = activeView;
-        })
-        
-        $scope.views = viewService.views;
-        $scope.activeView = viewService.activeView;
+    })   
 
+    .controller('QueryCtrl',function($scope,queryService){
         
-    })
-    .controller('QueryResultsCtrl',function($scope,viewService){
-        
-        viewService.subscribe(function(activeView){
-            $scope.activeView = activeView;
+        queryService.subscribe(function(active){
+            $scope.active = active;
         })
         
-        $scope.views = viewService.views;
-        $scope.activeView = viewService.activeView;
+        $scope.queries = queryService.queries;
+        $scope.active = queryService.active;
         
-        $scope.selectedTab = $scope.activeView.key;
+        $scope.selectedTab = $scope.active.key;
 
         $scope.$watch('selectedTab',function(key){
-            viewService.updateView(key);
+            queryService.update(key);
         });
         
-       
-/*
-        $scope.$watch('activeView', function (view) {
-            $scope.activeViewKey = view.key;
-       //     shouldEnabledAddToGraph();
-        });
-
-        $scope.$watch('activeViewKey', function (key) {
-            $scope.activeView = $scope.views[key];
-        });
-        
-        */
-        /*
-        $scope.subscribe("query", function (query) {
-
-            if (query && (query.q || query.queryGenerator)) {
-
-                if (!query.view) {
-                    query.view = query.type;
-                }
-
-                var view = $scope.views[query.view];
-
-                if (view) {
-                    //reset name incase it changed due to node filter
-                    view.name = query.view;
-                }
-                else {
-
-                    view = newView(query.view, query.type);//view = view key, type = "Graph" or "Grid"
-                }
-
-                if (query.queryGenerator) {
-                    var qg = view.queryGenerators[query.queryGenerator.id];
-                    qg.options = query.queryGenerator.options;
-                    view.queryGenerator = qg;
-
-                }
-                else {
-                    view.query = query;
-                }
-
-                $scope.activeView = view;
-
-            }
-
-        });
-
-*/
-        
-        
-    });
-    
+    })

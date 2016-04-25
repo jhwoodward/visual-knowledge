@@ -1,0 +1,31 @@
+﻿<div ng-form name="edgeForm" >
+
+    <div style="float: left; width: 125px">
+        <label>From</label>
+        <div>{{edge.start.lookup}}</div>
+    </div>
+
+    <div style="float: left; width: 250px">
+        <label>Predicate</label>
+        <div>{{edge.predicate.toString()}}
+    </div>
+
+    <div style="float: left; width: 125px">
+        <label>To</label>
+        <div>{{edge.end.lookup}}</div>
+    </div>
+
+
+    <div style="margin-top: 20px; margin-bottom: 20px">
+
+        <div style="float: left; width: 125px">
+            <label>Weight</label>
+            <div>{{edge.properties.weight}}</div>
+        </div>
+        <div style="float: left; width: 456px">
+            <label>Text</label>
+            <div>{{edge.properties.text}}</div>
+        </div>
+    </div>
+</div>
+

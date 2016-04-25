@@ -33,6 +33,9 @@
     "run-sequence": "^1.1.5"
   },
   "scripts": {
+    "prestart": "gulp build",
+    "predev":"gulp build",
+    "dev":"gulp watch",
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

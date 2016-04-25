@@ -36,10 +36,12 @@
                                 node="selection.selectedNode"
                                 class="tab-content"></nodegraphpanel>
 
-                <nodeimages ng-switch-when="Pictures" active="selectedTab==='Pictures'"
-                            node="selection.selectedNode"
-                         
-                            class="tab-content" ></nodeimages>
+                <div ng-switch-when="Images"  class="tab-content" >   
+                    
+                    <ui-view name="nodeimages"></ui-view>
+                
+                </div>
+           
 
                 <freebase ng-switch-when="Freebase" active="selectedTab==='Freebase'" node="selection.selectedNode"
                           class="tab-content" ></freebase>
