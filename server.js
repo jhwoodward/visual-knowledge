@@ -1,5 +1,4 @@
-﻿
-var express = require('express');        // call express
+﻿var express = require('express');        // call express
 var app = express();                 // define our app using express
 var bodyParser = require('body-parser');
 
@@ -8,14 +7,10 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-
-//app.use(express.static(__dirname + '/client'));
-
-app.use(express.static('client'));
+app.use(express.static('dist'));
 
 app.get('*', function (req, res) {
-    res.sendFile('client/index.html', { root: __dirname });
-   // res.render('client/index.html');
+    res.sendFile('dist/index.html', { root: __dirname });
 });
 
 var port = process.env.PORT || 50008;

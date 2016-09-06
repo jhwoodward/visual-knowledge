@@ -1,109 +1,73 @@
-﻿angular.module('neograph.query.generator.nodeFilter',['neograph.neo'])
-    .directive('nodeFilter', ['neo', function (neo) {
+﻿angular.module('neograph.query.generator.nodeFilter', ['neograph.neo'])
+    .directive('nodeFilter', neo => ({
+      restrict: 'E',
+      templateUrl: 'app/query/generator/nodeFilter.html',
+      scope: {
+        options: '=',
+        generated: '=',
+        nodechanged: '&?'
+      },
+      link: ($scope) => {
+        $scope.filters = [];
+        $scope.node = {};
+        let labels = [];
 
-    return {
-        restrict: 'E',
-        templateUrl: 'app/query/generator/nodeFilter.html',
-        scope: {
-            options: '='
-            ,
-            generated: '='
-            ,
-            nodechanged: '&?'
-        },
-        link: function ($scope, $element, $attrs) {
+        const getFilters = () => {
+          if (labels && labels.length) {
+            neo.getDistinctLabels(labels).
+                then(l => {
+                  // Remove filter for this node as it is duplicating
+                  labels.forEach(lab => { l.splice(lab.indexOf(l), 1); });
+                  $scope.filters = l;
+                });
+          }
+        };
 
+        const load = () => {
+          if ($scope.node) {
+            labels = [$scope.node.label, 'Picture'];
+            getFilters();
+            $scope.enabledFilters = [];
+            $scope.process();
+          }
+        };
 
-            $scope.filters = [];
-            $scope.node = {};
-            var labels = [];
+        $scope.$watch('options', options => {
+          $scope.node = options.node;
+        });
 
-            $scope.$watch('options', function (options) {
+        $scope.$watch('node', node => {
+          if ($scope.nodechanged) {
+            $scope.nodechanged({ node });
+          }
+          load();
+        });
 
-                console.log('node filter options changed')
-                $scope.node = options.node;
+        $scope.openNode = () => {
+          if ($scope.node) {
+            $scope.publish('selected', { selection:{ nodes:[$scope.node] } });
+          }
+        };
 
-            });
-        
-
-            //$scope.$watch('options.node', function (node) {
-             
-            //    console.log('node filter options.node changed')
-                 
-              
-            //});
-
-            $scope.$watch('node', function (node) {
-                if ($scope.nodechanged) {
-                    $scope.nodechanged({ node: node });
-                }
-                load();
-            });
-        
-            $scope.openNode = function () {
-
-                if ($scope.node) {
-                    $scope.publish('selected',{selection:{nodes:[$scope.node]}})
-                }
+        $scope.process = labs => {
+          if ($scope.node) {
+            if (!labs || !labs.length) {
+              labs = labels;
+            } else {
+              labs = labs.concat(labels);
             }
-
-            var load = function () {
-                if ($scope.node) {
-                    labels = [$scope.node.Label, 'Picture'];
-                    getFilters();
-                    $scope.enabledFilters = [];
-                    $scope.process();
-                }
+            $scope.generated = `
+              match (a:${labs.join(':')}) return a 
+              order by a.Status desc limit 500
+              `;
+            if (labs != labels) {
+              neo.getDistinctLabels(labs).
+                  then(l => { $scope.enabledFilters = l; });
+            } else {
+              $scope.enabledFilters = [];
             }
-
-            var getFilters = function () {
-                console.log('node filter - get filters')
-                console.log(labels);
-                if (labels && labels.length) {
-                    neo.getDistinctLabels(labels)
-                    .then(function (l) {
-
-                        //remove filter for this node as it is duplicating
-                        angular.forEach(labels, function (lab) {
-                            l.splice($.inArray(lab, l), 1);
-                        });
-
-                        $scope.filters = l;
-                        console.log($scope.filters )
-                    });
-                }
-            }
-
-
-            $scope.process = function (labs) {
-
-                if ($scope.node) {
-
-                    if (!labs || !labs.length) {
-                        labs = labels;
-                    }
-                    else {
-                        labs = labs.concat(labels);
-                    }
-
-                    $scope.generated = "match (a:" + labs.join(':') + " ) return a order by a.Status desc limit 500";
-
-                    if (labs != labels) {
-                        neo.getDistinctLabels(labs)
-                          .then(function (l) {
-                              $scope.enabledFilters = l;
-
-                          });
-                    }
-                    else {
-                        $scope.enabledFilters =[];
-                    }
-                }
-            }
-
-
-
-
-        }
-    }
-}])
+          }
+        };
+      }
+    })
+);

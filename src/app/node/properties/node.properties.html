@@ -1,17 +1,9 @@
 ﻿    <div  class="properties">
 
         <div class="row form-group">
-
-            <div class="col-sm-9">
-                <label>Labels</label>
-                <labels navpath="/admin/main/node/{label}/view" labels="node.labels" highlight="{{node.class}}"></labels>
+            <div class="col-sm-12">
+                <labels navpath="/admin/main/node/{label}" labels="node.labels" highlight="{{node.class}}"></labels>
             </div>
-
-            <div ng-if="node.hasOwnProperty('class')" class="col-sm-3 form-group">
-                <label>Class</label>
-                <div>{{node.class}}</div>
-            </div>
-
         </div>
 
         <div ng-if="node.hasOwnProperty('systemInfo')" class="form-group">
@@ -19,13 +11,16 @@
             <div>{{node.systemInfo}}</div>
         </div>
 
-
         <div class="row">
-            <div ng-if="node.hasOwnProperty('lookup')" class="col-xs-6 form-group">
+           <div ng-if="node.hasOwnProperty('class')" class="col-xs-4 form-group">
+                <label>Class</label>
+                <div>{{node.class}}</div>
+            </div>
+            <div ng-if="node.hasOwnProperty('lookup')" class="col-xs-4 form-group">
                 <label>Lookup</label>
                 <div>{{node.lookup}}</div>
             </div>
-            <div ng-if="node.hasOwnProperty('label')" class="col-xs-6 form-group" ng-style="{opacity:node.Label === node.Lookup ? 0.7 : 1}">
+            <div ng-if="node.hasOwnProperty('label')" class="col-xs-4 form-group" ng-style="{opacity:node.Label === node.Lookup ? 0.7 : 1}">
                 <label>
                     Label
                     <!--<span ng-show="node.Label === node.Lookup">(as lookup)</span>-->

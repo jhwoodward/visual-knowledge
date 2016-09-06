@@ -1,47 +1,47 @@
-angular.module('neograph.common.typeaheadSimple',[])
+angular.module('neograph.common.typeaheadSimple', [])
 .directive('typeaheadSimple', [function () {
-    return {
-        restrict: 'E',
-        replace: true,
-        scope: {
-            ngModel: '=?',   //the choice should be an object for 2 way binding with Lookup property
-            source: '='
-        },
-        template: '<input type="text" />',
-        link: function ($scope, element, attrs) {
+  return {
+    restrict: 'E',
+    replace: true,
+    scope: {
+      ngModel: '=?',   // the choice should be an object for 2 way binding with Lookup property
+      source: '='
+    },
+    template: '<input type="text" />',
+    link: function ($scope, element, attrs) {
 
-            var placeholderDefault = "";
+      var placeholderDefault = '';
 
-            var $input = $(element);//.find('input');
-            $input.attr("placeholder", attrs["placeholder"] || placeholderDefault);
-
-
-            $input.typeahead({
-                source: $scope.source,
-                updater: function (item) {
+      var $input = $(element);// .find('input');
+      $input.attr('placeholder', attrs['placeholder'] || placeholderDefault);
 
 
-                    $scope.$apply(function () {
+      $input.typeahead({
+        source: $scope.source,
+        updater: function (item) {
 
 
-                        $scope.ngModel = item;
+          $scope.$apply(function () {
 
 
-                    });
+            $scope.ngModel = item;
 
 
-
-                    return item;
-
-
-                }
-            });
+          });
 
 
 
-
+          return item;
 
 
         }
-    };
+      });
+
+
+
+
+
+
+    }
+  };
 }]);

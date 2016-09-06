@@ -18,7 +18,7 @@ gulp.task('build',['app-js','lib-js','css','html-templates']);
 gulp.task('browser-sync', function() {
   browserSync.init({
     server: {
-      baseDir: 'build'
+      baseDir: 'dist'
     },
   })
 });
@@ -33,7 +33,7 @@ gulp.task('watch',['browser-sync'],function(){
 
 
 gulp.task('clean',function(callback){
-    del(['./build'],{force:true}).then(function(){callback();});
+    del(['./dist'],{force:true}).then(function(){callback();});
 });
 
 gulp.task('app-js', function(cb){
@@ -44,14 +44,11 @@ gulp.task('app-js', function(cb){
      .pipe(concat('bundle.js'))
      .pipe(uglify())
      .pipe(sourcemaps.write('./'))
-     .pipe(gulp.dest('./build'))
+     .pipe(gulp.dest('./dist'))
      .pipe(browserSync.reload({
       stream: true
     }))
 });
-
-
-
 
 gulp.task('lib-js', function(){
     return gulp.src([
@@ -69,14 +66,14 @@ gulp.task('lib-js', function(){
         .pipe(concat('bundle-lib.js'))
         .pipe(uglify())
         .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest('./build'));
+        .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('css', function(cb){
     return gulp.src(['./src/css/style.css','./src/css/vis-custom.css'])
         .pipe(minify())
         .pipe(concat('bundle.css'))
-        .pipe(gulp.dest('./build'))
+        .pipe(gulp.dest('./dist'))
         .pipe(browserSync.reload({
           stream: true
         }))
@@ -85,7 +82,7 @@ gulp.task('css', function(cb){
 gulp.task('html-templates', function () {
   return gulp.src('src/**/*.html')
     .pipe(templateCache())
-    .pipe(gulp.dest('./build'))
+    .pipe(gulp.dest('./dist'))
     .pipe(browserSync.reload({
       stream: true
     }))

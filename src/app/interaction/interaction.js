@@ -1,5 +1,5 @@
-angular.module('neograph.interaction',[
-    'neograph.interaction.draggable',
-    'neograph.interaction.resizable',
-    'neograph.interaction.selectable'
-])
+angular.module('neograph.interaction', [
+  'neograph.interaction.draggable',
+  'neograph.interaction.resizable',
+  'neograph.interaction.selectable'
+]);

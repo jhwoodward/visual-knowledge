@@ -1,8 +1,3 @@
-﻿angular.module('neograph.settings',[])
-.factory("settings", function () {
+﻿angular.module('neograph.settings', [])
+.factory('settings', () => ({ apiRoot: 'http://localhost:1337' }));
 
-    return {
-        apiRoot : 'http://localhost:1337'
-    }
-
-});

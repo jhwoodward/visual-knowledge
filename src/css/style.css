@@ -157,19 +157,6 @@ ul
           transition-property: left, right, top;
 }
 
-/*.propertyTabs .tab-pane
-{
-    padding-left:12px;
-   
-}*/
-
-
-.tabbable { 
-    position: relative;
-       margin-top: -36px;
-}
-
-
 
 
     .propertyTabs textarea {
@@ -177,19 +164,11 @@ ul
     }
 
 .propertyTabs .tab-content {
-    padding:10px;
+    margin-top:10px;
     display:block;
     overflow-y:auto; 
     overflow-x:hidden;
 }
-
-/*fixes height when no tabs visible*/
-.tabbable ul.nav.nav-tabs
-{height:37px
-}
-
-
-
 
 .selected {
      background-color: #3a87ad;color:#FFF
@@ -408,10 +387,6 @@ label {
   border: none;
   box-shadow: none;
 }
-
-
-   
-
 
 .tab-header {
     position:absolute;top:0;

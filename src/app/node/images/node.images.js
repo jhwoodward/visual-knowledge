@@ -1,53 +1,55 @@
-﻿angular.module('neograph.node.images',['neograph.neo'])
-    .controller('NodeImagesCtrl', ['neo', function (neo) {
-  
+﻿(function() {
+  'use strict';
 
-            $scope.images = [];
-            
-            if ($stateParams.node){
-                nodeService.get($stateParams.node,true).then(function(node){
-                        $scope.node = node;
-                    }); 
-            }
+  angular.module('neograph.node.images', ['neograph.neo'])
+    .controller('NodeImagesCtrl', controller);
 
-            var loaded = false;
+  function controller(neo) {
+    $scope.images = [];
 
-            //load images on active change or on node change if active
-            $scope.$watch('active', function (active) {
+    if ($stateParams.node) {
+      nodeService.get($stateParams.node, true).then(function (node) {
+        $scope.node = node;
+      });
+    }
 
-                if ($scope.node && active && !loaded) {
-                    getImages();
-                }
-            });
+    var loaded = false;
 
-            $scope.$watch('node', function (node) {
-                loaded = false;
-                if (!$scope.active) {
-                    $scope.images = [];
-                }
-                if (node && $scope.active) {
-                    getImages();
-                }
-            });
+          // load images on active change or on node change if active
+    $scope.$watch('active', function (active) {
 
-            var getImages = function () {
+      if ($scope.node && active && !loaded) {
+        getImages();
+      }
+    });
 
-                neo.getImages($scope.node).then(function (images) {
-                    $scope.images = images;
-                    loaded = true;
-                })
+    $scope.$watch('node', function (node) {
+      loaded = false;
+      if (!$scope.active) {
+        $scope.images = [];
+      }
+      if (node && $scope.active) {
+        getImages();
+      }
+    });
 
-            }
+    var getImages = function () {
 
-            $scope.openGridTab = function (node) {
+      neo.getImages($scope.node).then(function (images) {
+        $scope.images = images;
+        loaded = true;
+      });
 
-                $scope.publish("query", {
-                    view: node.Lookup,
-                    type: "Grid",
-                    queryGenerator: { id: "nodeFilter", options: { node: node } }
-                });
+    };
 
-            }
+    $scope.openGridTab = function (node) {
 
-    
-}]);
+      $scope.publish('query', {
+        view: node.Lookup,
+        type: 'Grid',
+        queryGenerator: { id: 'nodeFilter', options: { node: node } }
+      });
+
+    };
+  }
+})();

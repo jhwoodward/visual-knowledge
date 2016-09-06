@@ -1,16 +1,8 @@
-﻿  <div style="position: absolute; left: 0px; top: 50px; width: 1300px;"  ui-view="query" >
+﻿<div style="position: absolute; left: 0px; top: 50px; width: 800px;"  ui-view="query"></div>
 
-           
-   </div>
+<div draggable class="dragHandle" style="left: 850px;top:0; height: 1500px;z-index:100"></div>
 
-<!-- drag handle to allow horizontal resizing -->
-<div draggable class="dragHandle" style="left: 1320px;top:0; height: 1500px;z-index:100"></div>
+<ui-view style="position: absolute; left: 850px; top:10px; width: 500px; height: 40px;"  name="search"></ui-view>
+<ui-view style="position: absolute; left: 850px; top:50px; width: 500px; height: 1000px;"  name="panel"></ui-view>
 
-<div style="position: absolute; left: 1330px; width: 500px; height: 1500px;">
-    <div class="grad1" style="height:200px">
-            <div ui-view="nodeSearch" ></div>
-            <div ui-view="nodeHeader" ></div><div ui-view="edgeHeader" ></div>
-    </div>
-        <div ui-view="node" ></div><div ui-view="edge" ></div>
-    
-</div>
+ 
