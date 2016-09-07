@@ -825,75 +825,6 @@ angular.module('neograph.common.typeaheadSimple', [])
   };
 }]);
 
-(function() {
-
-    controller.$inject = ["$scope"];
-    childController.$inject = ["$scope", "$stateParams"];
-  angular.module('neograph.edge.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
-    .controller('EdgeCtrl', controller)
-    .controller('ChildEdgeCtrl', childController);
-
-    function controller ($scope) {
-      var vm = this;
-      vm.tabs = ['Properties'];
-      vm.selectedTab = 'Properties';
-      vm.selectTab = function (tab) {
-        vm.selectedTab = tab;
-      };
-    }
-
-    function childController ($scope, $stateParams) {
-      var vm = this;
-      if ($stateParams.edge) {
-        vm.edge = JSON.parse($stateParams.edge);
-      }
-    }
-
-  })();
-
-
-
-(function() {
-
-  angular.module('neograph.edge', [
-    'neograph.edge.routes', 
-    'neograph.edge.controller',
-    'neograph.edge.properties.edit.controller'
-  ]);
-  
-
-})();
-   
-(function() {
-
-  angular.module('neograph.edge.routes', ['neograph.neo', 'neograph.utils', 'ui.router'])
-    .config(["$stateProvider", function ($stateProvider) {
-      $stateProvider
-      .state('admin.edge', {
-        url:'/edge/:edge',
-        views: {
-          'panel@admin':{
-            templateUrl:'app/edge/edge.html',
-            controller: 'EdgeCtrl as vm'
-          },
-          'properties@admin.edge':{
-            templateUrl:'app/edge/properties.html',
-            controller: 'ChildEdgeCtrl as vm'
-          }
-        }
-      })
-      .state('admin.edge.edit', {
-          url:'/edit',
-          views: {
-            'properties@admin.edge':{
-              templateUrl:'app/edge/properties.edit.html',
-              controller:'EditEdgeCtrl as vm'
-            }
-          }
-        });
-    }]);
-
-})();
 angular.module('neograph.interaction.draggable', [])
     .directive('draggable', function () {
       return {
@@ -1028,6 +959,81 @@ angular.module('neograph.interaction.selectable', [])
 
 
 
+(function() {
+
+    controller.$inject = ["$scope"];
+    childController.$inject = ["$scope", "$stateParams"];
+  angular.module('neograph.edge.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
+    .controller('EdgeCtrl', controller)
+    .controller('ChildEdgeCtrl', childController);
+
+    function controller ($scope) {
+      var vm = this;
+      vm.tabs = ['Properties'];
+      vm.selectedTab = 'Properties';
+      vm.selectTab = function (tab) {
+        vm.selectedTab = tab;
+      };
+    }
+
+    function childController ($scope, $stateParams) {
+      var vm = this;
+      if ($stateParams.edge) {
+        vm.edge = JSON.parse($stateParams.edge);
+      }
+    }
+
+  })();
+
+(function() {
+
+  angular.module('neograph.edge', [
+    'neograph.edge.routes', 
+    'neograph.edge.controller',
+    'neograph.edge.edit.properties.controller'
+  ]);
+
+
+})();
+   
+(function() {
+
+  angular.module('neograph.edge.routes', ['neograph.neo', 'neograph.utils', 'ui.router'])
+    .config(["$stateProvider", function ($stateProvider) {
+      $stateProvider
+      .state('admin.edge', {
+        url:'/edge/:edge',
+        views: {
+          'panel@admin':{
+            templateUrl:'app/edge/edge.html',
+            controller: 'EdgeCtrl as vm'
+          },
+          'header@admin.edge':{
+            templateUrl:'app/edge/edge.header.html',
+            controller: 'EdgeCtrl as vm'
+          },
+          'properties@admin.edge':{
+            templateUrl:'app/edge/properties/edge.properties.html',
+            controller: 'ChildEdgeCtrl as vm'
+          }
+        }
+      })
+      .state('admin.edge.edit', {
+          url:'/edit',
+          views: {
+            'header@admin.edge':{
+              templateUrl:'app/edge/edge.edit.header.html',
+              controller: 'EdgeCtrl as vm'
+            },
+            'properties@admin.edge':{
+              templateUrl:'app/edge/properties/edge.edit.properties.html',
+              controller:'EditEdgeCtrl as vm'
+            }
+          }
+        });
+    }]);
+
+})();
 angular.module('neograph.layout', [])
 .directive('tabs', function () {
   return {
@@ -1284,9 +1290,9 @@ angular.module('neograph.layout', [])
       }
 
       function onNetworkSelect(params) {
-        
         if (params.nodes.length === 1) {
           var node = scope.data.nodes[params.nodes[0]];
+          console.log(node);
           scope.onSelect({node: node});
         } else if (params.edges.length === 1) {
           var id = params.edges[0];
@@ -1302,6 +1308,7 @@ angular.module('neograph.layout', [])
           scope.onSelect({edge: edge});
         }
       }
+    
 
       function onGlobalDeleted(params) {
         if (params.selection.nodes && params.selection.nodes.length) {
@@ -1588,11 +1595,14 @@ angular.module('neograph.map.graph', [
 
   function controller($scope, $state, neo, nodeService, mapService) {
 
-    console.log('map.controller');
     var vm = this;
     vm.data = [];
     vm.onGraphSelect = onGraphSelect;
     vm.node = {};
+    vm.maps = [];
+    vm.selectedMap = {};
+    vm.selectedNode = undefined;
+    vm.goToSelected = goToSelected;
 
     activate();
 
@@ -1601,21 +1611,32 @@ angular.module('neograph.map.graph', [
       $scope.$on('$stateChangeSuccess', setGraph);
 
       function setGraph() {
+        vm.selectedNode = undefined;
         if (!vm.node || vm.node.label !== $state.params.node) {
           nodeService.get($state.params.node, true)
             .then(function (node) {
               vm.node = node;
-              var queries = mapService.getQueries(node);
-              if (queries && queries.length) {
-                getData(queries[0]).then(function(data) {
-                  vm.data = data;
-                });
+              vm.maps = mapService.getQueries(node);
+              if (vm.maps && vm.maps.length) {
+                vm.selectedMap = vm.maps[0];
               }
           });
         }
       }
     }
 
+    $scope.$watch('vm.selectedMap', function(map) {
+      if (map) {
+        getData(map).then(function(data) {
+          vm.data = data;
+        });
+      }
+  
+    })
+
+    function goToSelected() {
+      $state.go('admin.node', {node: vm.selectedNode.label});
+    }
 
     function connectAll (data) {
       return neo.getAllRelationships(data.nodes)
@@ -1637,12 +1658,17 @@ angular.module('neograph.map.graph', [
     }
 
     function onGraphSelect(node, edge) {
+
       if (edge) {
         $state.go('admin.edge', { edge: JSON.stringify(edge) });
       }
       
       if (node) {
-        $state.go('admin.node', { node: node.label });
+        if (node === vm.selectedNode) {
+           $state.go('admin.node', { node: node.label });
+        } else {
+           vm.selectedNode = node;
+        }
       }
     }
 
@@ -1679,7 +1705,7 @@ angular.module('neograph.map', [
       var labels = node.labels;
 
       if (!labels || !label) return [];
-      
+
       if (labels.indexOf('Provenance') > -1) {
         queries.push(
           {
@@ -2463,302 +2489,6 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
 
     }]);
 
-(function() {
-  'use strict';
-
-  controller.$inject = ["$scope", "$state", "$stateParams", "nodeService"];
-  childController.$inject = ["$scope", "$stateParams", "nodeService"];
-  angular.module('neograph.node.controller', [])
-    .controller('NodeCtrl', controller)
-    .controller('ChildNodeCtrl', childController);
-
-  function controller($scope, $state, $stateParams, nodeService) {
-    var vm = this;
-    vm.node = {};
-    vm.tabs = ['Properties', 'Relationships'];
-    vm.selectedTab = 'Properties';
-    vm.selectTab = function (tab) {
-      vm.selectedTab = tab;
-    };
-
-    vm.edit = edit;
-    vm.new
-    vm.cancel = cancel;
-    vm.del = del;
-    vm.destroy = destroy;
-    vm.save = save;
-    vm.restore = restore;
-
-    activate();
-    function activate() {
-      if ($stateParams.node) {
-        nodeService.get($stateParams.node, true).then(function (node) {
-          //set node property on scope - propagates to child controllers
-          vm.node = node;
-          $scope.node = vm.node;
-        });
-      }
-    }
-
-    function edit() {
-      $state.go('admin.node.edit', { node: vm.node.label });
-    }
-
-    function cancel() {
-      $state.go('admin.node', { node: vm.node.label });
-    }
-
-    function del() {
-      nodeService.delete(vm.node)
-        .then(function(deleted) {
-          vm.node = deleted;
-          $scope.node = vm.node;
-          //$scope.publish('deleted', { selection: { nodes: [n] } });
-        });
-    };
-
-    function destroy() {
-      nodeService.destroy(vm.node)
-        .then(function() {
-          vm.node = undefined;
-          $scope.node = vm.node;
-        });
-    };
-
-
-    function save() {
-  
-      nodeService.save(vm.node)
-        .then(function(saved) {
-          vm.node = saved;
-          $scope.node = vm.node;
-        //  var newData = {};
-        //  newData[node.id] = node;
-        //  $scope.publish('dataUpdate', newData);
-          // if type, refresh types
-        //  if (node.class == 'Type') {
-       //     utils.refreshTypes();
-       //   }
-       ///   $(node.temp.links).each((i, e) => { e.editing = undefined; });
-        });
- 
-    };
-
-    function restore() {
-      nodeService.restore(vm.node)
-        .then(function(restored) {
-          vm.node = restored;
-          $scope.node = vm.node;
-        //  var newData = {};
-        //  newData[node.id] = node;
-        //  $scope.publish('dataUpdate', newData);
-      });
-    };
-
-
-  }
-
-  function childController($scope, $stateParams, nodeService) {
-    var vm = this;
-    //set node when loaded by parent controller
-    $scope.$watch('node', function(node) {
-      vm.node = node;
-    });
-  }
-
-})();
-(function() {
-  'use strict';
-
-  angular.module('neograph.node', [
-    'neograph.node.wikipedia',
-    'neograph.node.multiple',
-    'neograph.node.images',
-    'neograph.node.properties',
-    'neograph.node.relationships',
-    'neograph.node.search',
-    'neograph.node.service',
-    'neograph.node.routes',
-    'neograph.node.controller',
-    'ui.router'
-  ]);
-
-})();
-(function() {
-  'use strict';
-  
-  angular.module('neograph.node.routes',[])
-    .config(["$stateProvider", function ($stateProvider) {
-      $stateProvider
-        .state('admin.node', {
-          url:'/node/:node',
-          views: {
-            'panel@admin': {
-              templateUrl: 'app/node/node.html',
-              controller: 'NodeCtrl as vm'
-            },
-            'header@admin.node': {
-              templateUrl: 'app/node/node.header.html',
-              controller: 'NodeCtrl as vm'
-            },
-            'properties@admin.node': {
-              templateUrl: 'app/node/properties/node.properties.html',
-              controller: 'ChildNodeCtrl as vm'
-            },
-            'relationships@admin.node':{
-              templateUrl:'app/node/relationships/node.relationships.html',
-              controller: 'ChildNodeCtrl as vm'
-            },
-            'images@admin.node': {
-              templateUrl:'app/node/images/node.images.html',
-              controller:'NodeImagesCtrl as vm'
-            }
-          }
-        })
-        .state('admin.node.edit', {
-          url:'/edit',
-          views:{
-            'header@admin.node': {
-              templateUrl: 'app/node/node.header.edit.html',
-              controller:'NodeCtrl as vm'
-            },
-            'properties@admin.node':{
-              templateUrl:'app/node/properties/node.properties.edit.html',
-              controller:'EditPropertiesCtrl as vm'
-            },
-            'relationships@admin.node':{
-              templateUrl:'app/node/relationships/node.relationships.edit.html',
-              controller:'EditRelationshipsCtrl as vm'
-            }
-          }
-        });
-    }]);
-})();
-
-(function() {
-  'use strict';
-
-  service.$inject = ["neoClient", "utils", "$q", "nodeFactory"];
-  angular.module('neograph.node.service',[])
-    .factory('nodeService', service);
-
-  function service(neoClient, utils, $q, nodeFactory) {
-
-    var lastLoadedNode = {};
-
-    var api = {
-      setPropsAndTabsFromLabels: function (node) {
-        return neoClient.node.setPropsAndTabs({ node:node }).$promise.then(function (data) {
-          return data.toJSON();
-        });
-      },
-      get: function (label, addrelprops) {
-        if (addrelprops) {
-          if (lastLoadedNode && (label === lastLoadedNode.label || label === lastLoadedNode.id)) {
-            return $q.when(lastLoadedNode);
-          }
-          else {
-            return neoClient.node.getWithRels({ id: label }).$promise.then(function (node) {
-              lastLoadedNode = nodeFactory.create(node.toJSON());
-              return lastLoadedNode;
-            });
-          }
-        }
-        else {
-          return neoClient.node.get({ id: label }).$promise.then(function (node) {
-            return node.toJSON();
-          });
-        }
-      },
-      getList: function (q, limit) { // q = match (n) & where only (without return)
-        return neoClient.node.getList({ q: q, limit: limit }).$promise;// returns array
-      },
-      // short version for freebase prop saving
-      saveWikipagename: function (n) {
-        return neoClient.node.saveWikipagename({
-          id: n.id,
-          name: n.Wikipagename
-        })
-        .$promise.then(function (data) {
-          return data.toJSON();
-        });
-      },
-      getImages:function (node) {
-        return neoClient.node.getImages({
-          id: node.id,
-          isPicture: node.temp.isPicture,
-          isGroup: node.temp.isGroup
-        }).$promise;// returns array
-      },
-      saveProps: function (n) {// short version for freebase prop saving
-        return neoClient.node.saveProps({ node: n, user: user })
-          .$promise.then(function (data) {
-            return data.toJSON();
-          });
-      },
-      getProps: function (labels) {
-        return neoClient.node.getProps({ labels: labels })
-          .$promise.then(function (data) {
-            return data.toJSON();
-          });
-      },
-      save: function (n, user) {
-        if (n.temp.trimmed) {
-          throw ('Node is trimmed - cannot save');
-        }
-        return neoClient.node.save({ node: n, user: user })
-          .$promise.then(function (data) {
-            return data.toJSON();
-          });
-      },
-      saveRels: function (n) {
-        return neoClient.node.saveRels({ node: n })
-          .$promise.then(function (data) {
-            return data.toJSON();
-          });
-      },
-      // deletes node and relationships forever
-      destroy: function (node) {
-        return neoClient.node.destroy({ node: node })
-          .$promise.then(function (data) {
-            return data.toJSON();
-          });
-      },
-      // only supports 1 node at the mo
-      delete: function (node) {
-        var deferred = $q.deferred();
-        if (node && node.id) {
-          return neoClient.node.delete({ node: node })
-            .$promise.then(function (data) {
-              deferred.resolve(data.toJSON());
-            });
-        } else {
-          deferred.resolve({});
-        }
-      },
-      // only supports 1 node at the mo
-      restore: function (node) {
-        var deferred = $q.deferred();
-        if (node && node.id) {
-          neoClient.node.restore({ node: node })
-            .$promise.then(function (data) {
-              deferred.resolve(data.toJSON());
-            });
-        } else {
-          deferred.resolve({});
-        }
-        return deferred.promise;
-      },
-      search: function (txt, restrict) { // restrict = labels to restrict matches to
-        if (txt) {
-          return neoClient.node.search({ txt: txt, restrict: restrict }).$promise;// returns array
-        }
-      }
-    };
-    return api;
-
-  }
-})();
 angular.module('neograph.query',
 ['neograph.query.presets', 'neograph.queryInput', 'neograph.query.graph'])
 .factory('queryFactory', queryPresets => {
@@ -3066,9 +2796,310 @@ angular.module('neograph.queryInput',
 );
 
 (function() {
+  'use strict';
+
+  controller.$inject = ["$scope", "$state", "$stateParams", "nodeService"];
+  childController.$inject = ["$scope", "$stateParams", "nodeService"];
+  angular.module('neograph.node.controller', [])
+    .controller('NodeCtrl', controller)
+    .controller('ChildNodeCtrl', childController);
+
+  function controller($scope, $state, $stateParams, nodeService) {
+    var vm = this;
+    vm.node = {};
+    vm.tabs = ['Properties', 'Relationships'];
+    vm.selectedTab = 'Properties';
+    vm.selectTab = function (tab) {
+      vm.selectedTab = tab;
+    };
+
+    vm.edit = edit;
+    vm.new = newNode;
+    vm.cancel = cancel;
+    vm.del = del;
+    vm.destroy = destroy;
+    vm.save = save;
+    vm.restore = restore;
+
+    activate();
+    function activate() {
+      if ($stateParams.node) {
+        nodeService.get($stateParams.node, true).then(function (node) {
+          //set node property on scope - propagates to child controllers
+          vm.node = node;
+          $scope.node = vm.node;
+        });
+      }
+    }
+
+    function newNode() {
+      vm.node = node;
+      $scope.node = vm.node;
+    }
+
+    function edit() {
+      $state.go('admin.node.edit', { node: vm.node.label });
+    }
+
+    function cancel() {
+      $state.go('admin.node', { node: vm.node.label });
+    }
+
+    function del() {
+      nodeService.delete(vm.node)
+        .then(function(deleted) {
+          vm.node = deleted;
+          $scope.node = vm.node;
+          //$scope.publish('deleted', { selection: { nodes: [n] } });
+        });
+    };
+
+    function destroy() {
+      nodeService.destroy(vm.node)
+        .then(function() {
+          vm.node = undefined;
+          $scope.node = vm.node;
+        });
+    };
+
+
+    function save() {
+  
+      nodeService.save(vm.node)
+        .then(function(saved) {
+          vm.node = saved;
+          $scope.node = vm.node;
+        //  var newData = {};
+        //  newData[node.id] = node;
+        //  $scope.publish('dataUpdate', newData);
+          // if type, refresh types
+        //  if (node.class == 'Type') {
+       //     utils.refreshTypes();
+       //   }
+       ///   $(node.temp.links).each((i, e) => { e.editing = undefined; });
+        });
+ 
+    };
+
+    function restore() {
+      nodeService.restore(vm.node)
+        .then(function(restored) {
+          vm.node = restored;
+          $scope.node = vm.node;
+        //  var newData = {};
+        //  newData[node.id] = node;
+        //  $scope.publish('dataUpdate', newData);
+      });
+    };
+
+
+  }
+
+  function childController($scope, $stateParams, nodeService) {
+    var vm = this;
+    //set node when loaded by parent controller
+    $scope.$watch('node', function(node) {
+      vm.node = node;
+    });
+  }
+
+})();
+(function() {
+  'use strict';
+
+  angular.module('neograph.node', [
+    'neograph.node.wikipedia',
+    'neograph.node.multiple',
+    'neograph.node.images',
+    'neograph.node.properties',
+    'neograph.node.relationships',
+    'neograph.node.search',
+    'neograph.node.service',
+    'neograph.node.routes',
+    'neograph.node.controller',
+    'ui.router'
+  ]);
+
+})();
+(function() {
+  'use strict';
+  
+  angular.module('neograph.node.routes',[])
+    .config(["$stateProvider", function ($stateProvider) {
+      $stateProvider
+        .state('admin.node', {
+          url:'/node/:node',
+          views: {
+            'panel@admin': {
+              templateUrl: 'app/node/node.html',
+              controller: 'NodeCtrl as vm'
+            },
+            'header@admin.node': {
+              templateUrl: 'app/node/node.header.html',
+              controller: 'NodeCtrl as vm'
+            },
+            'properties@admin.node': {
+              templateUrl: 'app/node/properties/node.properties.html',
+              controller: 'ChildNodeCtrl as vm'
+            },
+            'relationships@admin.node':{
+              templateUrl:'app/node/relationships/node.relationships.html',
+              controller: 'ChildNodeCtrl as vm'
+            },
+            'images@admin.node': {
+              templateUrl:'app/node/images/node.images.html',
+              controller:'NodeImagesCtrl as vm'
+            }
+          }
+        })
+        .state('admin.node.edit', {
+          url:'/edit',
+          views:{
+            'header@admin.node': {
+              templateUrl: 'app/node/node.edit.header.html',
+              controller:'NodeCtrl as vm'
+            },
+            'properties@admin.node':{
+              templateUrl:'app/node/properties/node.edit.properties.html',
+              controller:'EditPropertiesCtrl as vm'
+            },
+            'relationships@admin.node':{
+              templateUrl:'app/node/relationships/node.edit.relationships.html',
+              controller:'EditRelationshipsCtrl as vm'
+            }
+          }
+        });
+    }]);
+})();
+
+(function() {
+  'use strict';
+
+  service.$inject = ["neoClient", "utils", "$q", "nodeFactory"];
+  angular.module('neograph.node.service',[])
+    .factory('nodeService', service);
+
+  function service(neoClient, utils, $q, nodeFactory) {
+
+    var lastLoadedNode = {};
+
+    var api = {
+      setPropsAndTabsFromLabels: function (node) {
+        return neoClient.node.setPropsAndTabs({ node:node }).$promise.then(function (data) {
+          return data.toJSON();
+        });
+      },
+      get: function (label, addrelprops) {
+        if (addrelprops) {
+          if (lastLoadedNode && (label === lastLoadedNode.label || label === lastLoadedNode.id)) {
+            return $q.when(lastLoadedNode);
+          }
+          else {
+            return neoClient.node.getWithRels({ id: label }).$promise.then(function (node) {
+              lastLoadedNode = nodeFactory.create(node.toJSON());
+              return lastLoadedNode;
+            });
+          }
+        }
+        else {
+          return neoClient.node.get({ id: label }).$promise.then(function (node) {
+            return node.toJSON();
+          });
+        }
+      },
+      getList: function (q, limit) { // q = match (n) & where only (without return)
+        return neoClient.node.getList({ q: q, limit: limit }).$promise;// returns array
+      },
+      // short version for freebase prop saving
+      saveWikipagename: function (n) {
+        return neoClient.node.saveWikipagename({
+          id: n.id,
+          name: n.Wikipagename
+        })
+        .$promise.then(function (data) {
+          return data.toJSON();
+        });
+      },
+      getImages:function (node) {
+        return neoClient.node.getImages({
+          id: node.id,
+          isPicture: node.temp.isPicture,
+          isGroup: node.temp.isGroup
+        }).$promise;// returns array
+      },
+      saveProps: function (n) {// short version for freebase prop saving
+        return neoClient.node.saveProps({ node: n, user: user })
+          .$promise.then(function (data) {
+            return data.toJSON();
+          });
+      },
+      getProps: function (labels) {
+        return neoClient.node.getProps({ labels: labels })
+          .$promise.then(function (data) {
+            return data.toJSON();
+          });
+      },
+      save: function (n, user) {
+        if (n.temp.trimmed) {
+          throw ('Node is trimmed - cannot save');
+        }
+        return neoClient.node.save({ node: n, user: user })
+          .$promise.then(function (data) {
+            return data.toJSON();
+          });
+      },
+      saveRels: function (n) {
+        return neoClient.node.saveRels({ node: n })
+          .$promise.then(function (data) {
+            return data.toJSON();
+          });
+      },
+      // deletes node and relationships forever
+      destroy: function (node) {
+        return neoClient.node.destroy({ node: node })
+          .$promise.then(function (data) {
+            return data.toJSON();
+          });
+      },
+      // only supports 1 node at the mo
+      delete: function (node) {
+        var deferred = $q.deferred();
+        if (node && node.id) {
+          return neoClient.node.delete({ node: node })
+            .$promise.then(function (data) {
+              deferred.resolve(data.toJSON());
+            });
+        } else {
+          deferred.resolve({});
+        }
+      },
+      // only supports 1 node at the mo
+      restore: function (node) {
+        var deferred = $q.deferred();
+        if (node && node.id) {
+          neoClient.node.restore({ node: node })
+            .$promise.then(function (data) {
+              deferred.resolve(data.toJSON());
+            });
+        } else {
+          deferred.resolve({});
+        }
+        return deferred.promise;
+      },
+      search: function (txt, restrict) { // restrict = labels to restrict matches to
+        if (txt) {
+          return neoClient.node.search({ txt: txt, restrict: restrict }).$promise;// returns array
+        }
+      }
+    };
+    return api;
+
+  }
+})();
+(function() {
 
     editController.$inject = ["neo", "utils", "$stateParams", "$scope"];
-  angular.module('neograph.edge.properties.edit.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
+  angular.module('neograph.edge.edit.properties.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
     .controller('EditEdgeCtrl', editController);
 
     function editController(neo, utils, $stateParams, $scope) {
@@ -3119,24 +3150,318 @@ angular.module('neograph.queryInput',
 
 
 
-(function() {
-  'use strict';
+angular.module('neograph.query.generator.favouritesFilter', ['neograph.neo'])
+.directive('favouritesFilter', neo => ({
+  restrict: 'E',
+  templateUrl: 'app/query/generator/favouritesFilter.html',
+  scope: {
+    options: '=',
+    generated: '='
+  },
+  link: ($scope, $element, $attrs) => {
+    $scope.filters = [];
+    $scope.node = {};
+    let labels = [];
+    $scope.$watch('options', function (options) {
+      if (options) {
+        $scope.node = options.user;
+      }
+    });
 
-  controller.$inject = ["$scope", "$stateParams", "neo", "nodeService"];
-  angular.module('neograph.node.images', ['neograph.neo', 'ui.router'])
-    .controller('NodeImagesCtrl', controller);
+    $scope.$watch('node', function (user) {
+      load();
+    });
 
-  function controller($scope, $stateParams, neo, nodeService) {
-    var vm = this;
-    vm.images = [];
-    if ($stateParams.node) {
-      neo.getImages($stateParams.node).then(function (images) {
-        vm.images = images;
-        loaded = true;
-      });
-    }
+    const load = function () {
+      if ($scope.node) {
+        labels = [$scope.node.Lookup, 'Favourite'];
+        getFilters();
+        $scope.enabledFilters = [];
+        $scope.process();
+      }
+
+    };
+
+    const getFilters = function () {
+      if (labels && labels.length) {
+        const labelQuery = `match (a:${labels.join(':')}) - [] -> (b) return distinct(LABELS(b))`;
+        neo.getDistinctLabelsQuery(labelQuery).
+            then(l => {
+                // remove filter for this node as it is duplicating
+              angular.forEach(labels, function (lab) {
+                l.splice($.inArray(lab, l), 1);
+              });
+              $scope.filters = l;
+            });
+      }
+    };
+
+    $scope.process = labs => {
+      if ($scope.node) {
+        labs = labs || [];
+        let b = 'b';
+        if (labs.length) {
+          b += `:${labs.join(':')}`;
+        }
+        const q = `match (a:${labels.join(':')}) - [] -> (${b})`;
+        $scope.generated = `${q} return b`;
+        if (labs.length) {
+          neo.getDistinctLabelsQuery(`${q}  return distinct(LABELS(b))`).
+              then(l => { $scope.enabledFilters = l; });
+        } else {
+          $scope.enabledFilters = [];
+        }
+      }
+    };
   }
-})();
+})
+);
+
+angular.module('neograph.query.generator.nodeFilter', ['neograph.neo'])
+    .directive('nodeFilter', neo => ({
+      restrict: 'E',
+      templateUrl: 'app/query/generator/nodeFilter.html',
+      scope: {
+        options: '=',
+        generated: '=',
+        nodechanged: '&?'
+      },
+      link: ($scope) => {
+        $scope.filters = [];
+        $scope.node = {};
+        let labels = [];
+
+        const getFilters = () => {
+          if (labels && labels.length) {
+            neo.getDistinctLabels(labels).
+                then(l => {
+                  // Remove filter for this node as it is duplicating
+                  labels.forEach(lab => { l.splice(lab.indexOf(l), 1); });
+                  $scope.filters = l;
+                });
+          }
+        };
+
+        const load = () => {
+          if ($scope.node) {
+            labels = [$scope.node.label, 'Picture'];
+            getFilters();
+            $scope.enabledFilters = [];
+            $scope.process();
+          }
+        };
+
+        $scope.$watch('options', options => {
+          $scope.node = options.node;
+        });
+
+        $scope.$watch('node', node => {
+          if ($scope.nodechanged) {
+            $scope.nodechanged({ node });
+          }
+          load();
+        });
+
+        $scope.openNode = () => {
+          if ($scope.node) {
+            $scope.publish('selected', { selection:{ nodes:[$scope.node] } });
+          }
+        };
+
+        $scope.process = labs => {
+          if ($scope.node) {
+            if (!labs || !labs.length) {
+              labs = labels;
+            } else {
+              labs = labs.concat(labels);
+            }
+            $scope.generated = `
+              match (a:${labs.join(':')}) return a 
+              order by a.Status desc limit 500
+              `;
+            if (labs != labels) {
+              neo.getDistinctLabels(labs).
+                  then(l => { $scope.enabledFilters = l; });
+            } else {
+              $scope.enabledFilters = [];
+            }
+          }
+        };
+      }
+    })
+);
+
+angular.module('neograph.query.generator.nodeGraph', ['neograph.neo'])
+    .directive('nodeGraph', neo => ({
+      restrict: 'E',
+      templateUrl: 'app/query/generator/nodeGraph.html',
+      scope: {
+        options: '=',
+        generated: '=',
+        nodechanged: '&?'
+      },
+      link: ($scope) => {
+        $scope.querys = [];
+        $scope.selected = '';
+        $scope.node = {};
+        $scope.$watch('options', options => {
+          $scope.node = options.node;
+        });
+
+        $scope.$watch('selected', sel => {
+          if (sel && sel.q) {
+            $scope.generated = sel.q;
+          }
+        });
+
+        $scope.$watch('node', node => {
+          if (node && node.id) {
+            if ($scope.nodechanged) {
+              $scope.nodechanged({ node });
+            }
+            neo.getNode(node.id, false).
+              then(loaded => {
+                getQuerys(loaded);
+              });
+          }
+        });
+
+        $scope.openNode = () => {
+          if ($scope.node) {
+            $scope.publish('selected', { selection: { nodes: [$scope.node] } });
+          }
+        };
+
+        function getQuerys(node) {
+          if (node) {
+            const querys = [];
+            const Lookup = node.Lookup;
+
+            querys.push({
+              name: 'All immediate relationships',
+              q: `MATCH (c)-[r]-(d:Global) where ID(c) = ${node.id} return c,d,r`
+            });
+
+            querys.push({
+              name: 'Self',
+              q: `MATCH (c:${node.Label})-[r]-(d:${node.Label}) return c,d,r`
+            });
+
+            if (node.labels.indexOf('Provenance') > -1) {
+              querys.push(
+                {
+                  name: 'Provenance',
+                  q: `
+                  MATCH (c:Global:${Lookup})-[r]-(d:Global) where  not (c-[:TYPE_OF]-d) 
+                  and not d.Lookup='${Lookup}' 
+                  and not c.Lookup='${Lookup}'  return c,d,r
+                  `
+                });
+            }
+
+            if (node.labels.indexOf('Period') > -1) {
+              querys.push({
+                name: 'Period',
+                q: `
+                  MATCH (c:Global:${Lookup})-[r]-(d:Global) where  not (c-[:TYPE_OF]-d) 
+                  and not d.Lookup='${Lookup}' and not c.Lookup='${Lookup}'  return c,d,r
+                  `
+              });
+            }
+
+            if (node.labels.indexOf('Theme') > -1) {
+              querys.push({
+                name: 'Theme',
+                q: `
+                  MATCH (c:Global:${Lookup})-[r]-(d:Global) where  not (c-[:TYPE_OF]-d) 
+                  and not d.Lookup='${Lookup}' and not c.Lookup='${Lookup}'  return c,d,r
+                  `
+              });
+            }
+
+            if (node.labels.indexOf('Person') > -1) {
+              querys.push({
+                name: 'Outbound Influence',
+                q: `
+                  MATCH (c {Lookup:'${Lookup}'})-[r]->(d:Painter) 
+                  with c,d,r optional  match(d) -[s]->(e:Painter) return c,d,r,s,e `,
+                connectAll: true
+              });
+              querys.push({
+                name: 'Inbound Influence',
+                q: `
+                  MATCH (c {Lookup:'${Lookup}'})<-[r]-(d:Painter) 
+                  with c,d,r optional  match(d) <-[s]-(e:Painter) return c,d,r,s,e 
+                  `,
+                connectAll: true
+              });
+            }
+
+            if (node.labels.indexOf('Group') > -1) {
+              querys.push({
+                name: 'Group',
+                q: `
+                match (n {Lookup:'${Lookup}'}) -[r]-(m:Global) -[s]-(p:Global) 
+                where not (n-[:TYPE_OF]-m) and not (m-[:TYPE_OF]-p) 
+                and (m:Painter or m:Group) and (p:Painter or p:Group) 
+                and not m:Provenance and not p:Provenance return n,r,m,s,p
+                `,
+                connectAll: true
+              });
+            }
+
+            if (node.labels.indexOf('Iconography') > -1) {
+              querys.push({
+                name: 'Iconography',
+                q: `
+                MATCH (c:Global:${Lookup})-[r]-(d:Global)  where not (c-[:TYPE_OF]-d)  
+                and not d.Lookup='${Lookup}' and (d:${Lookup} or d:Provenance or d:Group 
+                or d:Iconography or d:Place) return c,d,r
+                `,
+                connectAll: true
+              });
+            }
+
+            if (node.YearFrom && node.YearTo) {
+              querys.push({
+                name: 'YearFromYearTo',
+                q: `
+                MATCH (c:Global)-[r]-(d:Global) where  not (c-[:TYPE_OF]-d) and 
+                (
+                  (c.YearTo >= ${node.YearFrom} and c.YearTo<= ${node.YearTo}) 
+                  or (c.YearFrom >= ${node.YearFrom} and c.YearFrom<= ${node.YearTo})
+                )
+                and 
+                (
+                  (d.YearTo >= ${node.YearFrom} and d.YearTo<= ${node.YearTo}) 
+                  or (d.YearFrom >= ${node.YearFrom} and d.YearFrom<= ${node.YearTo})
+                )
+                return c,d,r
+               `,
+                connectAll: true
+              });
+            }
+
+            const prevselection = $scope.selected.name;
+
+            $scope.querys = querys;
+            $scope.querys.forEach(e => {
+              if (e.name === prevselection) {
+                $scope.selected = e;
+              }
+            });
+          }
+        }
+      }
+    })
+);
+
+angular.module('neograph.query.generator', [
+  'neograph.query.generator.favouritesFilter',
+  'neograph.query.generator.nodeFilter',
+  'neograph.query.generator.nodeGraph',
+]);
+
 (function() {
     'use strict';
   angular.module('neograph.node.multiple', ['neograph.neo', 'neograph.utils'])
@@ -3253,11 +3578,29 @@ angular.module('neograph.queryInput',
 (function() {
   'use strict';
 
-  controller.$inject = ["nodeService", "session", "utils", "$scope", "$stateParams"];
-  angular.module('neograph.node.properties.edit.controller', ['neograph.node.service', 'neograph.session', 'neograph.utils', 'ui.router'])
+  controller.$inject = ["$scope", "$stateParams", "neo", "nodeService"];
+  angular.module('neograph.node.images', ['neograph.neo', 'ui.router'])
+    .controller('NodeImagesCtrl', controller);
+
+  function controller($scope, $stateParams, neo, nodeService) {
+    var vm = this;
+    vm.images = [];
+    if ($stateParams.node) {
+      neo.getImages($stateParams.node).then(function (images) {
+        vm.images = images;
+        loaded = true;
+      });
+    }
+  }
+})();
+(function() {
+  'use strict';
+
+  controller.$inject = ["utils", "$scope", "$stateParams"];
+  angular.module('neograph.node.edit.properties.controller', [])
     .controller('EditPropertiesCtrl', controller);
 
-  function controller(nodeService, session, utils, $scope, $stateParams) {
+  function controller(utils, $scope, $stateParams) {
 
     var vm = this;
     vm.node = {};
@@ -3287,7 +3630,7 @@ angular.module('neograph.queryInput',
   
     function onNodeLabelsChanged(labels) {
       if (labels) {
-        const selectedTypes = [];
+        var selectedTypes = [];
         angular.forEach(vm.node.labels, function (l) {
           if (utils.types[l]) {
             selectedTypes.push({ lookup: l, class: 'Type' });
@@ -3313,12 +3656,10 @@ angular.module('neograph.queryInput',
   'use strict';
 
   angular.module('neograph.node.properties', [
-    'neograph.node.service', 
-    'neograph.session', 
-    'neograph.utils', 
-    'neograph.node.properties.edit.controller',
-    'ui.router']);
+    'neograph.node.edit.properties.controller'
+    ]);
 })();
+
 (function() {
   'use strict';
     
@@ -3644,315 +3985,3 @@ angular.module('neograph.queryInput',
         })
   );
 })();
-
-angular.module('neograph.query.generator.favouritesFilter', ['neograph.neo'])
-.directive('favouritesFilter', neo => ({
-  restrict: 'E',
-  templateUrl: 'app/query/generator/favouritesFilter.html',
-  scope: {
-    options: '=',
-    generated: '='
-  },
-  link: ($scope, $element, $attrs) => {
-    $scope.filters = [];
-    $scope.node = {};
-    let labels = [];
-    $scope.$watch('options', function (options) {
-      if (options) {
-        $scope.node = options.user;
-      }
-    });
-
-    $scope.$watch('node', function (user) {
-      load();
-    });
-
-    const load = function () {
-      if ($scope.node) {
-        labels = [$scope.node.Lookup, 'Favourite'];
-        getFilters();
-        $scope.enabledFilters = [];
-        $scope.process();
-      }
-
-    };
-
-    const getFilters = function () {
-      if (labels && labels.length) {
-        const labelQuery = `match (a:${labels.join(':')}) - [] -> (b) return distinct(LABELS(b))`;
-        neo.getDistinctLabelsQuery(labelQuery).
-            then(l => {
-                // remove filter for this node as it is duplicating
-              angular.forEach(labels, function (lab) {
-                l.splice($.inArray(lab, l), 1);
-              });
-              $scope.filters = l;
-            });
-      }
-    };
-
-    $scope.process = labs => {
-      if ($scope.node) {
-        labs = labs || [];
-        let b = 'b';
-        if (labs.length) {
-          b += `:${labs.join(':')}`;
-        }
-        const q = `match (a:${labels.join(':')}) - [] -> (${b})`;
-        $scope.generated = `${q} return b`;
-        if (labs.length) {
-          neo.getDistinctLabelsQuery(`${q}  return distinct(LABELS(b))`).
-              then(l => { $scope.enabledFilters = l; });
-        } else {
-          $scope.enabledFilters = [];
-        }
-      }
-    };
-  }
-})
-);
-
-angular.module('neograph.query.generator.nodeFilter', ['neograph.neo'])
-    .directive('nodeFilter', neo => ({
-      restrict: 'E',
-      templateUrl: 'app/query/generator/nodeFilter.html',
-      scope: {
-        options: '=',
-        generated: '=',
-        nodechanged: '&?'
-      },
-      link: ($scope) => {
-        $scope.filters = [];
-        $scope.node = {};
-        let labels = [];
-
-        const getFilters = () => {
-          if (labels && labels.length) {
-            neo.getDistinctLabels(labels).
-                then(l => {
-                  // Remove filter for this node as it is duplicating
-                  labels.forEach(lab => { l.splice(lab.indexOf(l), 1); });
-                  $scope.filters = l;
-                });
-          }
-        };
-
-        const load = () => {
-          if ($scope.node) {
-            labels = [$scope.node.label, 'Picture'];
-            getFilters();
-            $scope.enabledFilters = [];
-            $scope.process();
-          }
-        };
-
-        $scope.$watch('options', options => {
-          $scope.node = options.node;
-        });
-
-        $scope.$watch('node', node => {
-          if ($scope.nodechanged) {
-            $scope.nodechanged({ node });
-          }
-          load();
-        });
-
-        $scope.openNode = () => {
-          if ($scope.node) {
-            $scope.publish('selected', { selection:{ nodes:[$scope.node] } });
-          }
-        };
-
-        $scope.process = labs => {
-          if ($scope.node) {
-            if (!labs || !labs.length) {
-              labs = labels;
-            } else {
-              labs = labs.concat(labels);
-            }
-            $scope.generated = `
-              match (a:${labs.join(':')}) return a 
-              order by a.Status desc limit 500
-              `;
-            if (labs != labels) {
-              neo.getDistinctLabels(labs).
-                  then(l => { $scope.enabledFilters = l; });
-            } else {
-              $scope.enabledFilters = [];
-            }
-          }
-        };
-      }
-    })
-);
-
-angular.module('neograph.query.generator.nodeGraph', ['neograph.neo'])
-    .directive('nodeGraph', neo => ({
-      restrict: 'E',
-      templateUrl: 'app/query/generator/nodeGraph.html',
-      scope: {
-        options: '=',
-        generated: '=',
-        nodechanged: '&?'
-      },
-      link: ($scope) => {
-        $scope.querys = [];
-        $scope.selected = '';
-        $scope.node = {};
-        $scope.$watch('options', options => {
-          $scope.node = options.node;
-        });
-
-        $scope.$watch('selected', sel => {
-          if (sel && sel.q) {
-            $scope.generated = sel.q;
-          }
-        });
-
-        $scope.$watch('node', node => {
-          if (node && node.id) {
-            if ($scope.nodechanged) {
-              $scope.nodechanged({ node });
-            }
-            neo.getNode(node.id, false).
-              then(loaded => {
-                getQuerys(loaded);
-              });
-          }
-        });
-
-        $scope.openNode = () => {
-          if ($scope.node) {
-            $scope.publish('selected', { selection: { nodes: [$scope.node] } });
-          }
-        };
-
-        function getQuerys(node) {
-          if (node) {
-            const querys = [];
-            const Lookup = node.Lookup;
-
-            querys.push({
-              name: 'All immediate relationships',
-              q: `MATCH (c)-[r]-(d:Global) where ID(c) = ${node.id} return c,d,r`
-            });
-
-            querys.push({
-              name: 'Self',
-              q: `MATCH (c:${node.Label})-[r]-(d:${node.Label}) return c,d,r`
-            });
-
-            if (node.labels.indexOf('Provenance') > -1) {
-              querys.push(
-                {
-                  name: 'Provenance',
-                  q: `
-                  MATCH (c:Global:${Lookup})-[r]-(d:Global) where  not (c-[:TYPE_OF]-d) 
-                  and not d.Lookup='${Lookup}' 
-                  and not c.Lookup='${Lookup}'  return c,d,r
-                  `
-                });
-            }
-
-            if (node.labels.indexOf('Period') > -1) {
-              querys.push({
-                name: 'Period',
-                q: `
-                  MATCH (c:Global:${Lookup})-[r]-(d:Global) where  not (c-[:TYPE_OF]-d) 
-                  and not d.Lookup='${Lookup}' and not c.Lookup='${Lookup}'  return c,d,r
-                  `
-              });
-            }
-
-            if (node.labels.indexOf('Theme') > -1) {
-              querys.push({
-                name: 'Theme',
-                q: `
-                  MATCH (c:Global:${Lookup})-[r]-(d:Global) where  not (c-[:TYPE_OF]-d) 
-                  and not d.Lookup='${Lookup}' and not c.Lookup='${Lookup}'  return c,d,r
-                  `
-              });
-            }
-
-            if (node.labels.indexOf('Person') > -1) {
-              querys.push({
-                name: 'Outbound Influence',
-                q: `
-                  MATCH (c {Lookup:'${Lookup}'})-[r]->(d:Painter) 
-                  with c,d,r optional  match(d) -[s]->(e:Painter) return c,d,r,s,e `,
-                connectAll: true
-              });
-              querys.push({
-                name: 'Inbound Influence',
-                q: `
-                  MATCH (c {Lookup:'${Lookup}'})<-[r]-(d:Painter) 
-                  with c,d,r optional  match(d) <-[s]-(e:Painter) return c,d,r,s,e 
-                  `,
-                connectAll: true
-              });
-            }
-
-            if (node.labels.indexOf('Group') > -1) {
-              querys.push({
-                name: 'Group',
-                q: `
-                match (n {Lookup:'${Lookup}'}) -[r]-(m:Global) -[s]-(p:Global) 
-                where not (n-[:TYPE_OF]-m) and not (m-[:TYPE_OF]-p) 
-                and (m:Painter or m:Group) and (p:Painter or p:Group) 
-                and not m:Provenance and not p:Provenance return n,r,m,s,p
-                `,
-                connectAll: true
-              });
-            }
-
-            if (node.labels.indexOf('Iconography') > -1) {
-              querys.push({
-                name: 'Iconography',
-                q: `
-                MATCH (c:Global:${Lookup})-[r]-(d:Global)  where not (c-[:TYPE_OF]-d)  
-                and not d.Lookup='${Lookup}' and (d:${Lookup} or d:Provenance or d:Group 
-                or d:Iconography or d:Place) return c,d,r
-                `,
-                connectAll: true
-              });
-            }
-
-            if (node.YearFrom && node.YearTo) {
-              querys.push({
-                name: 'YearFromYearTo',
-                q: `
-                MATCH (c:Global)-[r]-(d:Global) where  not (c-[:TYPE_OF]-d) and 
-                (
-                  (c.YearTo >= ${node.YearFrom} and c.YearTo<= ${node.YearTo}) 
-                  or (c.YearFrom >= ${node.YearFrom} and c.YearFrom<= ${node.YearTo})
-                )
-                and 
-                (
-                  (d.YearTo >= ${node.YearFrom} and d.YearTo<= ${node.YearTo}) 
-                  or (d.YearFrom >= ${node.YearFrom} and d.YearFrom<= ${node.YearTo})
-                )
-                return c,d,r
-               `,
-                connectAll: true
-              });
-            }
-
-            const prevselection = $scope.selected.name;
-
-            $scope.querys = querys;
-            $scope.querys.forEach(e => {
-              if (e.name === prevselection) {
-                $scope.selected = e;
-              }
-            });
-          }
-        }
-      }
-    })
-);
-
-angular.module('neograph.query.generator', [
-  'neograph.query.generator.favouritesFilter',
-  'neograph.query.generator.nodeFilter',
-  'neograph.query.generator.nodeGraph',
-]);

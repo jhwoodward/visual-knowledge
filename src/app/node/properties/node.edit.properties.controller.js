@@ -1,10 +1,10 @@
 ﻿(function() {
   'use strict';
 
-  angular.module('neograph.node.properties.edit.controller', ['neograph.node.service', 'neograph.session', 'neograph.utils', 'ui.router'])
+  angular.module('neograph.node.edit.properties.controller', [])
     .controller('EditPropertiesCtrl', controller);
 
-  function controller(nodeService, session, utils, $scope, $stateParams) {
+  function controller(utils, $scope, $stateParams) {
 
     var vm = this;
     vm.node = {};
@@ -34,7 +34,7 @@
   
     function onNodeLabelsChanged(labels) {
       if (labels) {
-        const selectedTypes = [];
+        var selectedTypes = [];
         angular.forEach(vm.node.labels, function (l) {
           if (utils.types[l]) {
             selectedTypes.push({ lookup: l, class: 'Type' });

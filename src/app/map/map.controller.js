@@ -6,11 +6,14 @@
 
   function controller($scope, $state, neo, nodeService, mapService) {
 
-    console.log('map.controller');
     var vm = this;
     vm.data = [];
     vm.onGraphSelect = onGraphSelect;
     vm.node = {};
+    vm.maps = [];
+    vm.selectedMap = {};
+    vm.selectedNode = undefined;
+    vm.goToSelected = goToSelected;
 
     activate();
 
@@ -19,21 +22,32 @@
       $scope.$on('$stateChangeSuccess', setGraph);
 
       function setGraph() {
+        vm.selectedNode = undefined;
         if (!vm.node || vm.node.label !== $state.params.node) {
           nodeService.get($state.params.node, true)
             .then(function (node) {
               vm.node = node;
-              var queries = mapService.getQueries(node);
-              if (queries && queries.length) {
-                getData(queries[0]).then(function(data) {
-                  vm.data = data;
-                });
+              vm.maps = mapService.getQueries(node);
+              if (vm.maps && vm.maps.length) {
+                vm.selectedMap = vm.maps[0];
               }
           });
         }
       }
     }
 
+    $scope.$watch('vm.selectedMap', function(map) {
+      if (map) {
+        getData(map).then(function(data) {
+          vm.data = data;
+        });
+      }
+  
+    })
+
+    function goToSelected() {
+      $state.go('admin.node', {node: vm.selectedNode.label});
+    }
 
     function connectAll (data) {
       return neo.getAllRelationships(data.nodes)
@@ -55,12 +69,17 @@
     }
 
     function onGraphSelect(node, edge) {
+
       if (edge) {
         $state.go('admin.edge', { edge: JSON.stringify(edge) });
       }
       
       if (node) {
-        $state.go('admin.node', { node: node.label });
+        if (node === vm.selectedNode) {
+           $state.go('admin.node', { node: node.label });
+        } else {
+           vm.selectedNode = node;
+        }
       }
     }
 

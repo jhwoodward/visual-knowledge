@@ -33,15 +33,15 @@
           url:'/edit',
           views:{
             'header@admin.node': {
-              templateUrl: 'app/node/node.header.edit.html',
+              templateUrl: 'app/node/node.edit.header.html',
               controller:'NodeCtrl as vm'
             },
             'properties@admin.node':{
-              templateUrl:'app/node/properties/node.properties.edit.html',
+              templateUrl:'app/node/properties/node.edit.properties.html',
               controller:'EditPropertiesCtrl as vm'
             },
             'relationships@admin.node':{
-              templateUrl:'app/node/relationships/node.relationships.edit.html',
+              templateUrl:'app/node/relationships/node.edit.relationships.html',
               controller:'EditRelationshipsCtrl as vm'
             }
           }

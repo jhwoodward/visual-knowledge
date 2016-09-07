@@ -1,4 +1,5 @@
-<div class="tabbable propertyTabs"   >
+<ui-view name="header"></ui-view>
+<div class="tabbable propertyTabs">
   <ul class="nav nav-tabs">
     <li ng-repeat="tab in vm.tabs" ng-class="{active: vm.selectedTab === tab}">
       <a href ng-click="vm.selectTab(tab)">

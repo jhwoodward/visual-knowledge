@@ -1,12 +1,12 @@
 ﻿<div class="properties">
-  <div class="form-group" ng-if="vm.node.id >-1 && vm.node.label ">
+  <div class="form-group" ng-if="vm.node.id >-1 && vm.node.label && vm.node.temp.labelled">
     <label>Nodes labelled {{vm.node.label}}</label>
     <labels navpath="/admin/node/{label}"  items="vm.node.temp.labelled"></labels>
   </div>
 
   <div class="row" >
     <div ng-repeat="(key,value) in vm.node.relationships">
-      
+
       <div 
         ng-if="value.predicate.lookup.toLowerCase()!='created'" 
         style="margin-bottom:5px;" 

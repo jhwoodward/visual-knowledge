@@ -1,4 +1,21 @@
 <graph 
   data="vm.data"
-  onSelect="vm.onGraphSelect">
+  on-select="vm.onGraphSelect(node, edge)">
 </graph>
+<div ng-show="vm.selectedNode" class="graph-preview">
+  <div class="header">
+    {{vm.selectedNode.label}}
+  </div>
+  <div>
+    <p>{{vm.selectedNode.description}}</p>
+    <p>{{vm.selectedNode.text}}</p>
+  </div>
+  <div>
+    <button class="btn btn-primary"  ng-click="vm.goToSelected()">Go to {{vm.selectedNode.label}}</button>
+  </div>
+</div>
+<ul class="graph-types">
+  <li ng-repeat="map in vm.maps" ng-click="vm.selectedMap = map" ng-class="{selected: vm.selectedMap === map}">
+    {{map.name}}
+  </li>
+</ul>

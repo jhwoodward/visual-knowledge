@@ -470,6 +470,43 @@ label {
   transition-timing-function: cubic-bezier(0.0,0.0,0.2,1);
 }
 
+.graph-types {
+  z-index:3;
+  position:absolute;
+  width:300px;
+  margin:10px;
+  bottom:0px;
+  right: 0px;
+  border:1px solid #999;
+  background: #fff;
+}
+
+.graph-types li {
+  padding:20px;
+  border-bottom: 1px solid #999;
+  list-style-type: none;
+  cursor: pointer;
+  background: #eaebef;
+  color:#999;
+}
+.graph-types li.selected {
+  background: #fff;
+  font-weight:bold;
+}
+
+.graph-preview {
+  z-index:3;
+  position:absolute;
+  width:400px;
+  margin:10px;
+  top:0px;
+  right: 0px;
+  border:1px solid #999;
+  background: #fff;
+  border-radius: 10px;
+  padding:10px;
+}
+
 .header {
   font-size:2em;
 }

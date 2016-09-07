@@ -115,9 +115,9 @@
       }
 
       function onNetworkSelect(params) {
-        
         if (params.nodes.length === 1) {
           var node = scope.data.nodes[params.nodes[0]];
+          console.log(node);
           scope.onSelect({node: node});
         } else if (params.edges.length === 1) {
           var id = params.edges[0];
@@ -133,6 +133,7 @@
           scope.onSelect({edge: edge});
         }
       }
+    
 
       function onGlobalDeleted(params) {
         if (params.selection.nodes && params.selection.nodes.length) {

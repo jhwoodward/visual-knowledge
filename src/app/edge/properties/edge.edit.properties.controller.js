@@ -1,6 +1,6 @@
 (function() {
 
-  angular.module('neograph.edge.properties.edit.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
+  angular.module('neograph.edge.edit.properties.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
     .controller('EditEdgeCtrl', editController);
 
     function editController(neo, utils, $stateParams, $scope) {

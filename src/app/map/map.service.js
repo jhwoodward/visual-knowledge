@@ -20,7 +20,7 @@
       var labels = node.labels;
 
       if (!labels || !label) return [];
-      
+
       if (labels.indexOf('Provenance') > -1) {
         queries.push(
           {
