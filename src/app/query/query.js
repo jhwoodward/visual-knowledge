@@ -46,6 +46,7 @@ factory('queryService', queryFactory => {
       listeners[i](active);
     }
   };
+  
   return {
     queries,
     active,

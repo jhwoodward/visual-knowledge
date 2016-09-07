@@ -1,0 +1,12 @@
+<div class="row">
+  <div class="col-xs-7 header">
+    {{vm.node.isPicture() ? vm.node.title: vm.node.label}}
+  </div>
+
+  <div class="col-xs-5">
+    <div class="pull-right">
+      <button class="btn btn-default"  ng-click="vm.edit()">Edit</button>
+      <button class="btn btn-default" ng-click="vm.new()">New...</button>
+    </div>
+  </div>
+</div>

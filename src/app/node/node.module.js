@@ -1,11 +1,17 @@
-angular.module('neograph.node', [
-  'neograph.node.graphpanel',
-  'neograph.node.favourites',
-  'neograph.node.freebase',
-  'neograph.node.graphpanel',
-  'neograph.node.wikipedia',
-  'neograph.node.multiple',
-  'neograph.node.properties',
-  'neograph.node.relationships',
-  'ui.router'
-]);
+(function() {
+  'use strict';
+
+  angular.module('neograph.node', [
+    'neograph.node.wikipedia',
+    'neograph.node.multiple',
+    'neograph.node.images',
+    'neograph.node.properties',
+    'neograph.node.relationships',
+    'neograph.node.search',
+    'neograph.node.service',
+    'neograph.node.routes',
+    'neograph.node.controller',
+    'ui.router'
+  ]);
+
+})();

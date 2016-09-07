@@ -82,6 +82,7 @@
         }
       };
 
+/*
             // this assumes that we are looking at a view of not deleted items
       $scope.subscribe('deleted', function (params) {
 
@@ -95,7 +96,7 @@
                 // alternatively i could have a deep watch on nodearray and update that
         removeItems(params.selection.nodes);
       });
-
+*/
 
       var removeItems = function (items) {
 
@@ -166,7 +167,7 @@
 
             // NB if there are multiple instances of the images directive (as typically) it wont be possible ot know which one the event was sent from
                     // but mainly we need to know that it wasnt sent from the graph or controller, as images currently doesnt substribe to selected event
-          $scope.publish('selected', { sender: 'Images', selection: { nodes: selectedNodes } });
+    //      $scope.publish('selected', { sender: 'Images', selection: { nodes: selectedNodes } });
 
 
 
@@ -175,11 +176,8 @@
 
       });
 
-      $scope.makeFavourite = function (node) {
-        console.log(node);
-        $scope.publish('favourite', node);
-
-      };
+    
+    
 
 
     }

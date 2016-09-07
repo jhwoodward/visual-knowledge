@@ -1,50 +1,23 @@
-
-<!--title: node name-->
-<h2>
-    {{vm.selection.selectedNode.isPicture() ? vm.selection.selectedNode.title: vm.selection.selectedNode.lookup}} 
-    <button class="btn btn-default pull-right" 
-          ng-show='vm.enableAddToGraph' 
-          ng-click='vm.addNodeToGraph(vm.selection.selectedNode)'
-          >
-    Add to graph
-    </button>
-</h2>
-<!-- add to graph button-->
-<!-- node labels
-
-<labels node="vm.selection.selectedNode" navpath="/admin/node/{label}" ></labels>
--->
+<ui-view name="header"></ui-view>
 <div class="tabbable propertyTabs">
-  <!-- tab headers-->
   <ul class="nav nav-tabs">
       <li ng-repeat="tab in vm.tabs" ng-class="{active:vm.selectedTab==tab}">
           <a href ng-click="vm.selectTab(tab)"><span class="hidden-xs">{{tab}}</span><span class="visible-xs">{{tab.charAt(0)}}</span></a>
       </li>
   </ul>
 
-  <div class="tab-pane clearfix" ng-repeat="tab in vm.tabs" ng-switch="tab" style="position: absolute; visibility: {{vm.selectedTab === tab ? 'visible':'hidden' }}">
+  <div class="tab-pane" ng-repeat="tab in vm.tabs" ng-switch="tab" ng-show="vm.selectedTab === tab">
 
-  <div class="tab-content" ng-switch-when="Properties"  >
-      <ui-view name="properties"></ui-view>
-  </div>
+    <div class="tab-content" ng-switch-when="Properties"  >
+        <ui-view name="properties"></ui-view>
+    </div>
 
-  <div class="tab-content" ng-switch-when="Relationships">
-      <ui-view name="relationships"></ui-view>
-  </div>
+    <div class="tab-content" ng-switch-when="Relationships">
+        <ui-view name="relationships"></ui-view>
+    </div>
 
-  <nodegraphpanel ng-switch-when="Graph" active="vm.selectedTab==='Graph'"
-                  node="vm.selection.selectedNode"
-                  class="tab-content"></nodegraphpanel>
-
-  <div ng-switch-when="Images"  class="tab-content" >   
-      <ui-view name="images"></ui-view>
-  </div>
-
-  <freebase ng-switch-when="Freebase" active="vm.selectedTab==='Freebase'" node="selection.selectedNode"
-            class="tab-content" ></freebase>
-
-  <wikipedia ng-switch-when="Wikipedia" active="vm.selectedTab==='Wikipedia'" node="selection.selectedNode"
-              class="tab-content" ></wikipedia>
-
+    <div class="tab-content" ng-switch-when="Images"   >   
+        <ui-view name="images"></ui-view>
+    </div>
   </div>
 </div>

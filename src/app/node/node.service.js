@@ -1,6 +1,7 @@
 ﻿(function() {
   'use strict';
-  angular.module('neograph.node')
+
+  angular.module('neograph.node.service',[])
     .factory('nodeService', service);
 
   function service(neoClient, utils, $q, nodeFactory) {
@@ -14,46 +15,37 @@
         });
       },
       get: function (label, addrelprops) {
-
         if (addrelprops) {
-
-          if (lastLoadedNode && (label === lastLoadedNode.Label || label === lastLoadedNode.id)) {
+          if (lastLoadedNode && (label === lastLoadedNode.label || label === lastLoadedNode.id)) {
             return $q.when(lastLoadedNode);
           }
           else {
-
             return neoClient.node.getWithRels({ id: label }).$promise.then(function (node) {
-
-
               lastLoadedNode = nodeFactory.create(node.toJSON());
-              console.log(lastLoadedNode);
               return lastLoadedNode;
             });
           }
-
-
         }
         else {
           return neoClient.node.get({ id: label }).$promise.then(function (node) {
             return node.toJSON();
           });
         }
-
       },
       getList: function (q, limit) { // q = match (n) & where only (without return)
         return neoClient.node.getList({ q: q, limit: limit }).$promise;// returns array
       },
-      saveWikipagename: function (n)// short version for freebase prop saving
-          {
+      // short version for freebase prop saving
+      saveWikipagename: function (n) {
         return neoClient.node.saveWikipagename({
           id: n.id,
           name: n.Wikipagename
-        }).$promise.then(function (data) {
+        })
+        .$promise.then(function (data) {
           return data.toJSON();
         });
       },
       getImages:function (node) {
-
         return neoClient.node.getImages({
           id: node.id,
           isPicture: node.temp.isPicture,
@@ -61,41 +53,47 @@
         }).$promise;// returns array
       },
       saveProps: function (n) {// short version for freebase prop saving
-        return neoClient.node.saveProps({ node: n, user: user }).$promise.then(function (data) {
-          return data.toJSON();
-        });
+        return neoClient.node.saveProps({ node: n, user: user })
+          .$promise.then(function (data) {
+            return data.toJSON();
+          });
       },
       getProps: function (labels) {
-        return neoClient.node.getProps({ labels: labels }).$promise.then(function (data) {
-          return data.toJSON();
-        });
+        return neoClient.node.getProps({ labels: labels })
+          .$promise.then(function (data) {
+            return data.toJSON();
+          });
       },
       save: function (n, user) {
         if (n.temp.trimmed) {
           throw ('Node is trimmed - cannot save');
         }
-        return neoClient.node.save({ node: n, user: user }).$promise.then(function (data) {
-          return data.toJSON();
-        });
+        return neoClient.node.save({ node: n, user: user })
+          .$promise.then(function (data) {
+            return data.toJSON();
+          });
       },
       saveRels: function (n) {
-        return neoClient.node.saveRels({ node: n }).$promise.then(function (data) {
-          return data.toJSON();
-        });
+        return neoClient.node.saveRels({ node: n })
+          .$promise.then(function (data) {
+            return data.toJSON();
+          });
       },
       // deletes node and relationships forever
       destroy: function (node) {
-        return neoClient.node.destroy({ node: node }).$promise.then(function (data) {
-          return data.toJSON();
-        });
+        return neoClient.node.destroy({ node: node })
+          .$promise.then(function (data) {
+            return data.toJSON();
+          });
       },
       // only supports 1 node at the mo
       delete: function (node) {
         var deferred = $q.deferred();
         if (node && node.id) {
-          return neoClient.node.delete({ node: node }).$promise.then(function (data) {
-            deferred.resolve(data.toJSON());
-          });
+          return neoClient.node.delete({ node: node })
+            .$promise.then(function (data) {
+              deferred.resolve(data.toJSON());
+            });
         } else {
           deferred.resolve({});
         }
@@ -104,9 +102,10 @@
       restore: function (node) {
         var deferred = $q.deferred();
         if (node && node.id) {
-          neoClient.node.restore({ node: node }).$promise.then(function (data) {
-            deferred.resolve(data.toJSON());
-          });
+          neoClient.node.restore({ node: node })
+            .$promise.then(function (data) {
+              deferred.resolve(data.toJSON());
+            });
         } else {
           deferred.resolve({});
         }
@@ -119,6 +118,6 @@
       }
     };
     return api;
-    
+
   }
 })();

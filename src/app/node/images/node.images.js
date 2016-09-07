@@ -1,55 +1,17 @@
 ﻿(function() {
   'use strict';
 
-  angular.module('neograph.node.images', ['neograph.neo'])
+  angular.module('neograph.node.images', ['neograph.neo', 'ui.router'])
     .controller('NodeImagesCtrl', controller);
 
-  function controller(neo) {
-    $scope.images = [];
-
+  function controller($scope, $stateParams, neo, nodeService) {
+    var vm = this;
+    vm.images = [];
     if ($stateParams.node) {
-      nodeService.get($stateParams.node, true).then(function (node) {
-        $scope.node = node;
-      });
-    }
-
-    var loaded = false;
-
-          // load images on active change or on node change if active
-    $scope.$watch('active', function (active) {
-
-      if ($scope.node && active && !loaded) {
-        getImages();
-      }
-    });
-
-    $scope.$watch('node', function (node) {
-      loaded = false;
-      if (!$scope.active) {
-        $scope.images = [];
-      }
-      if (node && $scope.active) {
-        getImages();
-      }
-    });
-
-    var getImages = function () {
-
-      neo.getImages($scope.node).then(function (images) {
-        $scope.images = images;
+      neo.getImages($stateParams.node).then(function (images) {
+        vm.images = images;
         loaded = true;
       });
-
-    };
-
-    $scope.openGridTab = function (node) {
-
-      $scope.publish('query', {
-        view: node.Lookup,
-        type: 'Grid',
-        queryGenerator: { id: 'nodeFilter', options: { node: node } }
-      });
-
-    };
+    }
   }
 })();

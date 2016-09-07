@@ -1,56 +1,62 @@
-angular.module('neograph.node')
-  .controller('SearchCtrl', function ($scope, $state, nodeService) {
-    var vm = this;
-    vm.node = undefined;
-    $scope.$watch('vm.node', function (n) {
-      if (n && n.label) {
-        $state.go('admin.node', { node: n.label });
-      }
-    });
-
-
-    vm.newNode = newNode;
-    vm.addNodeToGraph = addNodeToGraph;
-
-    function addNodeToGraph(node) {
+(function() {
+  'use strict';
     
-      if (!$scope.views.Graph.data.nodes[node.id]) {
-        neo.getRelationships(node.id).then(function (g) {
+  angular.module('neograph.node.search',['neograph.node.service', 'ui.router'])
+    .controller('SearchCtrl', controller);
 
-          var newData = {
-            edges: g.edges,
-            nodes: {}
-          };
-          newData.nodes[node.id] = node;
+  function controller($scope, $state, nodeService) {
+      var vm = this;
+      vm.node = undefined;
+      $scope.$watch('vm.node', function (n) {
+        if (n && n.label) {
+          $state.go('admin.node', { node: n.label });
+        }
+      });
 
-          $scope.publish('dataUpdate', newData);
+      vm.newNode = newNode;
+      vm.addNodeToGraph = addNodeToGraph;
 
-          if (node.id === $scope.selection.selectedNode.id) {
-            $scope.publish('selected', { selection: { nodes: [node.id] } });
-            $scope.publish('focus', node.id);
-          }
+      function addNodeToGraph(node) {
+      
+        if (!$scope.views.Graph.data.nodes[node.id]) {
+          neo.getRelationships(node.id).then(function (g) {
 
-        });
-        $scope.activeView = graphView;
-      }
-    };
+            var newData = {
+              edges: g.edges,
+              nodes: {}
+            };
+            newData.nodes[node.id] = node;
 
-    function newNode() {
+            $scope.publish('dataUpdate', newData);
 
-      var newNode = {
-        id: -1,
-        labels: [],
-        Type: '',
-        temp: {
-          tabs: ['Properties']
+            if (node.id === $scope.selection.selectedNode.id) {
+              $scope.publish('selected', { selection: { nodes: [node.id] } });
+              $scope.publish('focus', node.id);
+            }
+
+          });
+          $scope.activeView = graphView;
         }
       };
 
-      if (vm.nodeLookupText && (!vm.selection.selectedNode || vm.nodeLookupText != vm.selection.selectedNode.Lookup)) {
-        newNode.lookup = vm.nodeLookupText;
+      function newNode() {
+
+        var newNode = {
+          id: -1,
+          labels: [],
+          Type: '',
+          temp: {
+            tabs: ['Properties']
+          }
+        };
+
+        if (vm.nodeLookupText && (!vm.selection.selectedNode || vm.nodeLookupText != vm.selection.selectedNode.Lookup)) {
+          newNode.lookup = vm.nodeLookupText;
+        }
+        vm.selection.selectedNode = newNode;
+        vm.tabs = $scope.selection.selectedNode.temp.tabs;
+        vm.selectedTab = 'Properties';
       }
-      vm.selection.selectedNode = newNode;
-      vm.tabs = $scope.selection.selectedNode.temp.tabs;
-      vm.selectedTab = 'Properties';
     }
-  });
+ 
+})();

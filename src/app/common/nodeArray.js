@@ -25,13 +25,9 @@
 
           $scope.nodes = [];
 
-
-
           $scope.$watch('items', function (items) {
 
             if (items && items.length) {
-              console.log(items);
-
 
               if (items[0] && (items[0].label || items[0].lookup)) {
 
@@ -44,9 +40,6 @@
 
 
               }
-
-              console.log($scope.nodes);
-
 
             }
             else {
@@ -63,25 +56,6 @@
           $($element).on('click', function () {
             $($element).find('input').focus();
           });
-
-            // //update items array (needed as items can be array of text items not nodes)
-            // $scope.$watch('nodes', function (nodes) {
-            //    if (!directBinding) {
-            //        mappingNodesToItems = true;
-            //        $scope.items = nodes.map(function (n) { return n.Label; })
-            //        mappingNodesToItems = false;
-            //    }
-
-            // }, true)
-
-            // $scope.getWidth = function () {
-            //    if ($scope.nodes) {
-            //        return $attrs["width"] ? $attrs["width"] : $scope.nodes.length > 5 ? '495px' : '230px'
-            //    }
-            //    else {
-            //        return null;
-            //    }
-            // }
 
           $scope.getClass = function (node) {
             return utils.getLabelClass($scope.node, node.label);
@@ -115,14 +89,13 @@
           };
 
           $scope.addNode = function (node) {
-            console.log(node);
-            console.log(directBinding);
+
             if (indexOf(node) == -1) {
-              console.log('node adding');
+
               $scope.nodes.push(node);
 
               if (!directBinding) {
-                console.log('item adding');
+
                 $scope.items.push(node.label);
 
               }
@@ -136,9 +109,9 @@
           };
 
           $scope.removeNode = function (node) {
-            console.log(node);
+
             var ind = indexOf(node);
-            console.log(ind);
+
             if (ind > -1) {
               $scope.nodes.splice(ind, 1);
 

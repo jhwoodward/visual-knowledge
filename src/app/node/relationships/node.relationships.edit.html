@@ -1,48 +1,43 @@
-﻿
-    <div ng-form  name="nodeForm" class="properties">
+﻿<div ng-form name="nodeForm" class="properties">
+  <div  ng-if="vm.node.id >-1 && vm.node.label ">
+      <label>Nodes labelled {{vm.node.label}}</label>
+      <div node-array items="vm.node.labelled" width="100%" 
+        onselected="publish('selected', { selection: { nodes: [item] } })"></div>
+  </div>
 
-       
-     
-
-        <div  ng-if="node.id>-1 && node.label ">
-
-            <label>Nodes labelled {{node.label}}</label>
-        <!--    <div ng-show="node.temp.labelledOverflow">(> 50 overflow)</div>-->
-
-            <div  node-array items="node.labelled" width="100%" onselected="publish('selected', { selection: { nodes: [item] } })"></div>
-
-        </div>
-
-        <div class="row">
-           
-          <div ng-repeat="(key,value) in node.relationships" 
-                ng-if="value.predicate.lookup.toLowerCase()!='created'" 
-                style="margin-bottom:5px;" 
-                ng-class="{'col-sm-12':value.items.length > 5,'col-sm-6':value.items.length <= 5}">
-                    <label style="float:left;">
-                        {{value.predicate.lookup.toLowerCase().replace("_"," ")}}
-                    </label>
-                    <div ng-show="!value.predicate.symmetrical" 
-                    title="Reverse direction" 
-                    style="float:right;margin-right:20px" 
-                    class="hoverOpacity" 
-                    ng-click="value.predicate.flip()">
-                        <i class="glyphicon" ng-class="{'glyphicon-arrow-right':value.predicate.direction=='out','glyphicon-arrow-left':value.predicate.direction=='in'}"></i>
-                    </div>
-                    <div style="float:left;clear:left;width:100%" node-array 
-                    items="value.items" node="node" onselected="publish('selected', { selection: { nodes: [item] } })"></div>
-                </div>
-            <div class="col-xs-6">
-                <label style="height:29px;">Add relationship type</label>
-                <typeahead style="margin-top:-5px;" class="pull-right" placeholder="New relationship type..."
-                           onselected="addRelationship(item)" text="newPredicate" choice="selectedPredicate" restrict="Predicate" clearonselect="true"></typeahead>
-            </div>
-
-        </div>
-        
-        
-
+  <div class="row">
+    <div ng-repeat="(key,value) in vm.node.relationships" 
+          ng-if="value.predicate.lookup.toLowerCase()!='created'" 
+          style="margin-bottom:5px;" 
+          ng-class="{'col-sm-12':value.items.length > 5,'col-sm-6':value.items.length <= 5}">
+      <label style="float:left;">
+          {{value.predicate.lookup.toLowerCase().replace("_"," ")}}
+      </label>
+      <div ng-show="!value.predicate.symmetrical" 
+      title="Reverse direction" 
+      style="float:right;margin-right:20px" 
+      class="hoverOpacity" 
+      ng-click="value.predicate.flip()">
+          <i class="glyphicon" ng-class="{'glyphicon-arrow-right':value.predicate.direction=='out','glyphicon-arrow-left':value.predicate.direction=='in'}"></i>
+      </div>
+      <div style="float:left;clear:left;width:100%" node-array 
+        items="value.items" node="vm.node" 
+        onselected="publish('selected', { selection: { nodes: [item] } })">
+      </div>
     </div>
-
-
-
+    <div class="col-xs-6">
+      <label style="height:29px;">Add relationship type</label>
+          
+          
+      <typeahead 
+        style="margin-top:-5px;" 
+        class="pull-right" 
+        placeholder="New relationship type..."
+        onselected="addRelationship(item)" text="newPredicate" 
+        choice="selectedPredicate" 
+        restrict="Predicate" 
+        clearonselect="true">
+      </typeahead>
+    </div>
+  </div>
+</div>

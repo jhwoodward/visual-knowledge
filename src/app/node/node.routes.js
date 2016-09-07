@@ -1,51 +1,50 @@
-angular.module('neograph.node')
-  .config(function ($stateProvider) {
-    $stateProvider
-      .state('admin.node', {
-        url:'/node/:node',
-        views: {
-          'panel@admin': {
-            controller:'NodeCtrl as vm',
-            templateUrl:'app/node/node.html'
-          },
-          'properties@admin.node': {
-            templateUrl:'app/node/properties/node.properties.html',
-            controller:function ($scope, $stateParams, nodeService) {
-              if ($stateParams.node) {
-                nodeService.get($stateParams.node, true).then(function (node) {
-                  $scope.node = node;
-                });
-              }
-            } 
-          },
-          'relationships@admin.node':{
-            templateUrl:'app/node/relationships/node.relationships.html',
-            controller:function ($scope, $stateParams, nodeService) {
-              if ($stateParams.node) {
-                nodeService.get($stateParams.node, true).then(function (node) {
-                  $scope.node = node;
-                  console.log(node);
-                });
-              }
+(function() {
+  'use strict';
+  
+  angular.module('neograph.node.routes',[])
+    .config(function ($stateProvider) {
+      $stateProvider
+        .state('admin.node', {
+          url:'/node/:node',
+          views: {
+            'panel@admin': {
+              templateUrl: 'app/node/node.html',
+              controller: 'NodeCtrl as vm'
+            },
+            'header@admin.node': {
+              templateUrl: 'app/node/node.header.html',
+              controller: 'NodeCtrl as vm'
+            },
+            'properties@admin.node': {
+              templateUrl: 'app/node/properties/node.properties.html',
+              controller: 'ChildNodeCtrl as vm'
+            },
+            'relationships@admin.node':{
+              templateUrl:'app/node/relationships/node.relationships.html',
+              controller: 'ChildNodeCtrl as vm'
+            },
+            'images@admin.node': {
+              templateUrl:'app/node/images/node.images.html',
+              controller:'NodeImagesCtrl as vm'
             }
-          },
-          'images@admin.node': {
-            controller:'NodeImagesCtrl',
-            templateUrl:'app/node/images/node.images.html'
           }
-        }
-      })
-      .state('admin.node.edit', {
-        url:'/edit',
-        views:{
-          'properties@admin.node':{
-            templateUrl:'app/node/properties/node.properties.edit.html',
-            controller:'EditPropertiesCtrl'
-          },
-          'relationships@admin.node':{
-            templateUrl:'app/node/relationships/node.relationships.edit.html',
-            controller:'EditRelationshipsCtrl'
+        })
+        .state('admin.node.edit', {
+          url:'/edit',
+          views:{
+            'header@admin.node': {
+              templateUrl: 'app/node/node.header.edit.html',
+              controller:'NodeCtrl as vm'
+            },
+            'properties@admin.node':{
+              templateUrl:'app/node/properties/node.properties.edit.html',
+              controller:'EditPropertiesCtrl as vm'
+            },
+            'relationships@admin.node':{
+              templateUrl:'app/node/relationships/node.relationships.edit.html',
+              controller:'EditRelationshipsCtrl as vm'
+            }
           }
-        }
-      });
-  });
+        });
+    });
+})();

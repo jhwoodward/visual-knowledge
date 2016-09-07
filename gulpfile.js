@@ -38,17 +38,18 @@ gulp.task('clean',function(callback){
 
 gulp.task('app-js', function(cb){
     return gulp.src('src/app/**/*.js')
-     .pipe(sourcemaps.init())
-     .pipe(babel({presets: ['es2015']}))
+    // .pipe(sourcemaps.init())
+   //  .pipe(babel({presets: ['es2015']}))
      .pipe(ngAnnotate())
      .pipe(concat('bundle.js'))
-     .pipe(uglify())
-     .pipe(sourcemaps.write('./'))
+  //   .pipe(uglify())
+  //   .pipe(sourcemaps.write('./'))
      .pipe(gulp.dest('./dist'))
      .pipe(browserSync.reload({
       stream: true
     }))
 });
+
 
 gulp.task('lib-js', function(){
     return gulp.src([

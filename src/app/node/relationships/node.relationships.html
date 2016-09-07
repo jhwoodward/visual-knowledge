@@ -1,39 +1,29 @@
-﻿    <div  class="properties">
+﻿<div class="properties">
+  <div class="form-group" ng-if="vm.node.id >-1 && vm.node.label ">
+    <label>Nodes labelled {{vm.node.label}}</label>
+    <labels navpath="/admin/node/{label}"  items="vm.node.temp.labelled"></labels>
+  </div>
 
-    
-
-        <div class="form-group" ng-if="node.id>-1 && node.label ">
-
-            <label>Nodes labelled {{node.label}}</label>
-            <labels  navpath="/admin/main/node/{label}/view"  items="node.temp.labelled"></labels>
-
-        </div>
-
-        <div class="row" >
-            <div ng-repeat="(key,value) in node.relationships">
-                <div ng-if="value.predicate.lookup.toLowerCase()!='created'" 
-                style="margin-bottom:5px;" 
-                ng-class="{'col-sm-12':value.items.length > 5,'col-sm-6':value.items.length <= 5}">
-                    <label>
-                        {{value.predicate.toString()}}
-                    </label>
-
-                    <i class="glyphicon" style="opacity:0.5" ng-show="!value.predicate.symmetrical" 
-                    ng-class="{'glyphicon-arrow-right':value.predicate.direction==='out','glyphicon-arrow-left':value.predicate.direction==='in'}"></i>
-
-                    <labels navpath="/admin/main/node/{label}/view" items="value.items"></labels>
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-
-
-
-     
+  <div class="row" >
+    <div ng-repeat="(key,value) in vm.node.relationships">
+      
+      <div 
+        ng-if="value.predicate.lookup.toLowerCase()!='created'" 
+        style="margin-bottom:5px;" 
+        ng-class="{'col-sm-12':value.items.length > 5,'col-sm-6':value.items.length <= 5}">
+        <label>
+            {{value.predicate.toString()}}
+        </label>
+        <i 
+          class="glyphicon" 
+          style="opacity:0.5" 
+          ng-show="!value.predicate.symmetrical" 
+          ng-class="{'glyphicon-arrow-right':value.predicate.direction === 'out',
+            'glyphicon-arrow-left':value.predicate.direction === 'in'}">
+        </i>
+        <labels navpath="/admin/node/{label}" items="value.items"></labels>
+      </div>
 
     </div>
-
+  </div>
+</div>
