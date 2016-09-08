@@ -1,25 +1,24 @@
-<div class="row">
-  <div class="col-xs-7 header">
+<div class="clearfix header-container">
+  <div class="header pull-left">
     {{vm.node.isPicture() ? vm.node.title: vm.node.label}}
   </div>
 
- <div class="col-xs-5"  >
+ <div class="pull-right"  >
    <!--
     <div style="float: right; margin-right: 20px; margin-top: 10px; color: #999999">
       id: {{vm.node.id}} 
       <span ng-show="vm.node.created">created: {{vm.node.created | date:'dd/MM/yyyy'}}</span>
     </div>
     -->
-    <div ng-show="vm.deleted" class="pull-right">
+    <div ng-show="vm.deleted" >
         <button class="btn btn-success" ng-click="vm.restore()">Restore</button>
         <button class="btn btn-danger" ng-click="vm.destroy()">Destroy</button>
     </div>
-    <div ng-show="!vm.deleted && vm.node.id >= 0" class="pull-right">
-        <button class="btn btn-success" ng-click="vm.save()" ng-disabled="vm.nodeForm.$invalid">Save</button>
-        <button class="btn btn-danger" ng-click="vm.del()">Delete</button>
-        <button class="btn btn-default pull-right" ng-click="vm.cancel()">Cancel</button>
+    <div ng-show="!vm.deleted && vm.node.id >= 0" >
+        <button class="btn ion-checkmark-round" ng-click="vm.save()" ng-disabled="vm.nodeForm.$invalid"></button>
+        <button class="btn pull-right ion-close-round" ng-click="vm.cancel()"></button>
     </div>
-    <div ng-show="!vm.deleted && vm.node.id ==-1" class="pull-right">
+    <div ng-show="!vm.deleted && vm.node.id ==-1" >
         <button class="btn btn-success" ng-click="vm.save()" ng-disabled="nodeForm.$invalid">Create</button>
     </div>
   </div>

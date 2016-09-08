@@ -29,6 +29,7 @@
           //set node property on scope - propagates to child controllers
           vm.node = node;
           $scope.node = vm.node;
+          $scope.hasNode = true;
         });
       }
     }

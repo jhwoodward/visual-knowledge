@@ -1,17 +1,26 @@
 <graph 
   data="vm.data"
-  on-select="vm.onGraphSelect(node, edge)">
+  on-select="vm.onGraphSelect(node, edges)">
 </graph>
-<div ng-show="vm.selectedNode" class="graph-preview">
-  <div class="header">
-    {{vm.selectedNode.label}}
+<div class="graph-preview">
+  <div class="tfade" ng-show="vm.selectedNode">
+    <div class="header">
+      {{vm.selectedNode.label}}
+    </div>
+    <div>
+      <p>{{vm.selectedNode.description}}</p>
+      <p>{{vm.selectedNode.text}}</p>
+    </div>
+    <div>
+      <button class="btn btn-primary"  ng-click="vm.goToSelected()">Go to {{vm.selectedNode.label}}</button>
+    </div>
   </div>
-  <div>
-    <p>{{vm.selectedNode.description}}</p>
-    <p>{{vm.selectedNode.text}}</p>
-  </div>
-  <div>
-    <button class="btn btn-primary"  ng-click="vm.goToSelected()">Go to {{vm.selectedNode.label}}</button>
+  <div class="tfade"  ng-show="vm.selectedEdges.length">
+    <div ng-repeat="edge in vm.selectedEdges">
+      {{edge.start.label}}
+      <span style="color: #999999">{{edge.type | lowercase}}</span>
+      {{edge.end.label}}
+    </div>
   </div>
 </div>
 <ul class="graph-types">

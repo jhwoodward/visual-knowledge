@@ -3,44 +3,8 @@
     overflow: hidden;
 }
 
-/*.nav-tabs > .active > a, .nav-tabs > .active > a:hover, .nav-tabs > .active > a:focus {
- background: rgb(240,240,240);
-
- border: 1px solid rgb(190,190,190);
-   border-bottom-color: transparent;
-}*/
-
-.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
-    color: #555;
-    cursor: default;
-     background-color: #fff;
-     border: 1px solid rgb(190,190,190);
-     border-bottom-color: transparent;
-}
 
 
-.nav-tabs > li:hover > a {
-    background: rgb(210,210,210); border-color: transparent;
-}
-
-.nav-tabs > li > a {
-    padding: 8px 15px 7px 15px;
-}
-
-.grad1 { 
-    padding:10px;
-    /*background:rgb(200,210,220)*/
-    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(245,245,245)), color-stop(50%,rgb(235,235,235)), color-stop(90%,rgb(225,225,225)), color-stop(100%,rgb(220,220,220)));
-}
-
-
-.nav-tabs
-{/*background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(48%,#fcfcfc), color-stop(50%,#fafafa), color-stop(100%,#fcfcfc));*/
- /*background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(240,240,240)), color-stop(50%,rgb(235,235,235)), color-stop(100%,rgb(230,230,230)));*/
- /*background:#fff;*/
- background:transparent;
-   border-bottom: 1px solid rgb(190,190,190);
-}
 
 .icon{font-size:20px;}
 
@@ -160,17 +124,7 @@ ul
 
 
 
-    .propertyTabs textarea {
-        height:80px;
-    }
 
-.propertyTabs .tab-content {
-    padding-top:10px;
-    display:block;
-    overflow-y:auto; 
-    overflow-x:hidden;
-    background:#fff;
-}
 
 .selected {
      background-color: #3a87ad;color:#FFF
@@ -300,7 +254,8 @@ border-left:1px dashed #08c;
     
 .label-system
 {
-    background:#fff;border-color:#ccc !important; color:#ccc; padding: 1px 3px;text-shadow:none;
+    background:#fff; color:#ccc; padding: 1px 3px;
+    text-shadow:none;
 
 }
     .label-system i
@@ -356,21 +311,33 @@ label {
     overflow-y:auto;
     -webkit-overflow-scrolling: touch;
 }
-
+.label {
+  border-radius:2px;
+}
 .labelEdit
 {
-      background-color: #fff;
-  border: 1px solid #ccc;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  background-color: #e6f1fb;
   display: inline-block;
-  padding: 4px 6px;
   margin-bottom: 10px;
   color: #555;
   vertical-align: middle;
-  border-radius: 4px;
+  border-radius: 2px;
   line-height: 22px;
   cursor: text;
-  width:100%;
+  width: 100%;
+}
+
+.form-control {
+    height: 30px;
+    padding: 4px 8px;
+  
+    border: none;
+    border-radius: 2px;
+    box-shadow: none !important;
+}
+
+.tab-content .form-control {
+    background-color: #e6f1fb;
 }
 
 .labelEdit input {
@@ -417,14 +384,64 @@ label {
     float:left;
 }
 
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    color: #fff;
+  border:none;
+  background:transparent;
+    border-bottom:5px solid #fff;
+ 
+}
+.nav-tabs>li>a:hover {
+
+     background:transparent;
+    border-bottom:3px solid transparent;
+}
+
+.nav-tabs > li > a {
+   background:transparent;
+  border:none;
+   border-bottom:3px solid transparent;
+   color: #fff; border-radius: 2px; 
+       padding: 7px 3px 5px 3px;
+    margin: 0px 7px 0px 7px;
+}
+
+
+.nav-tabs {
+  border: none;
+  background:#5696ce;
+
+}
+
+.label-info {
+    background-color: #5696ce;
+}
+
+
+.tab-content textarea {
+        height:80px;
+    }
+
+.tab-content {
+    padding:10px;
+    display:block;
+    overflow-y:auto; 
+    overflow-x:hidden;
+   
+   color: #2b4163;
+}
+
 .tab-pane {
     overflow-x: hidden;
     overflow-y: auto;
-    height: calc(100vh - 300px);
+    height: calc(100vh - 430px);
 }
 
+.panel .image {
+  height:350px;
+}
 .map {
-    background: #eaebef;
+    background: #8fb1ca;
     top: 0;
     left: 0;
     width: 100%;
@@ -433,42 +450,120 @@ label {
     overflow: hidden;
 }
 
-.search {
-  z-index:3;
-  position: absolute;
-  left: 0px;
-  margin: 16px;
-  top: 0px;
-  z-index: 10;
-  transition: left 0.5s;
-  margin: 8px 0 8px 8px;
+.panel {
+  background:#c5d9ec;
+  border:0;
+  border-radius:0;
+  z-index: 3;
+  height: 100%;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
   transform: translateX(0px);
-  transition-property: -webkit-transform,transform,visibility,opacity;
-  transition-duration: 200ms;
-  transition-timing-function: cubic-bezier(0.0,0.0,0.2,1);
+  -webkit-transform: translateX(0px);
 }
 
-.panel {
- 
-  background: #fff;
-  padding:10px;
-  border-radius:0;
-  padding-top:200px;
-  z-index:2;
+.panel-slide {
+  position:absolute;
   width: 408px;
-  position: absolute;
   top: 0;
-  z-index: 3;
-/*  opacity: 0;
-  height: 0;*/
-  height: 100%;
   left: 0;
-  -webkit-transform: translateX(0px);
-  transform: translateX(0px);
-  transition-property: -webkit-transform,transform,opacity;
+
+  transition-property: -webkit-transform,transform;
   transition-duration: 0.2s;
   transition-timing-function: cubic-bezier(0.0,0.0,0.2,1);
 }
+
+
+.panel-collapsed {
+    box-shadow: none;
+    -webkit-transform: translateX(-408px);
+    transform: translateX(-408px);
+}
+.panel-collapsed .panel-toggle-button {
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+}
+
+.panel-toggle-button-container {
+    position: absolute;
+    z-index: 0;
+    top: 8px;
+    left: 100%;
+    display: block;
+}
+
+.panel-toggle-button {
+    width: 23px;
+    height: 48px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.7);
+    border-left: 1px solid #D4D4D4;
+    box-shadow: 0px 1px 4px rgba(0,0,0,0.3);
+    border:none;
+    outline: none;
+}
+.search-box-container {
+    top: 0;
+    position: absolute;
+    z-index: 4;
+    border: 1px solid #ccc;
+}
+.search-box {
+    z-index: 10;
+    margin: 8px 0 8px 8px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 10;
+    height: 48px;
+    background: rgba(255,255,255,0.2);
+    width: 388px;
+    border-radius: 2px;
+    transition: 300ms background;
+}
+.search-box-shadow {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2),0 -1px 0px rgba(0,0,0,0.02);
+}
+.search-box .btn,.panel-toggle-button {
+  color:#999;
+  outline: none;
+  border-radius: 2px;
+}
+.search-box .btn {
+  font-size: 26px;
+  background: transparent;
+  height: 5px;
+  outline:none !important;
+  box-shadow: none !important;
+}
+.panel .btn:hover {
+  color:#f0ad4e;
+}
+.search-box-inner {
+  border-radius: 2px;
+  position: relative;
+  width:380px
+}
+.btn-menu, .input-search, .btn-search {
+  position:absolute;
+}
+.input-search {
+  background:transparent;
+  border: none !important;
+  box-shadow: none !important;
+  position:absolute;
+  left: 41px;
+  padding-left: 0;
+  height: 48px;
+  width: 300px;
+  outline: none;
+}
+.search-box.focus {
+  background: #fff;
+}
+.btn-search {
+  right: 0;
+}
+
 
 .graph-types {
   z-index:3;
@@ -477,13 +572,13 @@ label {
   margin:10px;
   bottom:0px;
   right: 0px;
-  border:1px solid #999;
+  border:1px solid #dcdcdc;
   background: #fff;
 }
 
 .graph-types li {
-  padding:20px;
-  border-bottom: 1px solid #999;
+  padding:10px;
+  border-bottom: 1px solid #dcdcdc;
   list-style-type: none;
   cursor: pointer;
   background: #eaebef;
@@ -495,18 +590,69 @@ label {
 }
 
 .graph-preview {
-  z-index:3;
+  z-index:4;
   position:absolute;
-  width:400px;
-  margin:10px;
   top:0px;
   right: 0px;
-  border:1px solid #999;
+  
+}
+
+.graph-preview > div {
+  width:400px;
+  margin:10px;
+  
   background: #fff;
   border-radius: 10px;
   padding:10px;
+
+  -webkit-box-shadow: 0px 15px 46px -3px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0px 15px 46px -3px rgba(0,0,0,0.2);
+  box-shadow: 0px 15px 46px -3pxrgba(0,0,0,0.2);
 }
 
 .header {
   font-size:2em;
+}
+
+.panel .header-container {
+  background: #3e82bd;
+  color: #fff;  
+}
+
+.panel .header-container {
+  padding-top:3px;
+  padding-left: 7px;
+  padding-bottom:3px;
+}
+
+.panel .header-container .btn {
+   background: transparent;
+   padding:0;
+   padding-right:10px;
+   font-size:18px;
+   padding-top:7px;
+   
+}
+
+.panel .header-container  .btn-delete {
+  padding-top:5px;
+  font-size: 22px;
+}
+
+
+.tfade.ng-hide {
+  opacity: 0;
+}
+
+.tfade.ng-hide-remove,
+.tfade.ng-hide-add {
+  display: block !important;
+}
+
+.tfade.ng-hide-remove {
+  transition: all linear 500ms;
+}
+
+.tfade.ng-hide-add {
+  transition: all linear 500ms;
 }

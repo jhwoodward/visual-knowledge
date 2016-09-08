@@ -7,7 +7,6 @@
     'neograph.node.images',
     'neograph.node.properties',
     'neograph.node.relationships',
-    'neograph.node.search',
     'neograph.node.service',
     'neograph.node.routes',
     'neograph.node.controller',

@@ -1,39 +1,21 @@
-angular.module('templates', []);
-var app = angular
-  .module('Neograph',
-  [
+(function() {
+
+  angular.module('neograph', [
     'templates',
-    'publishSubscribe',
     'ui.router',
     'ngSanitize',
-    'neograph.common',
+    'ngAnimate',
+    'neograph.common', 
+    'common.filters',
     'neograph.edge',
     'neograph.interaction',
     'neograph.layout',
     'neograph.neo',
     'neograph.node',
-    'neograph.map'
-  ]).
-  config(function($stateProvider, $urlRouterProvider) {
-    $stateProvider
-        .state('admin', { 
-          url:'/admin',
-          views: {
-            '@': {
-              templateUrl:'app/partials/admin.html'
-            }, 
-            'search@admin':{
-              controller:'SearchCtrl as vm',
-              templateUrl:'app/node/search/search.html'
-            }, 
-            'map@admin':{
-              controller:'MapCtrl as vm',
-              templateUrl:'app/map/map.html'
-            }
-          }
-        });
+    'neograph.search',
+    'neograph.map',
+    'neograph.routes',
+    'neograph.constant'
+    ]);
 
-    $urlRouterProvider.otherwise('/admin');
-  });
-
-
+})();

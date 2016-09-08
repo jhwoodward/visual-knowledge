@@ -13,6 +13,7 @@
     vm.maps = [];
     vm.selectedMap = {};
     vm.selectedNode = undefined;
+    vm.selectedEdges = [];
     vm.goToSelected = goToSelected;
 
     activate();
@@ -42,8 +43,7 @@
           vm.data = data;
         });
       }
-  
-    })
+    });
 
     function goToSelected() {
       $state.go('admin.node', {node: vm.selectedNode.label});
@@ -68,21 +68,19 @@
         });
     }
 
-    function onGraphSelect(node, edge) {
-
-      if (edge) {
-        $state.go('admin.edge', { edge: JSON.stringify(edge) });
-      }
-      
+    function onGraphSelect(node, edges) {
+ 
+      vm.selectedEdges = edges;
       if (node) {
         if (node === vm.selectedNode) {
            $state.go('admin.node', { node: node.label });
         } else {
            vm.selectedNode = node;
         }
+      } else {
+        vm.selectedNode = undefined;
       }
     }
-
   }
  
 })();

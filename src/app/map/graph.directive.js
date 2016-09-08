@@ -115,25 +115,28 @@
       }
 
       function onNetworkSelect(params) {
+        var selection = {};
         if (params.nodes.length === 1) {
-          var node = scope.data.nodes[params.nodes[0]];
-          console.log(node);
-          scope.onSelect({node: node});
-        } else if (params.edges.length === 1) {
-          var id = params.edges[0];
-          var startNode = scope.data.nodes[scope.data.edges[id].startNode];
-          var endNode = scope.data.nodes[scope.data.edges[id].endNode];
-          var edge = {
-            id,
-            start: { lookup: startNode.label },
-            end: { lookup: endNode.label },
-            type: scope.data.edges[id].type,
-            properties: scope.data.edges[id].properties
-          };
-          scope.onSelect({edge: edge});
+          selection.node = scope.data.nodes[params.nodes[0]];
+        } 
+        if (params.edges.length) {
+          selection.edges = [];
+          params.edges.forEach(function(id) {
+            var edge = scope.data.edges[id];
+            var startNode = scope.data.nodes[edge.startNode];
+            var endNode = scope.data.nodes[edge.endNode];
+            selection.edges.push({
+              id,
+              start: startNode,
+              end: endNode,
+              type: edge.type,
+              properties: edge.properties
+            });
+          })
         }
+        scope.onSelect(selection);
+
       }
-    
 
       function onGlobalDeleted(params) {
         if (params.selection.nodes && params.selection.nodes.length) {

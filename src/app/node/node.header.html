@@ -1,12 +1,11 @@
-<div class="row">
-  <div class="col-xs-7 header">
+<div class="clearfix header-container">
+  <div class="pull-left header">
     {{vm.node.isPicture() ? vm.node.title: vm.node.label}}
   </div>
-
-  <div class="col-xs-5">
-    <div class="pull-right">
-      <button class="btn btn-default"  ng-click="vm.edit()">Edit</button>
-      <button class="btn btn-default" ng-click="vm.new()">New...</button>
-    </div>
+  <div class="pull-right">
+    <button class="btn ion-edit"  ng-click="vm.edit()"></button>
+     <button class="btn btn-delete ion-trash-a" ng-click="vm.del()"></button>
+   <!-- <button class="btn ion-plus" ng-click="vm.new()"></button>-->
   </div>
+ 
 </div>

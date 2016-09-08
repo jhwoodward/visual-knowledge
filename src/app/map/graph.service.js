@@ -117,7 +117,7 @@
           colour = 'green';
           break;
         default:
-          colour = 'blue';
+          colour = '#3e82bd';
       }
 
       var hideEdge = type === 'FROM';
@@ -130,8 +130,8 @@
           type !== 'PROPERTY' &&
           type !== 'INFLUENCES' &&
           type !== 'ASSOCIATED_WITH'
-          ) ? type.toLowerCase() : null,
-        fontColor: 'blue',
+          ) ? type.toLowerCase().replace(/_/g,'') : null,
+        fontColor: '#3e82bd',
         color: colour,
         opacity: hideEdge ? 0 : 1, // type === "INFLUENCES" ? 1 : 0.7,
         style: symmetrical ? 'dash-line' : 'arrow', // arrow-center' ,
