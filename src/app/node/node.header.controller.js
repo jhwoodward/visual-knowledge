@@ -8,7 +8,8 @@
     var vm = this;
     vm.node = undefined;
     vm.edit = edit;
-    vm.new = newNode;
+    vm.del = del;
+    vm.destroy = destroy;
     
     activate();
     function activate() {
@@ -18,14 +19,32 @@
       });
     }
 
-    function newNode() {
-      vm.node = node;
-      $scope.node = vm.node;
+    function reload() {
+      $state.go('admin.node', { node: vm.node.label });
     }
 
     function edit() {
-      $state.go('admin.node.edit', { node: vm.node.label });
+      $state.go('admin.node.edit');
     }
+
+    function del() {
+      nodeService.delete(vm.node)
+        .then(function(deleted) {
+          vm.node = deleted;
+          $scope.node = vm.node;
+          //$scope.publish('deleted', { selection: { nodes: [n] } });
+        });
+    };
+
+    function destroy() {
+      nodeService.destroy(vm.node)
+        .then(function() {
+          vm.node = undefined;
+          //where to now ???
+        });
+    };
+
+
   }
 
 })();

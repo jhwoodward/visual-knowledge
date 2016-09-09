@@ -449,6 +449,10 @@ label {
   opacity: 0;
   position: absolute;
 }
+
+.panel-fill{
+  height:65px;
+}
 .map {
     background: #8fb1ca;
     top: 0;

@@ -102,13 +102,10 @@
       };
 
       function link(scope, element, attrs) {
-        console.log('link');
         var url;
         var image = angular.element('<img/>')
           .on('load',function() {
-
             var imageElement = angular.element('<div/>').addClass("image layer");
-
             imageElement.css({
               'background-image': 'url(' + scope.url +')'
             });
@@ -120,8 +117,7 @@
             $timeout(function() {
               element.find('.complete').remove();
               element.find('.image.layer').addClass('complete');
-            },600);
-
+            }, 1000);
           });
 
         scope.$watch('url',setImage);
@@ -1037,7 +1033,6 @@ angular.module('neograph.common.typeaheadSimple', [])
 
   function filterFunc(_) {
     return function (input) {
-      console.log('filter');
       if (input != null) {
         return _.startCase(input);
       } else {
@@ -1962,46 +1957,37 @@ angular.module('neograph.map', [
   .factory('nodeFactory', ["predicateFactory", function (predicateFactory) {
 
     function Node(data) {
-
       this.labels = [];
-
+      this.id = -1;
       Object.assign(this, data);
-
         // instead i think i should call the service to get the reverse
       for (var relKey in this.relationships) {
         var rel = this.relationships[relKey];
         rel.predicate = predicateFactory.create(rel.predicate);
       }
-
       if (!this.label && this.lookup) {
         this.label = this.lookup;
       }
 
+      this.isDeleted = this.labels.indexOf('Deleted') > -1;
 
     }
 
     Node.prototype.isPicture = function () {
-
       return this.labels.indexOf('Picture') > -1;
-
     };
 
     Node.prototype.isPerson = function () {
-
       return this.labels.indexOf('Person') > -1;
-
     };
 
     Node.prototype.isProperty = function () {
-
       return this.labels.indexOf('Property') > -1;
-
     };
 
-
+   
 
     Node.prototype.isCustomField = function (key) {
-
       return key != 'lookup'
             && key != 'class'
             && key != 'label'
@@ -2015,7 +2001,6 @@ angular.module('neograph.map', [
             key != 'image' &&
             key != 'relationships' &&
             key != 'labelled';
-
     };
 
 
@@ -2024,12 +2009,7 @@ angular.module('neograph.map', [
         return new Node(data);
       }
     };
-
-
   }]);
-
-
-
 
   angular.module('neograph.models.predicate', [])
   .factory('predicateFactory', function () {
@@ -2637,8 +2617,10 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
   controller.$inject = ["$scope", "$state", "$stateParams", "nodeService"];
   childController.$inject = ["$scope", "$stateParams", "nodeService"];
   angular.module('neograph.node.controller', [
+    'neograph.node.create.controller',
     'neograph.node.header.controller',
-    'neograph.node.edit.header.controller'
+    'neograph.node.edit.header.controller',
+    'neograph.node.create.header.controller'
     ])
     .controller('NodeCtrl', controller)
     .controller('ChildNodeCtrl', childController);
@@ -2646,7 +2628,7 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
   function controller($scope, $state, $stateParams, nodeService) {
     var vm = this;
     vm.node = undefined;
-    vm.tabs = ['Properties', 'Relationships'];
+    vm.tabs = ['Properties', 'Relationships', 'References'];
     vm.selectedTab = 'Properties';
     vm.selectTab = function (tab) {
       vm.selectedTab = tab;
@@ -2675,6 +2657,56 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
 (function() {
   'use strict';
 
+  controller.$inject = ["$scope", "$state", "$stateParams", "nodeService", "nodeFactory"];
+  angular.module('neograph.node.create.controller', [])
+    .controller('NodeCreateCtrl', controller);
+
+  function controller($scope, $state, $stateParams, nodeService, nodeFactory) {
+    var vm = this;
+    vm.node = nodeFactory.create();
+    console.log(vm.node);
+    $scope.node = vm.node;
+    vm.tabs = ['Properties', 'Relationships', 'References'];
+    vm.selectedTab = 'Properties';
+    vm.selectTab = function (tab) {
+      vm.selectedTab = tab;
+    };
+
+    $scope.$emit('nodeLoaded', vm.node);
+
+  }
+
+})();
+(function() {
+  'use strict';
+
+  controller.$inject = ["$scope", "$state", "nodeService"];
+  angular.module('neograph.node.create.header.controller', [])
+    .controller('NodeCreateHeaderCtrl', controller);
+
+  function controller($scope, $state, nodeService) {
+    var vm = this;
+    vm.node = $scope.node;
+    vm.cancel = cancel;
+    vm.save = save;
+
+    function cancel() {
+      //where to ?
+    }
+
+    function save() {
+      nodeService.save(vm.node)
+        .then(function(saved) {
+          $state.go('admin.node', { node: saved.label });
+        });
+    };
+
+  }
+
+})();
+(function() {
+  'use strict';
+
   controller.$inject = ["$scope", "$state", "nodeService"];
   angular.module('neograph.node.edit.header.controller', [])
     .controller('NodeEditHeaderCtrl', controller);
@@ -2682,10 +2714,7 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
   function controller($scope, $state, nodeService) {
     var vm = this;
     vm.node = undefined;
-    
     vm.cancel = cancel;
-    vm.del = del;
-    vm.destroy = destroy;
     vm.save = save;
     vm.restore = restore;
 
@@ -2701,57 +2730,20 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
       $state.go('admin.node', { node: vm.node.label });
     }
 
-    function del() {
-      nodeService.delete(vm.node)
-        .then(function(deleted) {
-          vm.node = deleted;
-          $scope.node = vm.node;
-          //$scope.publish('deleted', { selection: { nodes: [n] } });
-        });
-    };
-
-    function destroy() {
-      nodeService.destroy(vm.node)
-        .then(function() {
-          vm.node = undefined;
-          $scope.node = vm.node;
-        });
-    };
-
-
     function save() {
-  
       nodeService.save(vm.node)
         .then(function(saved) {
-          vm.node = saved;
-          $scope.node = vm.node;
-        //  var newData = {};
-        //  newData[node.id] = node;
-        //  $scope.publish('dataUpdate', newData);
-          // if type, refresh types
-        //  if (node.class == 'Type') {
-       //     utils.refreshTypes();
-       //   }
-       ///   $(node.temp.links).each((i, e) => { e.editing = undefined; });
+          $state.go('admin.node', { node: saved.label });
         });
- 
     };
 
     function restore() {
       nodeService.restore(vm.node)
         .then(function(restored) {
-          vm.node = restored;
-          $scope.node = vm.node;
-        //  var newData = {};
-        //  newData[node.id] = node;
-        //  $scope.publish('dataUpdate', newData);
+          $state.go('admin.node', { node: restored.label });
       });
     };
-
-
   }
-
-
 
 })();
 (function() {
@@ -2765,7 +2757,8 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
     var vm = this;
     vm.node = undefined;
     vm.edit = edit;
-    vm.new = newNode;
+    vm.del = del;
+    vm.destroy = destroy;
     
     activate();
     function activate() {
@@ -2775,14 +2768,32 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
       });
     }
 
-    function newNode() {
-      vm.node = node;
-      $scope.node = vm.node;
+    function reload() {
+      $state.go('admin.node', { node: vm.node.label });
     }
 
     function edit() {
-      $state.go('admin.node.edit', { node: vm.node.label });
+      $state.go('admin.node.edit');
     }
+
+    function del() {
+      nodeService.delete(vm.node)
+        .then(function(deleted) {
+          vm.node = deleted;
+          $scope.node = vm.node;
+          //$scope.publish('deleted', { selection: { nodes: [n] } });
+        });
+    };
+
+    function destroy() {
+      nodeService.destroy(vm.node)
+        .then(function() {
+          vm.node = undefined;
+          //where to now ???
+        });
+    };
+
+
   }
 
 })();
@@ -2807,7 +2818,32 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
   
   angular.module('neograph.node.routes',[])
     .config(["$stateProvider", function ($stateProvider) {
-      $stateProvider
+        $stateProvider
+        .state('admin.createNode', {
+          url:'/create/node',
+          views:{
+            'panel@admin': {
+              templateUrl: 'app/node/node.html',
+              controller: 'NodeCreateCtrl as vm'
+            },
+            'header@admin.createNode': {
+              templateUrl: 'app/node/node.create.header.html',
+              controller:'NodeCreateHeaderCtrl as vm'
+            },
+            'properties@admin.createNode':{
+              templateUrl:'app/node/properties/node.edit.properties.html',
+              controller:'EditPropertiesCtrl as vm'
+            },
+            'relationships@admin.createNode':{
+              templateUrl:'app/node/relationships/node.edit.relationships.html',
+              controller:'EditRelationshipsCtrl as vm'
+            },
+            'references@admin.createNode':{
+              templateUrl:'app/node/references/node.edit.references.html',
+              controller:'EditReferencesCtrl as vm'
+            }
+          }
+        })
         .state('admin.node', {
           url:'/node/:node',
           views: {
@@ -2826,6 +2862,10 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
             'relationships@admin.node':{
               templateUrl:'app/node/relationships/node.relationships.html',
               controller: 'ChildNodeCtrl as vm'
+            },
+            'references@admin.node':{
+              templateUrl:'app/node/references/node.references.html',
+              controller:'ChildNodeCtrl as vm'
             },
             'images@admin.node': {
               templateUrl:'app/node/images/node.images.html',
@@ -2847,6 +2887,10 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
             'relationships@admin.node':{
               templateUrl:'app/node/relationships/node.edit.relationships.html',
               controller:'EditRelationshipsCtrl as vm'
+            },
+            'references@admin.node':{
+              templateUrl:'app/node/references/node.edit.references.html',
+              controller:'EditReferencesCtrl as vm'
             }
           }
         });
@@ -3534,11 +3578,11 @@ angular.module('neograph.queryInput',
 (function() {
   'use strict';
 
-  controller.$inject = ["utils", "$scope", "$stateParams"];
+  controller.$inject = ["utils", "$scope"];
   angular.module('neograph.node.edit.properties.controller', [])
     .controller('EditPropertiesCtrl', controller);
 
-  function controller(utils, $scope, $stateParams) {
+  function controller(utils, $scope) {
 
     var vm = this;
     vm.node = {};
@@ -3600,12 +3644,39 @@ angular.module('neograph.queryInput',
 
 (function() {
   'use strict';
+
+  controller.$inject = ["$scope"];
+  angular.module('neograph.node.edit.references.controller', [])
+    .controller('EditReferencesCtrl', controller);
+
+  function controller($scope) {
+
+    var vm = this;
+    vm.node = {};
+    //set node when loaded by parent controller
+    $scope.$watch('node', function(node) {
+      vm.node = node;
+    });
+
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular.module('neograph.node.references', [
+    'neograph.node.edit.references.controller'
+    ]);
+})();
+
+(function() {
+  'use strict';
     
-  controller.$inject = ["nodeService", "session", "utils", "$scope", "$stateParams", "predicateFactory"];
+  controller.$inject = ["$scope", "predicateFactory"];
   angular.module('neograph.node.relationships.edit.controller', [])
     .controller('EditRelationshipsCtrl', controller);
 
-  function controller(nodeService, session, utils, $scope, $stateParams, predicateFactory) {
+  function controller($scope, predicateFactory) {
     var vm = this;
     vm.node = {};
     //set node when loaded by parent controller

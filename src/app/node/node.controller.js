@@ -2,8 +2,10 @@
   'use strict';
 
   angular.module('neograph.node.controller', [
+    'neograph.node.create.controller',
     'neograph.node.header.controller',
-    'neograph.node.edit.header.controller'
+    'neograph.node.edit.header.controller',
+    'neograph.node.create.header.controller'
     ])
     .controller('NodeCtrl', controller)
     .controller('ChildNodeCtrl', childController);
@@ -11,7 +13,7 @@
   function controller($scope, $state, $stateParams, nodeService) {
     var vm = this;
     vm.node = undefined;
-    vm.tabs = ['Properties', 'Relationships'];
+    vm.tabs = ['Properties', 'Relationships', 'References'];
     vm.selectedTab = 'Properties';
     vm.selectTab = function (tab) {
       vm.selectedTab = tab;

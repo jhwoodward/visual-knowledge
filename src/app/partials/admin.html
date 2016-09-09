@@ -3,7 +3,7 @@
   <ui-view name="search" ></ui-view>
 </div>
 <div class="panel panel-slide tfade" ng-show="vm.node"  ng-class="{'panel-collapsed': !vm.panelVisible}" >
-  <ui-view name="search" ></ui-view>
+  <ui-view name="search"  ></ui-view>
 
   <div class="panel-toggle-button-container"> 
     <button 
@@ -11,8 +11,10 @@
       ng-click="vm.togglePanel()">
     </button> 
   </div>
-  <back-img url="vm.node.image.full.url">
+  <back-img url="vm.node.image.full.url" ng-if="vm.node.id > -1">
   </back-img>
+  <div ng-if="vm.node.id === -1" class="panel-fill">
+  </div>
   <ui-view name="panel"></ui-view>
 </div>
 

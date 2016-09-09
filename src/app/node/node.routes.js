@@ -3,7 +3,32 @@
   
   angular.module('neograph.node.routes',[])
     .config(function ($stateProvider) {
-      $stateProvider
+        $stateProvider
+        .state('admin.createNode', {
+          url:'/create/node',
+          views:{
+            'panel@admin': {
+              templateUrl: 'app/node/node.html',
+              controller: 'NodeCreateCtrl as vm'
+            },
+            'header@admin.createNode': {
+              templateUrl: 'app/node/node.create.header.html',
+              controller:'NodeCreateHeaderCtrl as vm'
+            },
+            'properties@admin.createNode':{
+              templateUrl:'app/node/properties/node.edit.properties.html',
+              controller:'EditPropertiesCtrl as vm'
+            },
+            'relationships@admin.createNode':{
+              templateUrl:'app/node/relationships/node.edit.relationships.html',
+              controller:'EditRelationshipsCtrl as vm'
+            },
+            'references@admin.createNode':{
+              templateUrl:'app/node/references/node.edit.references.html',
+              controller:'EditReferencesCtrl as vm'
+            }
+          }
+        })
         .state('admin.node', {
           url:'/node/:node',
           views: {
@@ -22,6 +47,10 @@
             'relationships@admin.node':{
               templateUrl:'app/node/relationships/node.relationships.html',
               controller: 'ChildNodeCtrl as vm'
+            },
+            'references@admin.node':{
+              templateUrl:'app/node/references/node.references.html',
+              controller:'ChildNodeCtrl as vm'
             },
             'images@admin.node': {
               templateUrl:'app/node/images/node.images.html',
@@ -43,6 +72,10 @@
             'relationships@admin.node':{
               templateUrl:'app/node/relationships/node.edit.relationships.html',
               controller:'EditRelationshipsCtrl as vm'
+            },
+            'references@admin.node':{
+              templateUrl:'app/node/references/node.edit.references.html',
+              controller:'EditReferencesCtrl as vm'
             }
           }
         });

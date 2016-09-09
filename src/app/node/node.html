@@ -1,4 +1,3 @@
-
 <ui-view name="header"></ui-view>
 <div class="tabbable propertyTabs">
   <ul class="nav nav-tabs">
@@ -15,6 +14,10 @@
 
     <div class="tab-content" ng-switch-when="Relationships">
         <ui-view name="relationships"></ui-view>
+    </div>
+
+    <div class="tab-content" ng-switch-when="References">
+        <ui-view name="references"></ui-view>
     </div>
 
     <div class="tab-content" ng-switch-when="Images"   >   

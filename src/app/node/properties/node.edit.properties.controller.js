@@ -4,7 +4,7 @@
   angular.module('neograph.node.edit.properties.controller', [])
     .controller('EditPropertiesCtrl', controller);
 
-  function controller(utils, $scope, $stateParams) {
+  function controller(utils, $scope) {
 
     var vm = this;
     vm.node = {};

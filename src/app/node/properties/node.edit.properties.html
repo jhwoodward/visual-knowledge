@@ -88,32 +88,6 @@
     </div>
   </div>
 
-  <label>Related web pages</label>
-  <div ng-click="vm.node.links.push({name:'',url:'',editing:true})" 
-    class="hoverOpacity pointer" 
-    style="float:right">
-    add web page...
-  </div>
-
-  <div class="row" ng-repeat="link in vm.node.links">
-    <div ng-if="link.editing">
-      <label>Link name</label>
-      <typeahead-simple class="input" ng-model="link.name" 
-        source="['Main Site', 'Google Art Project','Image Search']"></typeahead-simple>
-      <label>Link url</label>
-      <input class="input input-large" type="text" ng-model="link.url" />
-      <i class="icon icon-trash pull-right pointer hoverOpacity" style="margin:5px" 
-        ng-click="vm.node.temp.links.splice(vm.node.temp.links.indexOf($index),1)"></i>
-      <i style="margin:5px" class="icon icon-check pull-right pointer hoverOpacity" 
-        ng-click="link.editing=false"></i>
-    </div>
-
-    <div ng-if="!link.editing">
-      <a href="{{link.url}}" target="{{link.name}}">{{link.name}}</a>
-      <i class="icon icon-edit pull-right pointer hoverOpacity" ng-click="link.editing=true"></i>
-    </div>
-  </div>
-
 </div>
 
 

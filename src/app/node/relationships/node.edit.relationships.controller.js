@@ -4,7 +4,7 @@
   angular.module('neograph.node.relationships.edit.controller', [])
     .controller('EditRelationshipsCtrl', controller);
 
-  function controller(nodeService, session, utils, $scope, $stateParams, predicateFactory) {
+  function controller($scope, predicateFactory) {
     var vm = this;
     vm.node = {};
     //set node when loaded by parent controller

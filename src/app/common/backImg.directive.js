@@ -15,13 +15,10 @@
       };
 
       function link(scope, element, attrs) {
-        console.log('link');
         var url;
         var image = angular.element('<img/>')
           .on('load',function() {
-
             var imageElement = angular.element('<div/>').addClass("image layer");
-
             imageElement.css({
               'background-image': 'url(' + scope.url +')'
             });
@@ -33,8 +30,7 @@
             $timeout(function() {
               element.find('.complete').remove();
               element.find('.image.layer').addClass('complete');
-            },600);
-
+            }, 1000);
           });
 
         scope.$watch('url',setImage);
