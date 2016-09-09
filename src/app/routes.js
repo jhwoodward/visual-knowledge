@@ -23,20 +23,20 @@
 
       $urlRouterProvider.otherwise('/admin');
     })
-    .controller('AdminCtrl', function($scope, $state) {
+    .controller('AdminCtrl', function($scope, $state, nodeService) {
       var vm = this;
       vm.panelVisible = true;
-      vm.hasNode = false;
+      vm.node = undefined;
       
       vm.togglePanel = function() {
         vm.panelVisible = !vm.panelVisible;
       }
 
-      $scope.$on('$stateChangeSuccess', setHasNode);
+      $scope.$on('nodeLoaded', onNodeLoaded);
 
-      function setHasNode() {
-        console.log($state.params.node);
-        vm.hasNode = $state.params.node !== undefined;
+      function onNodeLoaded(event) {
+        var node = event.targetScope.node;
+        vm.node = node;
       }
 
     });

@@ -1,15 +1,18 @@
 ﻿<ui-view name="map" class="map"></ui-view>
-<div ng-show="!vm.hasNode" >
+<div ng-show="!vm.node" >
   <ui-view name="search" ></ui-view>
 </div>
-<div class="panel panel-slide tfade" ng-show="vm.hasNode"  ng-class="{'panel-collapsed': !vm.panelVisible}" >
+<div class="panel panel-slide tfade" ng-show="vm.node"  ng-class="{'panel-collapsed': !vm.panelVisible}" >
   <ui-view name="search" ></ui-view>
+
   <div class="panel-toggle-button-container"> 
     <button 
       class="panel-toggle-button ion-arrow-left-b" 
       ng-click="vm.togglePanel()">
     </button> 
   </div>
+  <back-img url="vm.node.image.full.url">
+  </back-img>
   <ui-view name="panel"></ui-view>
 </div>
 

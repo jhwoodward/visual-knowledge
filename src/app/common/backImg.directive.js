@@ -5,33 +5,46 @@
 
     function directive($timeout) {
       return {
-        restrict: 'A',
+        scope: {
+          url: '='
+        },
+        replace: 'true',
+        template: '<div class="image" style="position:relative"></div>',
+        restrict: 'EA',
         link: link
       };
 
       function link(scope, element, attrs) {
-
+        console.log('link');
         var url;
-        var image = angular.element('<img/>').css('visibility','hidden').appendTo('body').on('load',function() {
-          element.css({
-            'background-image': 'url(' + url +')',
-            'background-size' : 'cover'
-          });
-        });
+        var image = angular.element('<img/>')
+          .on('load',function() {
 
-        scope.$watch('vm.node',setImage);
+            var imageElement = angular.element('<div/>').addClass("image layer");
+
+            imageElement.css({
+              'background-image': 'url(' + scope.url +')'
+            });
+            element.append(imageElement);
+            $timeout(function() {
+              imageElement.css({'opacity':1});
+            });
+
+            $timeout(function() {
+              element.find('.complete').remove();
+              element.find('.image.layer').addClass('complete');
+            },600);
+
+          });
+
+        scope.$watch('url',setImage);
         $timeout(setImage);
-        element.css('transition','background 400ms linear');
 
         function setImage() {
-          if (scope.vm.node.image) {
-            url = scope.vm.node.image.full.url;
-
-            image.attr('src', url)
+          if (scope.url) {
+            image.attr('src', scope.url)
           }
-        
         }
-
       }
   }
 

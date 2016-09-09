@@ -13,7 +13,7 @@
             },
             'header@admin.node': {
               templateUrl: 'app/node/node.header.html',
-              controller: 'NodeCtrl as vm'
+              controller: 'NodeHeaderCtrl as vm'
             },
             'properties@admin.node': {
               templateUrl: 'app/node/properties/node.properties.html',
@@ -34,7 +34,7 @@
           views:{
             'header@admin.node': {
               templateUrl: 'app/node/node.edit.header.html',
-              controller:'NodeCtrl as vm'
+              controller:'NodeEditHeaderCtrl as vm'
             },
             'properties@admin.node':{
               templateUrl:'app/node/properties/node.edit.properties.html',

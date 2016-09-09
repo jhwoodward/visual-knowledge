@@ -9,7 +9,7 @@
     return {
       restrict: 'E',
       replace: true,
-      templateUrl: 'app/map/graph.directive.html',
+      template: '<div class="graphContainer"></div>',
       scope: {
         data: '=',
         onSelect: '&'
@@ -28,8 +28,7 @@
       };
       var options = graphService.options;
       options.onConnect = onNetworkConnect;
-      var graphContainer = element.find('.graphContainer');
-      var network = new vis.Network(graphContainer[0], graph, options);
+      var network = new vis.Network(element[0], graph, options);
       $timeout(setGraphSize);
       $('.network-manipulationUI.connect').hide();
       scope.hoverNode = undefined;
@@ -44,7 +43,7 @@
       network.on('select', onNetworkSelect);
   //    scope.subscribe('deleted', onGlobalDeleted);
   //    scope.subscribe('focus', onGlobalFocus);
-      graphContainer.on('mousemove', onContainerMouseMove);
+      element.on('mousemove', onContainerMouseMove);
     
     // Update existing data (not replace)
  //     scope.subscribe('dataUpdate', onGlobalDataUpdate);

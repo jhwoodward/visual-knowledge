@@ -45,20 +45,20 @@
 
       $urlRouterProvider.otherwise('/admin');
     }])
-    .controller('AdminCtrl', ["$scope", "$state", function($scope, $state) {
+    .controller('AdminCtrl', ["$scope", "$state", "nodeService", function($scope, $state, nodeService) {
       var vm = this;
       vm.panelVisible = true;
-      vm.hasNode = false;
+      vm.node = undefined;
       
       vm.togglePanel = function() {
         vm.panelVisible = !vm.panelVisible;
       }
 
-      $scope.$on('$stateChangeSuccess', setHasNode);
+      $scope.$on('nodeLoaded', onNodeLoaded);
 
-      function setHasNode() {
-        console.log($state.params.node);
-        vm.hasNode = $state.params.node !== undefined;
+      function onNodeLoaded(event) {
+        var node = event.targetScope.node;
+        vm.node = node;
       }
 
     }]);
@@ -92,33 +92,46 @@
 
     function directive($timeout) {
       return {
-        restrict: 'A',
+        scope: {
+          url: '='
+        },
+        replace: 'true',
+        template: '<div class="image" style="position:relative"></div>',
+        restrict: 'EA',
         link: link
       };
 
       function link(scope, element, attrs) {
-
+        console.log('link');
         var url;
-        var image = angular.element('<img/>').css('visibility','hidden').appendTo('body').on('load',function() {
-          element.css({
-            'background-image': 'url(' + url +')',
-            'background-size' : 'cover'
-          });
-        });
+        var image = angular.element('<img/>')
+          .on('load',function() {
 
-        scope.$watch('vm.node',setImage);
+            var imageElement = angular.element('<div/>').addClass("image layer");
+
+            imageElement.css({
+              'background-image': 'url(' + scope.url +')'
+            });
+            element.append(imageElement);
+            $timeout(function() {
+              imageElement.css({'opacity':1});
+            });
+
+            $timeout(function() {
+              element.find('.complete').remove();
+              element.find('.image.layer').addClass('complete');
+            },600);
+
+          });
+
+        scope.$watch('url',setImage);
         $timeout(setImage);
-        element.css('transition','background 400ms linear');
 
         function setImage() {
-          if (scope.vm.node.image) {
-            url = scope.vm.node.image.full.url;
-
-            image.attr('src', url)
+          if (scope.url) {
+            image.attr('src', scope.url)
           }
-        
         }
-
       }
   }
 
@@ -1033,6 +1046,140 @@ angular.module('neograph.common.typeaheadSimple', [])
     };
   }
 })();
+angular.module('neograph.interaction.draggable', [])
+    .directive('draggable', function () {
+      return {
+
+        link: function ($scope, element, attrs) {
+
+          var initLeft = $(element).position().left;
+
+          $(element).draggable({
+            axis: 'x',
+            drag: function () {
+
+              var change = initLeft - $(element).position().left;
+
+              $scope.$apply(function () {
+                $scope.window.tabsWidth = $scope.window.tabsWidth + change;
+              });
+
+
+              initLeft = $(element).position().left;
+
+            }
+          });
+        }
+      };
+    });
+
+angular.module('neograph.interaction', [
+  'neograph.interaction.draggable',
+  'neograph.interaction.resizable',
+  'neograph.interaction.selectable'
+]);
+
+angular.module('neograph.interaction.resizable', [])
+.directive('resizable', ["$window", function ($window) {
+  return {
+    scope: {
+      window: '='
+    },
+    controller: ["$scope", "$element", function ($scope, $element) {
+
+      var w = angular.element($window);
+      var getWindowDimensions = function () {
+        var width = w.width();
+        var height = w.height();
+        return {
+          'height': height,
+          'width': width,
+          'tabsWidth': $scope.window.tabsWidth,
+          'tabsWidthInner': $scope.window.tabsWidth - 10,
+          'graphWidth': width - $scope.window.tabsWidth,
+          'graphHeight': height - $scope.window.topBarHeight,
+          'topBarHeight': $scope.window.topBarHeight,
+          'tabsHeight': height - $scope.window.topBarHeight
+        };
+      };
+
+      $scope.window = getWindowDimensions();
+
+      $scope.$watch(getWindowDimensions, function (newValue, oldValue) {
+
+        $scope.window = newValue;
+
+      }, true);
+
+      w.bind('resize', function () {
+        $scope.$apply();
+      });
+
+            // w.bind("debouncedresize", function (event) {
+            //    $scope.$apply();
+
+            // });
+
+    }]
+  };
+}]);
+
+
+angular.module('neograph.interaction.selectable', [])
+.directive('selectable', function () {
+  return {
+    scope: {
+      selected: '='
+
+    },
+    link: function ($scope, element, attrs) {
+
+      $scope.$watch($(element).find('li.ui-selected').length, function (i) {
+
+
+
+
+
+
+        $(element).selectable({
+          filter: 'li',
+          stop: function (event, ui) {
+
+
+            var selected = [];
+
+
+            $(element).find('li.ui-selected').each(function (i, e) {
+              selected.push(parseInt($(e).attr('nodeindex')));
+            });
+
+            $scope.$apply(function () {
+
+              $scope.selected = selected;
+
+            });
+
+          }
+                    ,
+          cancel: '.badge, .label'
+
+
+
+        });
+
+
+      });
+
+
+    }
+  };
+});
+
+
+
+
+
+
 angular.module('neograph.layout', [])
 .directive('tabs', function () {
   return {
@@ -1183,7 +1330,7 @@ angular.module('neograph.layout', [])
     return {
       restrict: 'E',
       replace: true,
-      templateUrl: 'app/map/graph.directive.html',
+      template: '<div class="graphContainer"></div>',
       scope: {
         data: '=',
         onSelect: '&'
@@ -1202,8 +1349,7 @@ angular.module('neograph.layout', [])
       };
       var options = graphService.options;
       options.onConnect = onNetworkConnect;
-      var graphContainer = element.find('.graphContainer');
-      var network = new vis.Network(graphContainer[0], graph, options);
+      var network = new vis.Network(element[0], graph, options);
       $timeout(setGraphSize);
       $('.network-manipulationUI.connect').hide();
       scope.hoverNode = undefined;
@@ -1218,7 +1364,7 @@ angular.module('neograph.layout', [])
       network.on('select', onNetworkSelect);
   //    scope.subscribe('deleted', onGlobalDeleted);
   //    scope.subscribe('focus', onGlobalFocus);
-      graphContainer.on('mousemove', onContainerMouseMove);
+      element.on('mousemove', onContainerMouseMove);
     
     // Update existing data (not replace)
  //     scope.subscribe('dataUpdate', onGlobalDataUpdate);
@@ -1591,11 +1737,11 @@ angular.module('neograph.map.graph', [
 (function() {
   'use strict';
     
-  controller.$inject = ["$scope", "$state", "neo", "nodeService", "mapService"];
+  controller.$inject = ["$scope", "$rootScope", "$state", "neo", "nodeService", "mapService"];
   angular.module('neograph.map.controller',['neograph.node.service', 'ui.router'])
     .controller('MapCtrl', controller);
 
-  function controller($scope, $state, neo, nodeService, mapService) {
+  function controller($scope, $rootScope, $state, neo, nodeService, mapService) {
 
     var vm = this;
     vm.data = [];
@@ -1610,20 +1756,16 @@ angular.module('neograph.map.graph', [
     activate();
 
     function activate() {
-
-      $scope.$on('$stateChangeSuccess', setGraph);
-
-      function setGraph() {
+      console.log('map controller activate');
+      $rootScope.$on('nodeLoaded', onNodeLoaded);
+      function onNodeLoaded(event) {
+        console.log('map on node loaded');
         vm.selectedNode = undefined;
-        if (!vm.node || vm.node.label !== $state.params.node) {
-          nodeService.get($state.params.node, true)
-            .then(function (node) {
-              vm.node = node;
-              vm.maps = mapService.getQueries(node);
-              if (vm.maps && vm.maps.length) {
-                vm.selectedMap = vm.maps[0];
-              }
-          });
+        vm.selectedEdges = [];
+        vm.node = event.targetScope.node;
+        vm.maps = mapService.getQueries(vm.node);
+        if (vm.maps && vm.maps.length) {
+          vm.selectedMap = vm.maps[0];
         }
       }
     }
@@ -1816,140 +1958,6 @@ angular.module('neograph.map', [
   }
 
 })();
-angular.module('neograph.interaction.draggable', [])
-    .directive('draggable', function () {
-      return {
-
-        link: function ($scope, element, attrs) {
-
-          var initLeft = $(element).position().left;
-
-          $(element).draggable({
-            axis: 'x',
-            drag: function () {
-
-              var change = initLeft - $(element).position().left;
-
-              $scope.$apply(function () {
-                $scope.window.tabsWidth = $scope.window.tabsWidth + change;
-              });
-
-
-              initLeft = $(element).position().left;
-
-            }
-          });
-        }
-      };
-    });
-
-angular.module('neograph.interaction', [
-  'neograph.interaction.draggable',
-  'neograph.interaction.resizable',
-  'neograph.interaction.selectable'
-]);
-
-angular.module('neograph.interaction.resizable', [])
-.directive('resizable', ["$window", function ($window) {
-  return {
-    scope: {
-      window: '='
-    },
-    controller: ["$scope", "$element", function ($scope, $element) {
-
-      var w = angular.element($window);
-      var getWindowDimensions = function () {
-        var width = w.width();
-        var height = w.height();
-        return {
-          'height': height,
-          'width': width,
-          'tabsWidth': $scope.window.tabsWidth,
-          'tabsWidthInner': $scope.window.tabsWidth - 10,
-          'graphWidth': width - $scope.window.tabsWidth,
-          'graphHeight': height - $scope.window.topBarHeight,
-          'topBarHeight': $scope.window.topBarHeight,
-          'tabsHeight': height - $scope.window.topBarHeight
-        };
-      };
-
-      $scope.window = getWindowDimensions();
-
-      $scope.$watch(getWindowDimensions, function (newValue, oldValue) {
-
-        $scope.window = newValue;
-
-      }, true);
-
-      w.bind('resize', function () {
-        $scope.$apply();
-      });
-
-            // w.bind("debouncedresize", function (event) {
-            //    $scope.$apply();
-
-            // });
-
-    }]
-  };
-}]);
-
-
-angular.module('neograph.interaction.selectable', [])
-.directive('selectable', function () {
-  return {
-    scope: {
-      selected: '='
-
-    },
-    link: function ($scope, element, attrs) {
-
-      $scope.$watch($(element).find('li.ui-selected').length, function (i) {
-
-
-
-
-
-
-        $(element).selectable({
-          filter: 'li',
-          stop: function (event, ui) {
-
-
-            var selected = [];
-
-
-            $(element).find('li.ui-selected').each(function (i, e) {
-              selected.push(parseInt($(e).attr('nodeindex')));
-            });
-
-            $scope.$apply(function () {
-
-              $scope.selected = selected;
-
-            });
-
-          }
-                    ,
-          cancel: '.badge, .label'
-
-
-
-        });
-
-
-      });
-
-
-    }
-  };
-});
-
-
-
-
-
-
   angular.module('neograph.models.node', ['neograph.models.predicate'])
   .factory('nodeFactory', ["predicateFactory", function (predicateFactory) {
 
@@ -2628,21 +2636,53 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
 
   controller.$inject = ["$scope", "$state", "$stateParams", "nodeService"];
   childController.$inject = ["$scope", "$stateParams", "nodeService"];
-  angular.module('neograph.node.controller', [])
+  angular.module('neograph.node.controller', [
+    'neograph.node.header.controller',
+    'neograph.node.edit.header.controller'
+    ])
     .controller('NodeCtrl', controller)
     .controller('ChildNodeCtrl', childController);
 
   function controller($scope, $state, $stateParams, nodeService) {
     var vm = this;
-    vm.node = {};
+    vm.node = undefined;
     vm.tabs = ['Properties', 'Relationships'];
     vm.selectedTab = 'Properties';
     vm.selectTab = function (tab) {
       vm.selectedTab = tab;
     };
 
-    vm.edit = edit;
-    vm.new = newNode;
+    activate();
+    function activate() {
+      nodeService.get($stateParams.node, true).then(function (node) {
+        //set node property on scope - propagates to child controllers
+        vm.node = node;
+        $scope.node = vm.node;
+        $scope.$emit('nodeLoaded', vm.node);
+      });
+    }
+  }
+
+  function childController($scope, $stateParams, nodeService) {
+    var vm = this;
+    //set node when loaded by parent controller
+    $scope.$watch('node', function(node) {
+      vm.node = node;
+    });
+  }
+
+})();
+(function() {
+  'use strict';
+
+  controller.$inject = ["$scope", "$state", "nodeService"];
+  angular.module('neograph.node.edit.header.controller', [])
+    .controller('NodeEditHeaderCtrl', controller);
+
+  function controller($scope, $state, nodeService) {
+    var vm = this;
+    vm.node = undefined;
+    
     vm.cancel = cancel;
     vm.del = del;
     vm.destroy = destroy;
@@ -2651,23 +2691,10 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
 
     activate();
     function activate() {
-      if ($stateParams.node) {
-        nodeService.get($stateParams.node, true).then(function (node) {
-          //set node property on scope - propagates to child controllers
-          vm.node = node;
-          $scope.node = vm.node;
-          $scope.hasNode = true;
-        });
-      }
-    }
-
-    function newNode() {
-      vm.node = node;
-      $scope.node = vm.node;
-    }
-
-    function edit() {
-      $state.go('admin.node.edit', { node: vm.node.label });
+      //set node when loaded by parent controller
+      $scope.$watch('node', function(node) {
+        vm.node = node;
+      });
     }
 
     function cancel() {
@@ -2724,12 +2751,38 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
 
   }
 
-  function childController($scope, $stateParams, nodeService) {
+
+
+})();
+(function() {
+  'use strict';
+
+  controller.$inject = ["$scope", "$state"];
+  angular.module('neograph.node.header.controller', [])
+    .controller('NodeHeaderCtrl', controller);
+
+  function controller($scope, $state) {
     var vm = this;
-    //set node when loaded by parent controller
-    $scope.$watch('node', function(node) {
+    vm.node = undefined;
+    vm.edit = edit;
+    vm.new = newNode;
+    
+    activate();
+    function activate() {
+      //set node when loaded by parent controller
+      $scope.$watch('node', function(node) {
+        vm.node = node;
+      });
+    }
+
+    function newNode() {
       vm.node = node;
-    });
+      $scope.node = vm.node;
+    }
+
+    function edit() {
+      $state.go('admin.node.edit', { node: vm.node.label });
+    }
   }
 
 })();
@@ -2764,7 +2817,7 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
             },
             'header@admin.node': {
               templateUrl: 'app/node/node.header.html',
-              controller: 'NodeCtrl as vm'
+              controller: 'NodeHeaderCtrl as vm'
             },
             'properties@admin.node': {
               templateUrl: 'app/node/properties/node.properties.html',
@@ -2785,7 +2838,7 @@ angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets
           views:{
             'header@admin.node': {
               templateUrl: 'app/node/node.edit.header.html',
-              controller:'NodeCtrl as vm'
+              controller:'NodeEditHeaderCtrl as vm'
             },
             'properties@admin.node':{
               templateUrl:'app/node/properties/node.edit.properties.html',

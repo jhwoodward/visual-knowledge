@@ -434,11 +434,20 @@ label {
 .tab-pane {
     overflow-x: hidden;
     overflow-y: auto;
-    height: calc(100vh - 430px);
+    height: calc(100vh /2 - 60px);
 }
 
 .panel .image {
-  height:350px;
+  height: calc(100vh /2 - 20px );
+  width: 408px;
+  position: relative;
+}
+.panel .image.layer {
+  position: absolute;
+  background-size : cover;
+  transition: opacity 300ms linear;
+  opacity: 0;
+  position: absolute;
 }
 .map {
     background: #8fb1ca;
@@ -572,20 +581,23 @@ label {
   margin:10px;
   bottom:0px;
   right: 0px;
-  border:1px solid #dcdcdc;
-  background: #fff;
+  border:1px solid #7a9cad;;
 }
 
 .graph-types li {
   padding:10px;
-  border-bottom: 1px solid #dcdcdc;
   list-style-type: none;
   cursor: pointer;
-  background: #eaebef;
-  color:#999;
+  background: #acc9de;
+  color: #556871;
+}
+
+.graph-types li:not(:last-child) {
+   border-bottom: 1px solid #7a9cad;
 }
 .graph-types li.selected {
   background: #fff;
+  color: #819ead;
   font-weight:bold;
 }
 
