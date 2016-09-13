@@ -10,31 +10,28 @@
     .controller('NodeCtrl', controller)
     .controller('ChildNodeCtrl', childController);
 
-  function controller($scope, $state, $stateParams, nodeService) {
+  function controller($stateParams, nodeManager) {
     var vm = this;
-    vm.node = undefined;
-    vm.tabs = ['Properties', 'Relationships', 'References'];
+    vm.tabs = ['Properties', 'Image', 'Relationships', 'References'];
     vm.selectedTab = 'Properties';
+    nodeManager.setActiveTab(vm.selectedTab);
     vm.selectTab = function (tab) {
       vm.selectedTab = tab;
+      nodeManager.setActiveTab(tab);
     };
 
     activate();
     function activate() {
-      nodeService.get($stateParams.node, true).then(function (node) {
-        //set node property on scope - propagates to child controllers
+      nodeManager.load($stateParams.node).then(function(node) {
         vm.node = node;
-        $scope.node = vm.node;
-        $scope.$emit('nodeLoaded', vm.node);
       });
     }
   }
 
-  function childController($scope, $stateParams, nodeService) {
+  function childController(nodeManager) {
     var vm = this;
-    //set node when loaded by parent controller
-    $scope.$watch('node', function(node) {
-      vm.node = node;
+    nodeManager.subscribe('loaded', function(state) {
+      vm.node = state.node;
     });
   }
 

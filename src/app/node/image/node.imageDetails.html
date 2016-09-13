@@ -1,0 +1,39 @@
+<div ng-if="vm.node.image" class="row image-details">
+  <div class="col-xs-6">
+    <img class="thumbnail" ng-src="{{vm.node.image.thumb.url}}" />
+  </div>
+  <div class="col-xs-6 form-group">
+    <label>Source</label>
+    <div>
+      <a href="{{vm.node.image.source.ref}}" target="_blank">
+          {{vm.node.image.source.name}}
+      </a>
+      <div ng-if="vm.node.image.source.url">
+        <a href="{{vm.node.image.source.url}}" target="_blank">
+          Direct Link
+        </a>
+      </div>
+      <div ng-if="vm.node.image.zoom" >
+        <a href="{{vm.node.image.zoom.replace('z/1','z/4')}}" target="_blank">
+          <i class="glyphicon glyphicon-zoom-in"></i> Zoom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-6 form-group">
+    <label>Aspect Ratio</label>
+    <div>
+      {{vm.node.image.full.width/vm.node.image.full.height | number:2}} 
+      ({{vm.node.image.full.width}}x{{vm.node.image.full.height}})
+    </div>
+  </div>
+  <div class="col-xs-6 form-group">
+    <label>Size</label>
+    <div>
+      {{vm.node.image.size/1000 | number:1 }}k
+    </div>
+  </div>
+</div>
+<div ng-if="!vm.node.image" class="text-center">
+  <h3>No image set</h3>
+</div>

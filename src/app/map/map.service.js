@@ -21,6 +21,17 @@
 
       if (!labels || !label) return [];
 
+      if (node.label === 'Schema') {
+         queries.push(
+          {
+            name: 'Schema',
+            q: `
+            MATCH (n:Schema)  return n
+            `,
+            connectAll: true
+          });
+      }
+
       if (labels.indexOf('Provenance') > -1) {
         queries.push(
           {

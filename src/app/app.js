@@ -15,7 +15,8 @@
     'neograph.search',
     'neograph.map',
     'neograph.routes',
-    'neograph.constant'
+    'neograph.constant',
+    'neograph.admin.controller'
     ]);
 
 })();

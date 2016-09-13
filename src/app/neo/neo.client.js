@@ -104,16 +104,13 @@
         method: 'POST'
 
       }
-               ,
-      getImages: {
-        url: root + '/node/getImages',
-        isArray:true,
-        method: 'POST'
 
+    }),
+    picture: $resource(null, null, {
+      labelled: {
+        url: root + '/pictures/labelled/:label',
+        method: 'GET'
       }
-
-
-
     }),
     edge: $resource(null, null, {
       save: {

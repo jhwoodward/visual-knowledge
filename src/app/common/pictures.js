@@ -1,0 +1,62 @@
+﻿(function(){
+angular.module('neograph.common.pictures',[])
+  .directive('pictures', directive);
+
+  function directive($timeout) {
+    return {
+      replace: true,
+      restrict: 'EA',
+      templateUrl: 'app/common/pictures.html',
+      scope: {
+        pictures: '=', // must be an array to preserve sort order
+        active: '=',
+        onSelected: '&?'
+      },
+      link: linkFn
+    };
+
+    function linkFn(scope, element) {
+      console.log('pictures duirecitve');
+      var listContainer = $(element).find('ul');
+
+      scope.$watch('pictures', function (pictures) {
+        listContainer.removeClass('masonryLoaded');
+        $timeout(applyMasonry, 100);
+      });
+
+      scope.$watch('updatemasonry', function () {
+        if (listContainer.hasClass('masonry')) {
+          listContainer.masonry('reload');
+        }
+      });
+
+      scope.$watch('active', function(isActive) {
+        if (isActive) {
+          $timeout(applyMasonry, 100);
+        }
+      });
+
+      function applyMasonry() {
+        console.log('wsgbwrg');
+        if (listContainer.hasClass('masonry')) {
+          listContainer.masonry('reload');
+        }
+        else {
+          listContainer.masonry({
+            nodeselector: 'li'
+          });
+        }
+        listContainer.addClass('masonryLoaded');
+      }
+    
+
+      scope.$watch('selected', function (selectedIndices) { // NB selected is now an array of node indexes
+        if (selectedIndices && selectedIndices.length === 1) {
+          var selectedPicture = scope.pictures[selectedIndices[0]];
+          scope.onSelected({picture: selectedPicture});
+        }
+      });
+    }
+  }
+
+})();

@@ -27,7 +27,8 @@
       var vm = this;
       vm.panelVisible = true;
       vm.node = undefined;
-      
+      vm.editing = false;
+
       vm.togglePanel = function() {
         vm.panelVisible = !vm.panelVisible;
       }
@@ -38,6 +39,13 @@
         var node = event.targetScope.node;
         vm.node = node;
       }
+
+      $scope.$on('$stateChangeSuccess', function() {
+        vm.editing = $state.current.name === 'admin.node.edit' || 
+          $state.current.name === 'admin.createNode';
+          console.log(vm.editing);
+          console.log($state.current);
+      });
 
     });
 

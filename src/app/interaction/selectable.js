@@ -9,19 +9,10 @@
 
       $scope.$watch($(element).find('li.ui-selected').length, function (i) {
 
-
-
-
-
-
         $(element).selectable({
           filter: 'li',
           stop: function (event, ui) {
-
-
             var selected = [];
-
-
             $(element).find('li.ui-selected').each(function (i, e) {
               selected.push(parseInt($(e).attr('nodeindex')));
             });

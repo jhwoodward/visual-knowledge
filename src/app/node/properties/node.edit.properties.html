@@ -1,92 +1,70 @@
-﻿<div ng-form  name="vm.nodeForm" class="properties">
-  <div class="row form-group">
-    <div class="col-sm-12">
+﻿<div ng-form name="nodePropertiesForm" class="properties">
+ 
+  <div class="row">
+   
+
+    <div class="col-xs-12 form-group">
       <label>Labels</label>
       <div 
         node-array 
         items="vm.node.labels" 
         directbinding="false" 
-        onselected="setType(item)" 
+        onselected="vm.setType(item)" 
         vm.node="vm.node" 
         width="100%">
       </div>
     </div>
-  </div>
-
-  <div ng-if="vm.node.hasOwnProperty('systemInfo')" class="form-group">
-    <label>System Info</label>
-    <textarea 
-      class="form-control" 
-      name="SystemInfo" 
-      no-bubble 
-      ng-model="vm.node.systemInfo" />
-  </div>
-
-  <div class="row">
-    <div ng-if="vm.node.hasOwnProperty('class')" class="col-xs-4 form-group">
-      <label>Class</label>
+   
+     <div class="col-xs-4 form-group">
+      <label>Type</label>
       <typeahead 
-        name="class" 
         class="input-small" 
-        onselected="setType(item)" 
-        watchvalue="vm.node.class" 
+        choice="vm.node.type" 
         restrict="Type" 
         placeholder="Type..." 
         required>
       </typeahead>
+
     </div>
-    <div ng-if="vm.node.hasOwnProperty('lookup')" class="col-xs-4 form-group">     
-      <label>Lookup</label>
-      <input 
-        name="Lookup" 
-        class="form-control" 
-        type="text" 
-        ng-pattern="/^[A-Za-z][A-Za-z0-9-_]*$/" 
-        ng-model="vm.node.lookup" 
-        required />
-    </div>
-    <div ng-if="vm.node.hasOwnProperty('label')" class="col-xs-4 form-group" 
-      ng-style="{opacity:vm.node.label === vm.node.lookup ? 0.7 : 1}">
-        <label>Label</label>
-        <input 
-          name="Label" 
-          type="text"
+
+    <div ng-repeat="(key, value) in vm.node.type.props" 
+      class="form-group" 
+      ng-class="{
+      'col-xs-3':  value.type==='number',
+      'col-xs-4':  value.type==='string' && value.maxLength <= 50,
+      'col-xs-8': (value.type==='string' && !value.maxLength) || (value.maxLength > 50 && value.maxLength <200),
+      'col-xs-12': (value.type=='string' && value.maxLength >= 200)
+      }"
+      ng-if="!value.readonly"
+      >
+      <label>{{key | startcase}}</label>
+
+      <input ng-if="(value.type==='string' && (value.maxLength <=200 || !value.maxLength))"  
+          name="{{key}}" 
           class="form-control" 
-          ng-pattern="/^[A-Za-z][A-Za-z0-9-_]*$/" 
-          ng-model="vm.node.label" 
-          required />
+          type="text" 
+          ng-model="vm.node[key]"
+          ng-pattern="value.pattern"
+          />
+
+      <textarea ng-if="value.type==='string' && value.maxLength > 200"  
+          name="{{key}}" 
+          class="form-control" 
+          type="text" 
+          ng-model="vm.node[key]"
+          ng-pattern="value.pattern"
+          ></textarea>
+
+      <input ng-if="value.type==='number'"  
+          name="{{key}}" 
+          class="form-control" 
+          type="number" 
+          ng-model="vm.node[key]"
+          ng-pattern="value.pattern"
+          />
+        
     </div>
-  </div>
-
-  <div class="form-group">
-    <label>Name</label>
-    <input name="Name" type="text" class="form-control" ng-model="vm.node.name" />
-  </div>
-
-  <div ng-if="vm.node.hasOwnProperty('description')" class="form-group">
-    <label>Description</label>
-    <textarea name="Description" no-bubble class="form-control" ng-model="vm.node.description" />
-  </div>
-
-
-  <div ng-if="vm.node.hasOwnProperty('text')" class="form-group">
-      <label>Text</label>
-      <textarea name="Text" no-bubble class="form-control" ng-model="vm.node.Text" />
-  </div>
-
-  <div class="row">
-    <div ng-repeat="(key, value) in vm.node" class="col-xs-6 form-group"
-      ng-if="vm.node.isCustomField(key)"
-      ng-switch="key"
-      ng-class="{'col-xs-3' : key==='yearFrom' || key==='yearTo' || key==='status' }">
-      <label>{{key}}</label>
-
-      <input name="{{key}}" class="form-control" ng-switch-when="yearFrom" type="text" ng-model="vm.node[key]" />
-      <input name="{{key}}" class="form-control" ng-switch-when="yearTo" type="text" ng-model="vm.node[key]" />
-      <input name="{{key}}" class="form-control" ng-switch-when="status" type="text" ng-model="vm.node[key]" />
-      <input name="{{key}}" class="form-control" ng-switch-default type="text" ng-model="vm.node[key]" />
-    </div>
-  </div>
+   </div>
 
 </div>
 

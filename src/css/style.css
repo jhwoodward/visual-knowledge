@@ -71,7 +71,7 @@ ul
   -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.22);
   box-shadow: 0 1px 2px 0 rgba(0,0,0,0.22);
   border-radius: 6px;
-  width: 236px;
+  width: 150px;
  display: inline-block;
   /*font-size: 11px;*/
   position: relative;
@@ -271,38 +271,43 @@ border-left:1px dashed #08c;
 }
 
 .label {
+  
     float:left;
     border:1px solid transparent;
-    margin-right: 4px;margin-bottom:1px;padding:3px;padding-left:5px;padding-right:5px;font-size:13px;border-radius:4px;
+    margin-right: 4px;
+    margin-bottom:1px;
+    padding:3px;padding-left:5px;
+    padding-right:5px;font-size:13px;
+    border-radius:4px;
 }
 labels .label {    margin-bottom: 4px;
 }
 label {
-      opacity: 0.6;
-    font-size: 1.2em;
-    margin-bottom: 1px;
+  font-weight: normal;
+  opacity: 0.6;
+  margin-bottom: 1px;
 }
-.labelEdit .label {
+.label-edit .label {
     margin:1px;
 }
 
-.labelEdit .label.label-system
+.label-edit .label.label-system
 {
     margin-top:1px !important;
 }
-.labelEdit .label
+.label-edit .label
 {
     float:left;
 }
 
-    .labelEdit .label i {
+    .label-edit .label i {
   margin-left: 5px;
   cursor: pointer;
   margin-top:0px !important;
   opacity:0.6;
 }
 
-.labelEdit .label i:hover {
+.label-edit .label i:hover {
   opacity:1;
 }
 
@@ -314,8 +319,9 @@ label {
 .label {
   border-radius:2px;
 }
-.labelEdit
+.label-edit
 {
+  min-height: 30px;
   background-color: #e6f1fb;
   display: inline-block;
   margin-bottom: 10px;
@@ -326,6 +332,7 @@ label {
   cursor: text;
   width: 100%;
 }
+
 
 .form-control {
     height: 30px;
@@ -340,19 +347,18 @@ label {
     background-color: #e6f1fb;
 }
 
-.labelEdit input {
-    margin-top:-3px;
+.label-edit input {
   border: none;
   box-shadow: none;
   outline: none;
   background-color: transparent;
   padding: 0;
-  margin: 0;
+  margin: 2px;
   width:100px;
   /*width: auto !important;
   max-width: inherit;*/
 }
-.labelEdit input:focus {
+.label-edit input:focus {
   border: none;
   box-shadow: none;
 }
@@ -401,8 +407,8 @@ label {
    background:transparent;
   border:none;
    border-bottom:3px solid transparent;
-   color: #fff; border-radius: 2px; 
-       padding: 7px 3px 5px 3px;
+   color: #beddec;
+   padding: 7px 3px 5px 3px;
     margin: 0px 7px 0px 7px;
 }
 
@@ -427,7 +433,7 @@ label {
     display:block;
     overflow-y:auto; 
     overflow-x:hidden;
-   
+   height: 100%;
    color: #2b4163;
 }
 
@@ -435,6 +441,18 @@ label {
     overflow-x: hidden;
     overflow-y: auto;
     height: calc(100vh /2 - 60px);
+}
+
+.panel.panel-editing .tab-pane {
+   height: calc(100vh);
+}
+
+.panel .image.layer {
+  transition: 300ms height ease-in-out;
+}
+
+.panel.panel-editing .image {
+  height:0;
 }
 
 .panel .image {
@@ -450,9 +468,7 @@ label {
   position: absolute;
 }
 
-.panel-fill{
-  height:65px;
-}
+
 .map {
     background: #8fb1ca;
     top: 0;
@@ -508,11 +524,18 @@ label {
     width: 23px;
     height: 48px;
     cursor: pointer;
-    background: rgba(255,255,255,0.7);
+    background: #c5d9ec;
     border-left: 1px solid #D4D4D4;
     box-shadow: 0px 1px 4px rgba(0,0,0,0.3);
     border:none;
     outline: none;
+    border-radius: 2px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    opacity:0.8;
+    color:#999;
+    outline: none;
+
 }
 .search-box-container {
     top: 0;
@@ -536,12 +559,9 @@ label {
 .search-box-shadow {
   box-shadow: 0 2px 4px rgba(0,0,0,0.2),0 -1px 0px rgba(0,0,0,0.02);
 }
-.search-box .btn,.panel-toggle-button {
-  color:#999;
-  outline: none;
-  border-radius: 2px;
-}
 .search-box .btn {
+  border-radius: 2px;
+  color: #999;
   font-size: 26px;
   background: transparent;
   height: 5px;
@@ -671,4 +691,19 @@ label {
 
 .tfade.ng-hide-add {
   transition: all linear 500ms;
+}
+
+.typeahead-type-info {
+  float:right;
+  margin-left:8px;
+  color:#ccc
+}
+
+input.ng-invalid {
+  background:red !important;color:white;
+}
+
+.image-details .thumbnail {
+  max-width: 100%;
+  max-height: 200px;
 }

@@ -4,12 +4,15 @@
   angular.module('neograph.node', [
     'neograph.node.wikipedia',
     'neograph.node.multiple',
-    'neograph.node.images',
     'neograph.node.properties',
     'neograph.node.relationships',
+    'neograph.node.references',
     'neograph.node.service',
     'neograph.node.routes',
     'neograph.node.controller',
+    'neograph.node.image',
+    'neograph.models.predicate',
+    'neograph.nodeManager.service',
     'ui.router'
   ]);
 

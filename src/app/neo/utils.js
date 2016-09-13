@@ -1,152 +1,94 @@
-﻿angular.module('neograph.utils', ['neograph.neo.client', 'neograph.query.presets'])
-    .factory('utils', ['neoClient', 'queryPresets', function (neoClient, presets) {
+﻿(function() {
 
+angular.module('neograph.utils', ['neograph.neo.client'])
+  .factory('utils', factory);
 
-      Array.prototype.diff = function (a) {
-        return this.filter(function (i) { return a.indexOf(i) < 0; });
-      };
+  function factory(neoClient, $q) {
 
-      Array.prototype.ids = function () {
-        return this.map(function (e) { return e.id; });
-      };
+    Array.prototype.diff = function (a) {
+      return this.filter(function (i) { return a.indexOf(i) < 0; });
+    };
+    Array.prototype.ids = function () {
+      return this.map(function (e) { return e.id; });
+    };
+    Array.prototype.hasAny = function (a) {
+      return this.filter(function (i) { return a.indexOf(i) > -1; }).length > 0;
+    };
+    Array.prototype.unique = function () {
+      var a = [];
+      for (i = 0; i < this.length; i++) {
+        var current = this[i];
+        if (a.indexOf(current) < 0) a.push(current);
+      }
+      return a;
+    };
 
-      Array.prototype.hasAny = function (a) {
-        return this.filter(function (i) { return a.indexOf(i) > -1; }).length > 0;
-      };
-
-      Array.prototype.unique = function () {
-        var a = [];
-        for (i = 0; i < this.length; i++) {
-          var current = this[i];
-          if (a.indexOf(current) < 0) a.push(current);
-        }
-        return a;
-      };
-
-
-
-
-
-
-
-
-      var utils = {
-
-        init: function () {
-
-          utils.refreshTypes();
-          utils.refreshPredicates();
-          return utils;
-
-
-        }
-        ,
-        types: {}
-
-        ,
-        predicates: {}
-        ,
-        isType: function (label) {
-          return utils.types[label] != undefined;
-        }
-        ,
-        refreshTypes: function () {
-
-          return neoClient.type.getAll().$promise.then(function (types) {
-            utils.types = types;
-            return types;
+    var api = {
+      isType: function (label) {
+        return api.types[label] != undefined;
+      },
+      // returns type object from lookup
+      getType: function(type) {
+         return api.getTypes()
+          .then(function(types) {
+            return types[type];
           });
+      },   
+      getTypes: function () {
+        if (api.types) {
+          var deferred = $q.defer();
+          deferred.resolve(api.types);
+          return deferred.promise;
+        } else {
+          return api.refreshTypes();
         }
-    ,
-        refreshPredicates: function () { // consider creating lookup nodes for relationship types so that i can store properties for them
-
-          return neoClient.predicate.getAll().$promise.then(function (predicates) {
-            utils.predicates = predicates.toJSON();
-               // console.log(utils.predicates);
-            return utils.predicates;
+      },
+      refreshTypes: function () {
+        return neoClient.type.getAll()
+          .$promise.then(function (types) {
+            api.types = types.toJSON();
+            return api.types;
           });
-
-
-
-
+      },
+      getPredicates: function() {
+        if (api.predicates) {
+          var deferred = $q.defer();
+          deferred.resolve(api.predicates);
+          return deferred.promise;
+        } else {
+          return api.refreshPredicates();
         }
-     ,
-        isSystemInfo: function (label) {
-
-          return label == 'Global' || label == 'Type' || label == 'Label' || label == 'SystemInfo';
-
-        },
-        getLabelClass: function (node, label) {
-
-
-
-
-
-          if (node && label === node.Type) {
-            return 'label-warning';
-          }
-
-          if (utils.isSystemInfo(label)) {
-            return 'label-system';
-          }
-
-          if (utils.isType(label)) {
-            return 'label-inverse pointer';
-          }
-
-
-          return 'label-info';
-
+      },
+      refreshPredicates: function () { 
+        return neoClient.predicate.getAll()
+          .$promise.then(function (predicates) {
+            api.predicates = predicates.toJSON();
+            return api.predicates;
+          });
+      },
+      isSystemInfo: function (label) {
+        return label === 'Global' || 
+          label === 'Type' || 
+          label === 'Label' || 
+          label === 'SystemInfo';
+      },
+      getLabelClass: function (node, label) {
+        if (node && label === node.Type) {
+          return 'label-warning';
         }
-
-        ,
-        personTypes: ['Painter',
-                'Illustrator',
-                'Philosopher',
-                'Poet',
-                'FilmMaker',
-               'Sculptor',
-                'Writer',
-               'Patron',
-                 'Leader',
-                 'Explorer',
-                 'Composer',
-                'Scientist',
-                'Caricaturist',
-                 'Mathematician']
-        ,
-        pictureTypes: ['Painting', 'Illustration', 'Drawing', 'Print']
-        ,
-        isPerson: function (type) {
-
-          return type == 'Painter' ||
-                type == 'Illustrator' ||
-                type == 'Philosopher' ||
-                type == 'Poet' ||
-                type == 'FilmMaker' ||
-                type == 'Sculptor' ||
-                type == 'Writer' ||
-                type == 'Patron' ||
-                type == 'Leader' ||
-                type == 'Explorer' ||
-                type == 'Composer' ||
-                type == 'Scientist' ||
-                type == 'Caricaturist' ||
-                type == 'Mathematician';
-
+        if (api.isSystemInfo(label)) {
+          return 'label-system';
         }
+        if (api.isType(label)) {
+          return 'label-inverse pointer';
+        }
+        return 'label-info';
+      }
+    };
 
+    api.refreshPredicates();
+    api.refreshTypes();
+    return api;
+  }
 
-            // mopve to 'state' object
-            ,
-        tabSettings: {}
-            ,
-        selectedTab:'Properties'
-
-
-
-
-      };
-      return utils.init();
-
-    }]);
+})();

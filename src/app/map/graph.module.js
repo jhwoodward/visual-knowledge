@@ -1,4 +1,5 @@
 angular.module('neograph.map.graph', [
   'neograph.map.graph.service',
-  'neograph.map.graph.directive'
+  'neograph.map.graph.directive',
+  'neograph.node.service'
 ]);

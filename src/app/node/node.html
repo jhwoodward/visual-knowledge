@@ -1,27 +1,34 @@
-<ui-view name="header"></ui-view>
-<div class="tabbable propertyTabs">
-  <ul class="nav nav-tabs">
-      <li ng-repeat="tab in vm.tabs" ng-class="{active:vm.selectedTab===tab}">
-          <a href ng-click="vm.selectTab(tab)"><span class="hidden-xs">{{tab}}</span><span class="visible-xs">{{tab.charAt(0)}}</span></a>
-      </li>
-  </ul>
+<div ng-form name="nodeForm" >
+  <ui-view name="header"></ui-view>
+  <div class="tabbable propertyTabs">
+    <ul class="nav nav-tabs">
+        <li ng-repeat="tab in vm.tabs" ng-class="{active:vm.selectedTab===tab}">
+            <a href ng-click="vm.selectTab(tab)"><span class="hidden-xs">{{tab}}</span><span class="visible-xs">{{tab.charAt(0)}}</span></a>
+        </li>
+    </ul>
 
-  <div class="tab-pane" ng-repeat="tab in vm.tabs" ng-switch="tab" ng-show="vm.selectedTab === tab">
+    <div class="tab-pane" 
+      ng-repeat="tab in vm.tabs" 
+      ng-switch="tab" 
+      ng-show="vm.selectedTab === tab"
+    >
 
-    <div class="tab-content" ng-switch-when="Properties"  >
-        <ui-view name="properties"></ui-view>
-    </div>
+      <div class="tab-content" ng-switch-when="Properties"  >
+          <ui-view name="properties"></ui-view>
+      </div>
 
-    <div class="tab-content" ng-switch-when="Relationships">
-        <ui-view name="relationships"></ui-view>
-    </div>
+      <div class="tab-content" ng-switch-when="Image"  >
+          <ui-view name="image"></ui-view>
+      </div>
 
-    <div class="tab-content" ng-switch-when="References">
-        <ui-view name="references"></ui-view>
-    </div>
+      <div class="tab-content" ng-switch-when="Relationships">
+          <ui-view name="relationships"></ui-view>
+      </div>
 
-    <div class="tab-content" ng-switch-when="Images"   >   
-        <ui-view name="images"></ui-view>
+      <div class="tab-content" ng-switch-when="References">
+          <ui-view name="references"></ui-view>
+      </div>
+
     </div>
   </div>
 </div>

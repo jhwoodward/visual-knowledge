@@ -178,7 +178,7 @@
         console.log('new data');
         graph.nodes.clear();
         graph.edges.clear();
-        var gArr = graphService.toGraphData(scope.data);
+        var gArr = graphService.toVisNetworkData(scope.data);
         graph.nodes.add(gArr.nodes);
         graph.edges.add(gArr.edges);
       }

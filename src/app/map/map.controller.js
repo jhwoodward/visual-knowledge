@@ -4,7 +4,7 @@
   angular.module('neograph.map.controller',['neograph.node.service', 'ui.router'])
     .controller('MapCtrl', controller);
 
-  function controller($scope, $rootScope, $state, neo, nodeService, mapService) {
+  function controller($scope, $state, neo, nodeManager, mapService) {
 
     var vm = this;
     vm.data = [];
@@ -20,12 +20,12 @@
 
     function activate() {
       console.log('map controller activate');
-      $rootScope.$on('nodeLoaded', onNodeLoaded);
-      function onNodeLoaded(event) {
-        console.log('map on node loaded');
+      nodeManager.subscribe('loaded', onNodeLoaded);
+
+      function onNodeLoaded(state) {
         vm.selectedNode = undefined;
         vm.selectedEdges = [];
-        vm.node = event.targetScope.node;
+        vm.node = state.node;
         vm.maps = mapService.getQueries(vm.node);
         if (vm.maps && vm.maps.length) {
           vm.selectedMap = vm.maps[0];
@@ -42,7 +42,7 @@
     });
 
     function goToSelected() {
-      $state.go('admin.node', {node: vm.selectedNode.label});
+      $state.go('admin.node', {node: vm.selectedNode.label || vm.selectedNode.id });
     }
 
     function connectAll (data) {

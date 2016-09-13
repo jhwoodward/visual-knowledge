@@ -5,10 +5,10 @@
   angular.module('neograph.map.graph.service', [])
   .factory('graphService', factory);
 
-  function factory(nodeFactory) {
+  function factory(nodeService) {
     
     function graphNodeFromNeoNode(neoNode) {
-      neoNode = nodeFactory.create(neoNode);
+      neoNode = nodeService.create(neoNode);
       var type = neoNode.class;
       var yf = parseInt(neoNode.yearFrom, 10);
       var yt = parseInt(neoNode.yearTo, 10);
@@ -34,6 +34,7 @@
       var node = {
         id: neoNode.id,
         label: neoNode.label || neoNode.lookup,
+          fontFill: '#8fb1ca',
         size: neoNode.status / 10,
         group: neoNode.class,
         mass: type === 'Group' ? 0.5 : 1,
@@ -73,7 +74,7 @@
         node.shape = 'box';
       }
 
-      node.color = { background: node.color || '#97C2FC', border: 'transparent' };
+      node.color = { background: node.color || '#3e82bd', border: 'transparent' };
       if (neoNode.isProperty()) {
         node.color.background = 'lightgreen';
       }
@@ -109,7 +110,7 @@
           colour = '#EEE';
           break;
         case 'INFLUENCES':
-          colour = 'pink';
+          colour = '#3e82bd';
           break;
         case 'TEACHES':
         case 'TEACHES_AT':
@@ -133,6 +134,7 @@
           ) ? type.toLowerCase().replace(/_/g,'') : null,
         fontColor: '#3e82bd',
         color: colour,
+        fontFill: '#8fb1ca',
         opacity: hideEdge ? 0 : 1, // type === "INFLUENCES" ? 1 : 0.7,
         style: symmetrical ? 'dash-line' : 'arrow', // arrow-center' ,
         type: ['curved'],
@@ -196,7 +198,7 @@
       },
       // Transforms neo graph data object into object
       // containing array of nodes and array of edges renderable by vis network
-      toGraphData: function(g) {
+      toVisNetworkData: function(g) {
         return {
           nodes: Object.keys(g.nodes).map(function(key) { return graphNodeFromNeoNode(g.nodes[key]); }),
           edges: Object.keys(g.edges).map(function(key) { return graphEdgeFromNeoEdge(g.edges[key]); })

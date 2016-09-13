@@ -4,18 +4,17 @@
   angular.module('neograph.node.header.controller', [])
     .controller('NodeHeaderCtrl', controller);
 
-  function controller($scope, $state) {
+  function controller($state, nodeManager) {
     var vm = this;
-    vm.node = undefined;
     vm.edit = edit;
-    vm.del = del;
+    vm.delete = del;
     vm.destroy = destroy;
     
     activate();
     function activate() {
       //set node when loaded by parent controller
-      $scope.$watch('node', function(node) {
-        vm.node = node;
+      nodeManager.subscribe('loaded', function(state) {
+        vm.node = state.node;
       });
     }
 
@@ -28,16 +27,11 @@
     }
 
     function del() {
-      nodeService.delete(vm.node)
-        .then(function(deleted) {
-          vm.node = deleted;
-          $scope.node = vm.node;
-          //$scope.publish('deleted', { selection: { nodes: [n] } });
-        });
+      vm.node.delete();
     };
 
     function destroy() {
-      nodeService.destroy(vm.node)
+      vm.node.destroy()
         .then(function() {
           vm.node = undefined;
           //where to now ???

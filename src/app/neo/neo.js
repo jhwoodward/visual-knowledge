@@ -33,8 +33,8 @@
           return data.toJSON();
         });
     },
-    getImages: function (label) {
-      return neoClient.node.getImages({ label: label })
+    getPictures: function (label) {
+      return neoClient.picture.labelled({ label: label })
         .$promise.then(function (data) {
           return data.toJSON();
         });

@@ -5,21 +5,21 @@
 <div class="graph-preview">
   <div class="tfade" ng-show="vm.selectedNode">
     <div class="header">
-      {{vm.selectedNode.label | startcase}}
+      {{vm.selectedNode.label || vm.selectedNode.lookup | startcase}}
     </div>
     <div>
       <p>{{vm.selectedNode.description}}</p>
       <p>{{vm.selectedNode.text}}</p>
     </div>
     <div>
-      <button class="btn btn-primary"  ng-click="vm.goToSelected()">Go to {{vm.selectedNode.label | startcase}}</button>
+      <button class="btn btn-primary"  ng-click="vm.goToSelected()">Go to {{vm.selectedNode.label || vm.selectedNode.lookup  | startcase}}</button>
     </div>
   </div>
   <div class="tfade"  ng-show="vm.selectedEdges.length">
     <div ng-repeat="edge in vm.selectedEdges">
-      {{edge.start.label | startcase}}
+      {{edge.start.label || edge.start.lookup | startcase}}
       <span style="color: #999999">{{edge.type | lowercase}}</span>
-      {{edge.end.label | startcase}}
+      {{edge.end.label || edge.end.lookup | startcase}}
     </div>
   </div>
 </div>

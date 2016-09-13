@@ -1,19 +1,20 @@
 ﻿(function() {
   'use strict';
     
-  angular.module('neograph.node.relationships.edit.controller', [])
+  angular.module('neograph.node.edit.relationships.controller', [])
     .controller('EditRelationshipsCtrl', controller);
 
-  function controller($scope, predicateFactory) {
+  function controller($scope, predicateFactory, nodeManager) {
     var vm = this;
     vm.node = {};
-    //set node when loaded by parent controller
-    $scope.$watch('node', function(node) {
-      vm.node = node;
+
+    nodeManager.subscribe('loaded', function(state) {
+      vm.node = state.node;
     });
 
     vm.nodeTypes = [];
 
+/*
     $scope.$watch('vm.node', function(node) {
       if (node) {
         node.labelled = node.labelled || [];
@@ -21,10 +22,11 @@
         vm.deleted = node.labels.indexOf('Deleted') > -1;
       }
     });
+    */
 
-    $scope.$watch('newPredicate', function(v) {
-      if (v) {
-        addRelationship({ lookup: v.toUpperCase().replace(/ /g, '_') });
+    $scope.$watch('newPredicate', function(predicate) {
+      if (predicate) {
+        addRelationship({ lookup: predicate.toUpperCase().replace(/ /g, '_') });
       }
     });
 

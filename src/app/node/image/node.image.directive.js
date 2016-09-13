@@ -1,7 +1,7 @@
 (function() {
   'use strict';
-  angular.module('neograph.common.backImg', [])
-    .directive('backImg', directive);
+  angular.module('neograph.node.image.directive', [])
+    .directive('nodeImage', directive);
 
     function directive($timeout) {
       return {
@@ -24,7 +24,7 @@
             });
             element.append(imageElement);
             $timeout(function() {
-              imageElement.css({'opacity':1});
+              imageElement.css({'opacity': 1});
             });
 
             $timeout(function() {
@@ -39,6 +39,8 @@
         function setImage() {
           if (scope.url) {
             image.attr('src', scope.url)
+          } else {
+            element.find('.image.layer').css({'opacity': 0});
           }
         }
       }

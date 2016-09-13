@@ -12,9 +12,12 @@
     -->
 
   
-        <button class="btn ion-checkmark-round" ng-click="vm.save()" ng-disabled="nodeForm.$invalid"></button>
-        <button class="btn pull-right ion-close-round" ng-click="vm.cancel()"></button>
- 
+    <button class="btn ion-checkmark-round" ng-click="vm.save()" 
+    ng-disabled="nodeForm.$invalid"
+    ng-class="{'disabled':nodeForm.$invalid}"
+    ></button>
+    <button class="btn pull-right ion-close-round" ng-click="vm.cancel()"></button>
+
     <div ng-show="vm.node.id ===-1" >
         <button class="btn btn-success" ng-click="vm.save()" ng-disabled="nodeForm.$invalid">Create</button>
     </div>

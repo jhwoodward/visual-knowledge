@@ -4,117 +4,114 @@
   angular.module('neograph.node.service',[])
     .factory('nodeService', service);
 
-  function service(neoClient, utils, $q, nodeFactory) {
+  function service(neoClient, utils, $q, predicateFactory) {
 
-    var lastLoadedNode = {};
+    function Node(data) {
+      this.labels = [];
+      this.id = -1;
+      _.extend(this, data);
+
+      for (var relKey in this.relationships) {
+        var rel = this.relationships[relKey];
+        rel.predicate = predicateFactory.create(rel.predicate);
+      }
+      if (!this.label && this.lookup) {
+        this.label = this.lookup;
+      }
+   
+      this.original = angular.copy(this);
+    }
+
+    Node.prototype.revert = function() {
+      var reverted = angular.copy(this.original);
+      reverted.original = angular.copy(reverted);
+      this.replace(reverted);
+    }
+
+    Node.prototype.save = function() {
+      return neoClient.node.save({ node: this })
+        .$promise.then(create)
+        .then(this.replace);
+    }
+
+    Node.prototype.delete = function () {
+      /*
+      return neoClient.node.delete({ node: this })
+        .$promise.then(create)
+        .then(this.replace);
+        */
+    }
+
+    Node.prototype.restore = function () {
+      return neoClient.node.restore({ node: this })
+        .$promise.then(create)
+        .then(this.replace);
+    }
+
+     // deletes node and relationships forever
+    Node.prototype.destroy = function () {
+      //return neoClient.node.destroy({ node: this });
+    }
+
+    Node.prototype.replace = function(node) {
+      for (var prop in this) { 
+        if (this.hasOwnProperty(prop) && prop !== 'labels') { 
+          delete this[prop]; 
+        } 
+      }
+      _.extend(this, node);
+    }
+
+    Node.prototype.isDeleted = function () {
+      return this.labels.indexOf('Deleted') > -1;
+    };
+    
+    Node.prototype.isPicture = function () {
+      return this.labels.indexOf('Picture') > -1;
+    };
+
+    Node.prototype.isPerson = function () {
+      return this.labels.indexOf('Person') > -1;
+    };
+
+    Node.prototype.isProperty = function () {
+      return this.labels.indexOf('Property') > -1;
+    };
+
+ 
+
+    function create(nodeResponseData) {
+      var node = nodeResponseData.toJSON();
+      return utils.getType(node.type)
+        .then(function(typeObject) {
+          node.type = typeObject;
+          return new Node(node);
+        });
+    }
 
     var api = {
-      setPropsAndTabsFromLabels: function (node) {
-        return neoClient.node.setPropsAndTabs({ node:node }).$promise.then(function (data) {
-          return data.toJSON();
-        });
-      },
-      get: function (label, addrelprops) {
-        if (addrelprops) {
-          if (lastLoadedNode && (label === lastLoadedNode.label || label === lastLoadedNode.id)) {
-            return $q.when(lastLoadedNode);
-          }
-          else {
-            return neoClient.node.getWithRels({ id: label }).$promise.then(function (node) {
-              lastLoadedNode = nodeFactory.create(node.toJSON());
-              return lastLoadedNode;
-            });
-          }
-        }
-        else {
-          return neoClient.node.get({ id: label }).$promise.then(function (node) {
-            return node.toJSON();
-          });
-        }
+      // id = label or internal id
+      get: function (id) {
+        return neoClient.node.getWithRels({ id: id })
+          .$promise.then(create);
       },
       getList: function (q, limit) { // q = match (n) & where only (without return)
         return neoClient.node.getList({ q: q, limit: limit }).$promise;// returns array
       },
-      // short version for freebase prop saving
-      saveWikipagename: function (n) {
-        return neoClient.node.saveWikipagename({
-          id: n.id,
-          name: n.Wikipagename
-        })
-        .$promise.then(function (data) {
-          return data.toJSON();
-        });
-      },
       getImages:function (node) {
         return neoClient.node.getImages({
           id: node.id,
-          isPicture: node.temp.isPicture,
-          isGroup: node.temp.isGroup
+          isPicture: node.isPicture(),
+          isGroup: node.isGroup()
         }).$promise;// returns array
-      },
-      saveProps: function (n) {// short version for freebase prop saving
-        return neoClient.node.saveProps({ node: n, user: user })
-          .$promise.then(function (data) {
-            return data.toJSON();
-          });
-      },
-      getProps: function (labels) {
-        return neoClient.node.getProps({ labels: labels })
-          .$promise.then(function (data) {
-            return data.toJSON();
-          });
-      },
-      save: function (n, user) {
-        if (n.temp.trimmed) {
-          throw ('Node is trimmed - cannot save');
-        }
-        return neoClient.node.save({ node: n, user: user })
-          .$promise.then(function (data) {
-            return data.toJSON();
-          });
-      },
-      saveRels: function (n) {
-        return neoClient.node.saveRels({ node: n })
-          .$promise.then(function (data) {
-            return data.toJSON();
-          });
-      },
-      // deletes node and relationships forever
-      destroy: function (node) {
-        return neoClient.node.destroy({ node: node })
-          .$promise.then(function (data) {
-            return data.toJSON();
-          });
-      },
-      // only supports 1 node at the mo
-      delete: function (node) {
-        var deferred = $q.deferred();
-        if (node && node.id) {
-          return neoClient.node.delete({ node: node })
-            .$promise.then(function (data) {
-              deferred.resolve(data.toJSON());
-            });
-        } else {
-          deferred.resolve({});
-        }
-      },
-      // only supports 1 node at the mo
-      restore: function (node) {
-        var deferred = $q.deferred();
-        if (node && node.id) {
-          neoClient.node.restore({ node: node })
-            .$promise.then(function (data) {
-              deferred.resolve(data.toJSON());
-            });
-        } else {
-          deferred.resolve({});
-        }
-        return deferred.promise;
       },
       search: function (txt, restrict) { // restrict = labels to restrict matches to
         if (txt) {
           return neoClient.node.search({ txt: txt, restrict: restrict }).$promise;// returns array
         }
+      },
+      create: function(nodeAsJson) {
+        return new Node(nodeAsJson);
       }
     };
     return api;

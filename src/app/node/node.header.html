@@ -3,11 +3,11 @@
     {{vm.node.isPicture() ? vm.node.title: vm.node.label | startcase}}
   </div>
   <div class="pull-right">
-    <div ng-show="!vm.node.isDeleted">
+    <div ng-show="!vm.node.isDeleted()">
       <button class="btn ion-edit"  ng-click="vm.edit()"></button>
       <button class="btn btn-delete ion-trash-a" ng-click="vm.delete()"></button>
     </div>
-    <div ng-show="vm.node.isDeleted" >
+    <div ng-show="vm.node.isDeleted()" >
       <button class="btn btn-success" ng-click="vm.restore()">Restore</button>
       <button class="btn btn-danger" ng-click="vm.destroy()">Destroy</button>
     </div>

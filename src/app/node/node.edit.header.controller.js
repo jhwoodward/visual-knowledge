@@ -4,37 +4,39 @@
   angular.module('neograph.node.edit.header.controller', [])
     .controller('NodeEditHeaderCtrl', controller);
 
-  function controller($scope, $state, nodeService) {
+  function controller($scope, $state, nodeManager, _) {
     var vm = this;
-    vm.node = undefined;
+
     vm.cancel = cancel;
     vm.save = save;
     vm.restore = restore;
 
     activate();
+
     function activate() {
       //set node when loaded by parent controller
-      $scope.$watch('node', function(node) {
-        vm.node = node;
+      nodeManager.subscribe('loaded', function(state) {
+        vm.node = state.node;
       });
     }
 
-    function cancel() {
+    function exit() {
       $state.go('admin.node', { node: vm.node.label });
     }
 
+    function cancel() {
+      vm.node.revert();
+      exit();
+    }
+
     function save() {
-      nodeService.save(vm.node)
-        .then(function(saved) {
-          $state.go('admin.node', { node: saved.label });
-        });
+      vm.node.save()
+        .then(exit);
     };
 
     function restore() {
-      nodeService.restore(vm.node)
-        .then(function(restored) {
-          $state.go('admin.node', { node: restored.label });
-      });
+      vm.node.restore(vm.node)
+        .then(exit);
     };
   }
 
