@@ -9,7 +9,7 @@
     "express": "^4.9.8",
     "serve-favicon": "^2.1.7"
   },
-   "scripts": {
+  "scripts": {
     "lint": "eslint --fix -c .eslintrc src",
     "prestart": "gulp build",
     "predev": "gulp build",

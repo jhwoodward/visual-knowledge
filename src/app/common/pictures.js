@@ -2,7 +2,7 @@
 angular.module('neograph.common.pictures',[])
   .directive('pictures', directive);
 
-  function directive($timeout) {
+  function directive($timeout, $window, _) {
     return {
       replace: true,
       restrict: 'EA',
@@ -10,13 +10,18 @@ angular.module('neograph.common.pictures',[])
       scope: {
         pictures: '=', // must be an array to preserve sort order
         active: '=',
-        onSelected: '&?'
+        onSelected: '&?',
+        imageWidth: '=?'
       },
       link: linkFn
     };
 
     function linkFn(scope, element) {
-      console.log('pictures duirecitve');
+
+      scope.imageWidth = scope.imageWidth || 236;
+
+      $($window).on('resize', _.debounce(applyMasonry));
+
       var listContainer = $(element).find('ul');
 
       scope.$watch('pictures', function (pictures) {
@@ -37,7 +42,6 @@ angular.module('neograph.common.pictures',[])
       });
 
       function applyMasonry() {
-        console.log('wsgbwrg');
         if (listContainer.hasClass('masonry')) {
           listContainer.masonry('reload');
         }

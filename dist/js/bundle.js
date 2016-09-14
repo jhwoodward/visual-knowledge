@@ -42,7 +42,8 @@
     'neograph.map',
     'neograph.routes',
     'neograph.constant',
-    'neograph.admin.controller'
+    'neograph.admin.controller',
+    'ui.bootstrap'
     ]);
 
 })();
@@ -119,16 +120,35 @@
   angular.module('templates', []);
 
 })();
-angular.module('neograph.common', [
-  'neograph.common.filter',
-  'neograph.common.pictures',
-  'neograph.common.labels',
-  'neograph.common.network',
-  'neograph.common.nodeArray',
-  'neograph.common.typeahead',
-  'neograph.common.typeaheadSimple',
-  'neograph.common.focusTo'
-]);
+(function () {
+    'use strict';
+
+  config.$inject = ["modalProvider"];
+  angular.module('neograph.common', [
+    'neograph.common.filter',
+    'neograph.common.pictures',
+    'neograph.common.labels',
+    'neograph.common.network',
+    'neograph.common.nodeArray',
+    'neograph.common.typeahead',
+    'neograph.common.typeaheadSimple',
+    'neograph.common.focusTo',
+    'neograph.common.modal'
+  ]).config(config);
+
+  function config(modalProvider) {
+
+    modalProvider.add('node.image.select', {
+      templateUrl: 'app/node/image/node.edit.image.select.html',
+      controller: 'NodeImageSelectCtrl',
+      controllerAs: 'vm',
+      animation: false,
+      backdrop: 'static',
+      size: 'lg'
+    });
+  }
+
+})();
 
 (function() {
   'use strict';
@@ -502,6 +522,108 @@ angular.module('neograph.common.labels', ['neograph.neo', 'neograph.utils'])
   };
 }]);
 
+(function() {
+    'use strict';
+    modalClose.$inject = ["modal"];
+    modalOpen.$inject = ["modal"];
+    angular.module('neograph.common.modal',[])
+      .provider('modal', modalProvider)
+      .directive('modalClose', modalClose)
+      .directive('modalOpen', modalOpen);
+
+    /* @ngInject */
+    function modalProvider() {
+        /* jshint validthis:true */
+
+        var _map = {};
+        var current;
+        var passedData;
+        var service = {
+            open: modalOpen,
+            close: modalClose,
+            add: modalAdd,
+            getData: getData
+        };
+        var bootstrapModal;
+
+        /* @ngInject */
+        this.$get = ["$uibModal", function($uibModal) {
+            bootstrapModal = $uibModal;
+            return service;
+        }];
+        this.$get.$inject = ["$uibModal"];
+
+        this.add = modalAdd;
+
+        function modalAdd(name, obj) {
+            if (_map[name]) {
+                throw new Error(name, 'already existing');
+            }
+            _map[name] = {};
+            _map[name].config = obj;
+            return this;
+        }
+
+        function getData(name) {
+            name = name || current;
+            if (!_map[name]) {
+                return null;
+            }
+            return passedData;
+        }
+
+        function modalOpen(name, data) {
+            if (!_map[name]) {
+                return false;
+            }
+            current = name;
+            passedData = data;
+            _map[name].instance = bootstrapModal.open(_map[name].config);
+            return _map[name].instance.result;
+        }
+
+        function modalClose(name, result) {
+            name = name || current;
+            if (!_map[name] || !_map[name].instance) {
+                return false;
+            }
+            _map[name].instance.close(result);
+            current = null;
+            passedData = null;
+            delete _map[name].instance;
+            return true;
+        }
+    }
+    /* @ngInject */
+    function modalClose(modal) {
+        return {
+            scope: false,
+            restrict: 'A',
+            controller: ["$scope", "$element", "$attrs", function ($scope, $element, $attrs) {
+                $element.bind('click', function() {
+                    var name = $attrs.modalClose;
+                    var reason = $attrs.dismiss;
+                    modal.close(name, reason);
+                });
+            }]
+        };
+    }
+    /* @ngInject */
+    function modalOpen(modal) {
+        return {
+            scope: false,
+            restrict: 'A',
+            controller: ["$scope", "$element", "$attrs", function ($scope, $element, $attrs) {
+                $element.bind('click', function() {
+                    var name = $attrs['modalOpen'];
+                    modal.open(name);
+                });
+            }]
+        };
+    }
+
+}());
+
 angular.module('neograph.common.network', [])
 .directive('network', function () {
   return {
@@ -619,11 +741,11 @@ angular.module('neograph.common.nodeArray', ['neograph.utils'])
     }]);
 
 (function(){
-  directive.$inject = ["$timeout"];
+  directive.$inject = ["$timeout", "$window", "_"];
 angular.module('neograph.common.pictures',[])
   .directive('pictures', directive);
 
-  function directive($timeout) {
+  function directive($timeout, $window, _) {
     return {
       replace: true,
       restrict: 'EA',
@@ -631,13 +753,18 @@ angular.module('neograph.common.pictures',[])
       scope: {
         pictures: '=', // must be an array to preserve sort order
         active: '=',
-        onSelected: '&?'
+        onSelected: '&?',
+        imageWidth: '=?'
       },
       link: linkFn
     };
 
     function linkFn(scope, element) {
-      console.log('pictures duirecitve');
+
+      scope.imageWidth = scope.imageWidth || 236;
+
+      $($window).on('resize', _.debounce(applyMasonry));
+
       var listContainer = $(element).find('ul');
 
       scope.$watch('pictures', function (pictures) {
@@ -658,7 +785,6 @@ angular.module('neograph.common.pictures',[])
       });
 
       function applyMasonry() {
-        console.log('wsgbwrg');
         if (listContainer.hasClass('masonry')) {
           listContainer.masonry('reload');
         }
@@ -1069,131 +1195,6 @@ angular.module('neograph.common.typeaheadSimple', [])
     };
   }
 })();
-angular.module('neograph.interaction.draggable', [])
-    .directive('draggable', function () {
-      return {
-
-        link: function ($scope, element, attrs) {
-
-          var initLeft = $(element).position().left;
-
-          $(element).draggable({
-            axis: 'x',
-            drag: function () {
-
-              var change = initLeft - $(element).position().left;
-
-              $scope.$apply(function () {
-                $scope.window.tabsWidth = $scope.window.tabsWidth + change;
-              });
-
-
-              initLeft = $(element).position().left;
-
-            }
-          });
-        }
-      };
-    });
-
-angular.module('neograph.interaction', [
-  'neograph.interaction.draggable',
-  'neograph.interaction.resizable',
-  'neograph.interaction.selectable'
-]);
-
-angular.module('neograph.interaction.resizable', [])
-.directive('resizable', ["$window", function ($window) {
-  return {
-    scope: {
-      window: '='
-    },
-    controller: ["$scope", "$element", function ($scope, $element) {
-
-      var w = angular.element($window);
-      var getWindowDimensions = function () {
-        var width = w.width();
-        var height = w.height();
-        return {
-          'height': height,
-          'width': width,
-          'tabsWidth': $scope.window.tabsWidth,
-          'tabsWidthInner': $scope.window.tabsWidth - 10,
-          'graphWidth': width - $scope.window.tabsWidth,
-          'graphHeight': height - $scope.window.topBarHeight,
-          'topBarHeight': $scope.window.topBarHeight,
-          'tabsHeight': height - $scope.window.topBarHeight
-        };
-      };
-
-      $scope.window = getWindowDimensions();
-
-      $scope.$watch(getWindowDimensions, function (newValue, oldValue) {
-
-        $scope.window = newValue;
-
-      }, true);
-
-      w.bind('resize', function () {
-        $scope.$apply();
-      });
-
-            // w.bind("debouncedresize", function (event) {
-            //    $scope.$apply();
-
-            // });
-
-    }]
-  };
-}]);
-
-
-angular.module('neograph.interaction.selectable', [])
-.directive('selectable', function () {
-  return {
-    scope: {
-      selected: '='
-
-    },
-    link: function ($scope, element, attrs) {
-
-      $scope.$watch($(element).find('li.ui-selected').length, function (i) {
-
-        $(element).selectable({
-          filter: 'li',
-          stop: function (event, ui) {
-            var selected = [];
-            $(element).find('li.ui-selected').each(function (i, e) {
-              selected.push(parseInt($(e).attr('nodeindex')));
-            });
-
-            $scope.$apply(function () {
-
-              $scope.selected = selected;
-
-            });
-
-          }
-                    ,
-          cancel: '.badge, .label'
-
-
-
-        });
-
-
-      });
-
-
-    }
-  };
-});
-
-
-
-
-
-
 angular.module('neograph.layout', [])
 .directive('tabs', function () {
   return {
@@ -1331,6 +1332,204 @@ angular.module('neograph.layout', [])
 
 
 });
+
+  angular.module('neograph.models.predicate', [])
+  .factory('predicateFactory', function () {
+
+    function Predicate(data) {
+
+      Object.assign(this, data);
+
+    }
+
+    Predicate.prototype.setDirection = function (direction) {
+      this.direction = direction;
+      return this;
+    };
+
+    Predicate.prototype.toString = function () {
+      if (this.direction === 'in' && !this.symmetrical) {
+        if (this.reverse) { // use reverse if present
+          return this.reverse.replace(/_/g, ' ').toLowerCase();
+        }
+        else {
+          var lookup = this.lookup.toUpperCase();
+          if (lookup === 'CREATED' || lookup === 'CREATES')
+            return 'created by';
+          else if (lookup === 'INFLUENCES')
+            return 'influenced by';
+                else if (lookup === 'INSPIRES')
+                  return 'inspired by';
+                else if (lookup === 'ANTICIPATES')
+                  return 'anticipated by';
+                else if (lookup === 'DEVELOPS')
+                  return 'developed by';
+                else if (lookup === 'DEPICTS')
+                  return 'depicted by';
+                else if (lookup === 'TYPE_OF')
+                  return 'type(s)';
+                else
+                    return '(' + this.lookup.replace(/_/g, ' ').toLowerCase() + ')';
+        }
+      }
+
+       // if (!this.isDirectional || !this.direction || this.direction === "out") {
+      return this.lookup.replace(/_/g, ' ').toLowerCase();
+
+
+    };
+
+    Predicate.prototype.flip = function () {
+
+      if (!this.isDirectional) {
+        return;
+      }
+      if (this.direction === 'in') {
+        this.setDirection('out');
+      }
+      else {
+        this.setDirection('in');
+      }
+      return this;
+
+    };
+
+    return {
+      create:function (data) {
+        return new Predicate(data);
+      }
+    };
+
+
+  });
+
+
+
+
+angular.module('neograph.interaction.draggable', [])
+    .directive('draggable', function () {
+      return {
+
+        link: function ($scope, element, attrs) {
+
+          var initLeft = $(element).position().left;
+
+          $(element).draggable({
+            axis: 'x',
+            drag: function () {
+
+              var change = initLeft - $(element).position().left;
+
+              $scope.$apply(function () {
+                $scope.window.tabsWidth = $scope.window.tabsWidth + change;
+              });
+
+
+              initLeft = $(element).position().left;
+
+            }
+          });
+        }
+      };
+    });
+
+angular.module('neograph.interaction', [
+  'neograph.interaction.draggable',
+  'neograph.interaction.resizable',
+  'neograph.interaction.selectable'
+]);
+
+angular.module('neograph.interaction.resizable', [])
+.directive('resizable', ["$window", function ($window) {
+  return {
+    scope: {
+      window: '='
+    },
+    controller: ["$scope", "$element", function ($scope, $element) {
+
+      var w = angular.element($window);
+      var getWindowDimensions = function () {
+        var width = w.width();
+        var height = w.height();
+        return {
+          'height': height,
+          'width': width,
+          'tabsWidth': $scope.window.tabsWidth,
+          'tabsWidthInner': $scope.window.tabsWidth - 10,
+          'graphWidth': width - $scope.window.tabsWidth,
+          'graphHeight': height - $scope.window.topBarHeight,
+          'topBarHeight': $scope.window.topBarHeight,
+          'tabsHeight': height - $scope.window.topBarHeight
+        };
+      };
+
+      $scope.window = getWindowDimensions();
+
+      $scope.$watch(getWindowDimensions, function (newValue, oldValue) {
+
+        $scope.window = newValue;
+
+      }, true);
+
+      w.bind('resize', function () {
+        $scope.$apply();
+      });
+
+            // w.bind("debouncedresize", function (event) {
+            //    $scope.$apply();
+
+            // });
+
+    }]
+  };
+}]);
+
+
+angular.module('neograph.interaction.selectable', [])
+.directive('selectable', function () {
+  return {
+    scope: {
+      selected: '='
+
+    },
+    link: function ($scope, element, attrs) {
+
+      $scope.$watch($(element).find('li.ui-selected').length, function (i) {
+
+        $(element).selectable({
+          filter: 'li',
+          stop: function (event, ui) {
+            var selected = [];
+            $(element).find('li.ui-selected').each(function (i, e) {
+              selected.push(parseInt($(e).attr('nodeindex')));
+            });
+
+            $scope.$apply(function () {
+
+              $scope.selected = selected;
+
+            });
+
+          }
+                    ,
+          cancel: '.badge, .label'
+
+
+
+        });
+
+
+      });
+
+
+    }
+  };
+});
+
+
+
+
+
 
 (function() {
 
@@ -1981,545 +2180,6 @@ angular.module('neograph.map', [
 
       return queries;
     }
-  }
-
-})();
-  angular.module('neograph.models.predicate', [])
-  .factory('predicateFactory', function () {
-
-    function Predicate(data) {
-
-      Object.assign(this, data);
-
-    }
-
-    Predicate.prototype.setDirection = function (direction) {
-      this.direction = direction;
-      return this;
-    };
-
-    Predicate.prototype.toString = function () {
-      if (this.direction === 'in' && !this.symmetrical) {
-        if (this.reverse) { // use reverse if present
-          return this.reverse.replace(/_/g, ' ').toLowerCase();
-        }
-        else {
-          var lookup = this.lookup.toUpperCase();
-          if (lookup === 'CREATED' || lookup === 'CREATES')
-            return 'created by';
-          else if (lookup === 'INFLUENCES')
-            return 'influenced by';
-                else if (lookup === 'INSPIRES')
-                  return 'inspired by';
-                else if (lookup === 'ANTICIPATES')
-                  return 'anticipated by';
-                else if (lookup === 'DEVELOPS')
-                  return 'developed by';
-                else if (lookup === 'DEPICTS')
-                  return 'depicted by';
-                else if (lookup === 'TYPE_OF')
-                  return 'type(s)';
-                else
-                    return '(' + this.lookup.replace(/_/g, ' ').toLowerCase() + ')';
-        }
-      }
-
-       // if (!this.isDirectional || !this.direction || this.direction === "out") {
-      return this.lookup.replace(/_/g, ' ').toLowerCase();
-
-
-    };
-
-    Predicate.prototype.flip = function () {
-
-      if (!this.isDirectional) {
-        return;
-      }
-      if (this.direction === 'in') {
-        this.setDirection('out');
-      }
-      else {
-        this.setDirection('in');
-      }
-      return this;
-
-    };
-
-    return {
-      create:function (data) {
-        return new Predicate(data);
-      }
-    };
-
-
-  });
-
-
-
-
-angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
-.factory('neoClient', ['$resource', 'settings', function ($resource, settings) {
-    // return $resource('http://localhost:1337/node/match', {txt:'@txt',restrict:'@restrict'}, {
-    //    matchNodes: {
-    //        method: 'POST',
-    //        isArray:true
-    //    }
-    // });
-
-    // return $resource(null,null, {
-    //    matchNodes: {
-    //        url: 'http://localhost:1337/node/match',
-    // //       params: {txt:'',restrict:''},
-    //        method: 'POST',
-    //        isArray: true
-    //    }
-    // });
-
-  var root = settings.apiRoot;
-
-  return {
-
-    node:$resource(null, null, {
-      search: {
-        url: root + '/search',
-
-        method: 'POST',
-        isArray: true
-      }
-            ,
-      get: {
-        url: root + '/node/get/:id',
-        method: 'GET',
-      }
-            ,
-      getWithRels: {
-        url: root + '/node/getWithRels/:id',
-        method: 'GET',
-      }
-                   ,
-      getRelationships: {
-        url: root + '/node/relationships/:id',
-        method: 'GET',
-      }
-            ,
-      getOne: {
-        url: root + '/node/single',
-        method: 'POST',
-      }
-            ,
-      getList: {
-        url: root + '/node/list',
-        method: 'POST',
-        isArray:true
-      }
-            ,
-      save: {
-        url: root + '/node/save',
-
-        method: 'POST'
-      },
-      saveProps: {
-        url: root + '/node/saveProps',
-
-        method: 'POST'
-      },
-      saveRels: {
-        url: root + '/node/saveRels',
-
-        method: 'POST'
-      },
-      saveWikipagename: {
-        url: root + '/node/saveWikipagename',
-
-        method:'POST'
-      }
-            ,
-      saveMultiple: {
-        url: root + '/node/saveMultiple',
-
-        method: 'POST'
-      }
-            ,
-      del: {
-        url: root + '/node/delete',
-
-        method: 'POST'
-      }
-            ,
-      destroy: {
-        url: root + '/node/destroy',
-
-        method: 'POST'
-      },
-      restore: {
-        url: root + '/node/restore',
-
-        method: 'POST'
-      }
-            ,
-      getProps: {
-        url: root + '/node/getProps',
-
-        method: 'POST'
-
-      }
-
-    }),
-    picture: $resource(null, null, {
-      labelled: {
-        url: root + '/pictures/labelled/:label',
-        method: 'GET'
-      }
-    }),
-    edge: $resource(null, null, {
-      save: {
-        url: root + '/edge/save',
-        method: 'POST'
-      }
-            ,
-      del: {
-        url: root + '/edge/delete',
-        method: 'POST'
-
-      }
-            ,
-      getImageRelationships: {
-        url: root + '/edge/imagerelationships',
-        method: 'POST'
-      }
-    })
-        ,
-    user:$resource(null, null, {
-      saveFavourite: {
-        url: root + '/user/saveFavourite',
-
-        method: 'POST'
-
-      },
-      get: {
-        url: root + '/user/:user',
-        method: 'GET'
-      }
-    })
-        ,
-    graph: $resource(null, null, {
-      get: {
-        url: root + '/graph',
-
-        method: 'POST'
-      }
-    })
-            ,
-    type: $resource(null, null, {
-      getAll: {
-        url: root + '/types',
-        method: 'GET'
-      }
-    })
-        ,
-    predicate: $resource(null, null, {
-      getAll: {
-        url: root + '/predicates',
-        method: 'GET'
-      }
-    })
-        ,
-    utils:$resource(null, null, {
-      getDistinctLabels: {
-        url: root + '/utils/distinctLabels',
-        isArray:true,
-        method: 'POST'
-      }
-    })
-
-  };
-
-}]);
-
-angular.module('neograph.neo', ['neograph.utils', 'neograph.neo.client'])
-.factory('neo', ['neoClient', 'utils', function (neoClient, utils) {
-
-  var api = {
-    getGraph: function (q, returnArray) {
-      return neoClient.graph.get({ q: q, returnArray: returnArray })
-        .$promise.then(function (data) {
-          var out = data.toJSON();
-          return out;
-        });
-    },
-    // returns all relationships between supplied nodes, which can be vis.Dataset or graph data object
-    getAllRelationships: function (nodes) {
-      var nodeIds = '';
-      if (nodes.getIds) {
-        // if vis.DataSet
-        nodeIds = nodes.getIds({ returnType: 'Array' }).join(',');
-      } else { 
-        // otherwise data object
-        for (var key in nodes) {
-          if (nodeIds.length) {
-            nodeIds += ',';
-          }
-          nodeIds += key;
-        }
-      }
-      var q = 'MATCH a -[r]- b WHERE id(a) IN[' + nodeIds + '] and id(b) IN[' + nodeIds + '] and not (a-[:TYPE_OF]-b) return r';
-      return api.getGraph(q);
-    },
-    getRelationships: function (id) {
-      return neoClient.node.getRelationships({ id: id })
-        .$promise.then(function (data) {
-          return data.toJSON();
-        });
-    },
-    getPictures: function (label) {
-      return neoClient.picture.labelled({ label: label })
-        .$promise.then(function (data) {
-          return data.toJSON();
-        });
-    },
-    saveMultiple: function (multiple) {
-      return neoClient.node.saveMultiple({ multiple: multiple })
-        .$promise.then(function (data) {
-          return data.toJSON();
-        });
-    },
-    // saves edge to neo (update/create)
-    // TODO: according to certain rules labels will need to be maintained when relationships are created. (update not required as we always delete and recreate when changing start/end nodes)
-    // tag a with label b where:
-    // a=person and b=provenance (eg painter from france)
-    // a=person and n=group, period (eg painter part of les fauves / roccocco)
-    // a=picture and b=non-person (eg picture by corot / of tree) - although typically this will be managed through labels directly (which will then in turn has to keep relationships up to date)
-    saveEdge: function (e) { // startNode and endNode provide the full node objects for the edge
-      return neoClient.edge.save({ edge: e })
-        .$promise.then(function (data) {
-          return data.toJSON();
-        });
-    },
-    saveFavourite: function (node, user) {
-      return neoClient.user.saveFavourite({ user: user, node: node })
-        .$promise.then(function (data) {
-          return data.toJSON();
-        });
-    },
-    deleteEdge: function (edge) {
-      if (edge && edge.id) {
-        return neoClient.edge.delete({ edge: edge })
-          .$promise.then(function (data) {
-            return data.toJSON();
-          });
-      }
-    },
-    getUser: function (userLookup) {
-      return neoClient.user.get({ user: userLookup })
-        .$promise.then(function (data) {
-          return data.toJSON();
-        });
-    },
-    getOne: function (q) { // q must be a match return a single entity n
-      return neoClient.node.getOne({ q: q })
-        .$promise.then(function (data) {
-          return data.toJSON();
-        });
-    },
-    getImageRelationships: function (edge) { // loks up id/label first then call get by label
-      return neoClient.edge.getImageRelationships({ edge: edge })
-        .$promise.then(function (data) {
-          return data.toJSON();
-        });
-    },
-    // Alternatively i could query the actual labels and merge them into a distinct array
-    getDistinctLabels: function (labels) {
-      return neoClient.utils.getDistinctLabels({ labels: labels }).$promise;// returns array
-    },
-    getDistinctLabelsQuery: function (q) {
-      return neoClient.utils.getDistinctLabels({ q: q }).$promise;// returns array
-    }
-  };
-
-  return api;
-
-}]);
-
-angular.module('neograph.session', ['neograph.neo'])
-    .factory('session', ['neo', '$q', function (neo, $q) {
-
-      var anonUser = {
-        Lookup: 'Anonymous',
-        roles: { 'Public': {} }
-      };
-
-
-      var session = {
-
-        init: function () {
-
-          neo.getUser('Julian').then(function (user) {
-
-            session.user = user;
-            session.signedIn = true;
-          });
-
-          return session;
-
-        }
-        ,
-        signingIn: false
-        ,
-        signedIn: false
-        ,
-        user: anonUser
-        ,
-        signIn: function (username, password) {
-
-          return neo.authenticate(username, password).then(function (user) {
-
-            session.user = user;
-
-
-            console.log(session.user);
-             //   session.apps = service.getApps(session.user.roles);
-
-
-            localStorage.username = session.user.username;
-
-
-            session.signedIn = true;
-
-            if (user.roles.PreReg) {
-              $('body').addClass('prereg');
-            }
-            else {
-              $('body').removeClass('prereg');
-            }
-
-
-
-          }, function (failMessage) {
-            console.log(failMessage);
-            return $q.reject(failMessage);
-          });
-
-        }
-        ,
-        signOut: function () {
-
-          session.user = anonUser;
-          localStorage.username = '';// = JSON.stringify(session.user);
-          session.signedIn = false;
-          //  session.apps = service.getApps(session.user.roles);
-
-        }
-      };
-
-
-
-      if (localStorage.username) {
-        session.user = neo.getUser(localStorage.username);
-      }
-
-      if (session.user.name != 'Anonymous') {
-        session.signedIn = true;
-      }
-
- //   session.apps = service.getApps(session.user.roles);
-
-      return session.init();
-
-
-    }]);
-
-(function() {
-
-  factory.$inject = ["neoClient", "$q"];
-angular.module('neograph.utils', ['neograph.neo.client'])
-  .factory('utils', factory);
-
-  function factory(neoClient, $q) {
-
-    Array.prototype.diff = function (a) {
-      return this.filter(function (i) { return a.indexOf(i) < 0; });
-    };
-    Array.prototype.ids = function () {
-      return this.map(function (e) { return e.id; });
-    };
-    Array.prototype.hasAny = function (a) {
-      return this.filter(function (i) { return a.indexOf(i) > -1; }).length > 0;
-    };
-    Array.prototype.unique = function () {
-      var a = [];
-      for (i = 0; i < this.length; i++) {
-        var current = this[i];
-        if (a.indexOf(current) < 0) a.push(current);
-      }
-      return a;
-    };
-
-    var api = {
-      isType: function (label) {
-        return api.types[label] != undefined;
-      },
-      // returns type object from lookup
-      getType: function(type) {
-         return api.getTypes()
-          .then(function(types) {
-            return types[type];
-          });
-      },   
-      getTypes: function () {
-        if (api.types) {
-          var deferred = $q.defer();
-          deferred.resolve(api.types);
-          return deferred.promise;
-        } else {
-          return api.refreshTypes();
-        }
-      },
-      refreshTypes: function () {
-        return neoClient.type.getAll()
-          .$promise.then(function (types) {
-            api.types = types.toJSON();
-            return api.types;
-          });
-      },
-      getPredicates: function() {
-        if (api.predicates) {
-          var deferred = $q.defer();
-          deferred.resolve(api.predicates);
-          return deferred.promise;
-        } else {
-          return api.refreshPredicates();
-        }
-      },
-      refreshPredicates: function () { 
-        return neoClient.predicate.getAll()
-          .$promise.then(function (predicates) {
-            api.predicates = predicates.toJSON();
-            return api.predicates;
-          });
-      },
-      isSystemInfo: function (label) {
-        return label === 'Global' || 
-          label === 'Type' || 
-          label === 'Label' || 
-          label === 'SystemInfo';
-      },
-      getLabelClass: function (node, label) {
-        if (node && label === node.Type) {
-          return 'label-warning';
-        }
-        if (api.isSystemInfo(label)) {
-          return 'label-system';
-        }
-        if (api.isType(label)) {
-          return 'label-inverse pointer';
-        }
-        return 'label-info';
-      }
-    };
-
-    api.refreshPredicates();
-    api.refreshTypes();
-    return api;
   }
 
 })();
@@ -3363,6 +3023,472 @@ angular.module('neograph.queryInput',
     }
  
 })();
+angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
+.factory('neoClient', ['$resource', 'settings', function ($resource, settings) {
+    // return $resource('http://localhost:1337/node/match', {txt:'@txt',restrict:'@restrict'}, {
+    //    matchNodes: {
+    //        method: 'POST',
+    //        isArray:true
+    //    }
+    // });
+
+    // return $resource(null,null, {
+    //    matchNodes: {
+    //        url: 'http://localhost:1337/node/match',
+    // //       params: {txt:'',restrict:''},
+    //        method: 'POST',
+    //        isArray: true
+    //    }
+    // });
+
+  var root = settings.apiRoot;
+
+  return {
+
+    node:$resource(null, null, {
+      search: {
+        url: root + '/search',
+
+        method: 'POST',
+        isArray: true
+      }
+            ,
+      get: {
+        url: root + '/node/get/:id',
+        method: 'GET',
+      }
+            ,
+      getWithRels: {
+        url: root + '/node/getWithRels/:id',
+        method: 'GET',
+      }
+                   ,
+      getRelationships: {
+        url: root + '/node/relationships/:id',
+        method: 'GET',
+      }
+            ,
+      getOne: {
+        url: root + '/node/single',
+        method: 'POST',
+      }
+            ,
+      getList: {
+        url: root + '/node/list',
+        method: 'POST',
+        isArray:true
+      }
+            ,
+      save: {
+        url: root + '/node/save',
+
+        method: 'POST'
+      },
+      saveProps: {
+        url: root + '/node/saveProps',
+
+        method: 'POST'
+      },
+      saveRels: {
+        url: root + '/node/saveRels',
+
+        method: 'POST'
+      },
+      saveWikipagename: {
+        url: root + '/node/saveWikipagename',
+
+        method:'POST'
+      }
+            ,
+      saveMultiple: {
+        url: root + '/node/saveMultiple',
+
+        method: 'POST'
+      }
+            ,
+      del: {
+        url: root + '/node/delete',
+
+        method: 'POST'
+      }
+            ,
+      destroy: {
+        url: root + '/node/destroy',
+
+        method: 'POST'
+      },
+      restore: {
+        url: root + '/node/restore',
+
+        method: 'POST'
+      }
+            ,
+      getProps: {
+        url: root + '/node/getProps',
+
+        method: 'POST'
+
+      }
+
+    }),
+    picture: $resource(null, null, {
+      labelled: {
+        url: root + '/pictures/labelled/:label',
+        method: 'GET'
+      }
+    }),
+    edge: $resource(null, null, {
+      save: {
+        url: root + '/edge/save',
+        method: 'POST'
+      }
+            ,
+      del: {
+        url: root + '/edge/delete',
+        method: 'POST'
+
+      }
+            ,
+      getImageRelationships: {
+        url: root + '/edge/imagerelationships',
+        method: 'POST'
+      }
+    })
+        ,
+    user:$resource(null, null, {
+      saveFavourite: {
+        url: root + '/user/saveFavourite',
+
+        method: 'POST'
+
+      },
+      get: {
+        url: root + '/user/:user',
+        method: 'GET'
+      }
+    })
+        ,
+    graph: $resource(null, null, {
+      get: {
+        url: root + '/graph',
+
+        method: 'POST'
+      }
+    })
+            ,
+    type: $resource(null, null, {
+      getAll: {
+        url: root + '/types',
+        method: 'GET'
+      }
+    })
+        ,
+    predicate: $resource(null, null, {
+      getAll: {
+        url: root + '/predicates',
+        method: 'GET'
+      }
+    })
+        ,
+    utils:$resource(null, null, {
+      getDistinctLabels: {
+        url: root + '/utils/distinctLabels',
+        isArray:true,
+        method: 'POST'
+      }
+    })
+
+  };
+
+}]);
+
+angular.module('neograph.neo', ['neograph.utils', 'neograph.neo.client'])
+.factory('neo', ['neoClient', 'utils', function (neoClient, utils) {
+
+  var api = {
+    getGraph: function (q, returnArray) {
+      return neoClient.graph.get({ q: q, returnArray: returnArray })
+        .$promise.then(function (data) {
+          var out = data.toJSON();
+          return out;
+        });
+    },
+    // returns all relationships between supplied nodes, which can be vis.Dataset or graph data object
+    getAllRelationships: function (nodes) {
+      var nodeIds = '';
+      if (nodes.getIds) {
+        // if vis.DataSet
+        nodeIds = nodes.getIds({ returnType: 'Array' }).join(',');
+      } else { 
+        // otherwise data object
+        for (var key in nodes) {
+          if (nodeIds.length) {
+            nodeIds += ',';
+          }
+          nodeIds += key;
+        }
+      }
+      var q = 'MATCH a -[r]- b WHERE id(a) IN[' + nodeIds + '] and id(b) IN[' + nodeIds + '] and not (a-[:TYPE_OF]-b) return r';
+      return api.getGraph(q);
+    },
+    getRelationships: function (id) {
+      return neoClient.node.getRelationships({ id: id })
+        .$promise.then(function (data) {
+          return data.toJSON();
+        });
+    },
+    getPictures: function (label) {
+      return neoClient.picture.labelled({ label: label })
+        .$promise.then(function (data) {
+          return data.toJSON();
+        });
+    },
+    saveMultiple: function (multiple) {
+      return neoClient.node.saveMultiple({ multiple: multiple })
+        .$promise.then(function (data) {
+          return data.toJSON();
+        });
+    },
+    // saves edge to neo (update/create)
+    // TODO: according to certain rules labels will need to be maintained when relationships are created. (update not required as we always delete and recreate when changing start/end nodes)
+    // tag a with label b where:
+    // a=person and b=provenance (eg painter from france)
+    // a=person and n=group, period (eg painter part of les fauves / roccocco)
+    // a=picture and b=non-person (eg picture by corot / of tree) - although typically this will be managed through labels directly (which will then in turn has to keep relationships up to date)
+    saveEdge: function (e) { // startNode and endNode provide the full node objects for the edge
+      return neoClient.edge.save({ edge: e })
+        .$promise.then(function (data) {
+          return data.toJSON();
+        });
+    },
+    saveFavourite: function (node, user) {
+      return neoClient.user.saveFavourite({ user: user, node: node })
+        .$promise.then(function (data) {
+          return data.toJSON();
+        });
+    },
+    deleteEdge: function (edge) {
+      if (edge && edge.id) {
+        return neoClient.edge.delete({ edge: edge })
+          .$promise.then(function (data) {
+            return data.toJSON();
+          });
+      }
+    },
+    getUser: function (userLookup) {
+      return neoClient.user.get({ user: userLookup })
+        .$promise.then(function (data) {
+          return data.toJSON();
+        });
+    },
+    getOne: function (q) { // q must be a match return a single entity n
+      return neoClient.node.getOne({ q: q })
+        .$promise.then(function (data) {
+          return data.toJSON();
+        });
+    },
+    getImageRelationships: function (edge) { // loks up id/label first then call get by label
+      return neoClient.edge.getImageRelationships({ edge: edge })
+        .$promise.then(function (data) {
+          return data.toJSON();
+        });
+    },
+    // Alternatively i could query the actual labels and merge them into a distinct array
+    getDistinctLabels: function (labels) {
+      return neoClient.utils.getDistinctLabels({ labels: labels }).$promise;// returns array
+    },
+    getDistinctLabelsQuery: function (q) {
+      return neoClient.utils.getDistinctLabels({ q: q }).$promise;// returns array
+    }
+  };
+
+  return api;
+
+}]);
+
+angular.module('neograph.session', ['neograph.neo'])
+    .factory('session', ['neo', '$q', function (neo, $q) {
+
+      var anonUser = {
+        Lookup: 'Anonymous',
+        roles: { 'Public': {} }
+      };
+
+
+      var session = {
+
+        init: function () {
+
+          neo.getUser('Julian').then(function (user) {
+
+            session.user = user;
+            session.signedIn = true;
+          });
+
+          return session;
+
+        }
+        ,
+        signingIn: false
+        ,
+        signedIn: false
+        ,
+        user: anonUser
+        ,
+        signIn: function (username, password) {
+
+          return neo.authenticate(username, password).then(function (user) {
+
+            session.user = user;
+
+
+            console.log(session.user);
+             //   session.apps = service.getApps(session.user.roles);
+
+
+            localStorage.username = session.user.username;
+
+
+            session.signedIn = true;
+
+            if (user.roles.PreReg) {
+              $('body').addClass('prereg');
+            }
+            else {
+              $('body').removeClass('prereg');
+            }
+
+
+
+          }, function (failMessage) {
+            console.log(failMessage);
+            return $q.reject(failMessage);
+          });
+
+        }
+        ,
+        signOut: function () {
+
+          session.user = anonUser;
+          localStorage.username = '';// = JSON.stringify(session.user);
+          session.signedIn = false;
+          //  session.apps = service.getApps(session.user.roles);
+
+        }
+      };
+
+
+
+      if (localStorage.username) {
+        session.user = neo.getUser(localStorage.username);
+      }
+
+      if (session.user.name != 'Anonymous') {
+        session.signedIn = true;
+      }
+
+ //   session.apps = service.getApps(session.user.roles);
+
+      return session.init();
+
+
+    }]);
+
+(function() {
+
+  factory.$inject = ["neoClient", "$q"];
+angular.module('neograph.utils', ['neograph.neo.client'])
+  .factory('utils', factory);
+
+  function factory(neoClient, $q) {
+
+    Array.prototype.diff = function (a) {
+      return this.filter(function (i) { return a.indexOf(i) < 0; });
+    };
+    Array.prototype.ids = function () {
+      return this.map(function (e) { return e.id; });
+    };
+    Array.prototype.hasAny = function (a) {
+      return this.filter(function (i) { return a.indexOf(i) > -1; }).length > 0;
+    };
+    Array.prototype.unique = function () {
+      var a = [];
+      for (i = 0; i < this.length; i++) {
+        var current = this[i];
+        if (a.indexOf(current) < 0) a.push(current);
+      }
+      return a;
+    };
+
+    var api = {
+      isType: function (label) {
+        return api.types[label] != undefined;
+      },
+      // returns type object from lookup
+      getType: function(type) {
+         return api.getTypes()
+          .then(function(types) {
+            return types[type];
+          });
+      },   
+      getTypes: function () {
+        if (api.types) {
+          var deferred = $q.defer();
+          deferred.resolve(api.types);
+          return deferred.promise;
+        } else {
+          return api.refreshTypes();
+        }
+      },
+      refreshTypes: function () {
+        return neoClient.type.getAll()
+          .$promise.then(function (types) {
+            api.types = types.toJSON();
+            return api.types;
+          });
+      },
+      getPredicates: function() {
+        if (api.predicates) {
+          var deferred = $q.defer();
+          deferred.resolve(api.predicates);
+          return deferred.promise;
+        } else {
+          return api.refreshPredicates();
+        }
+      },
+      refreshPredicates: function () { 
+        return neoClient.predicate.getAll()
+          .$promise.then(function (predicates) {
+            api.predicates = predicates.toJSON();
+            return api.predicates;
+          });
+      },
+      isSystemInfo: function (label) {
+        return label === 'Global' || 
+          label === 'Type' || 
+          label === 'Label' || 
+          label === 'SystemInfo';
+      },
+      getLabelClass: function (node, label) {
+        if (node && label === node.Type) {
+          return 'label-warning';
+        }
+        if (api.isSystemInfo(label)) {
+          return 'label-system';
+        }
+        if (api.isType(label)) {
+          return 'label-inverse pointer';
+        }
+        return 'label-info';
+      }
+    };
+
+    api.refreshPredicates();
+    api.refreshTypes();
+    return api;
+  }
+
+})();
 (function() {
 
     editController.$inject = ["neo", "utils", "$stateParams", "$scope"];
@@ -3420,29 +3546,70 @@ angular.module('neograph.queryInput',
 (function() {
   'use strict';
 
-  controller.$inject = ["nodeManager", "neo"];
+  controller.$inject = ["nodeManager", "neo", "modal"];
   angular.module('neograph.node.edit.image.controller', [])
     .controller('EditImageCtrl', controller);
 
-  function controller(nodeManager, neo) {
+  function controller(nodeManager, neo, modal) {
 
     var vm = this;
+    var modalId = 'node.image.select';
     vm.active = false;
-    vm.onSelected = onSelected;
+    vm.openModal = openModal;
 
     nodeManager.subscribe('loaded', function(state) {
       vm.node = state.node;
-      neo.getPictures(vm.node.label).then(function(pictureData) {
-        vm.pictures = pictureData.items;
-      });
     });
 
-    nodeManager.subscribe('tabChanged', function(state) {
-      vm.active = state.tab === 'Image';
-    });
 
     function onSelected(picture) {
       vm.node.image = picture.image;
+    }
+
+    function openModal() {
+      var modalData = {
+        node: vm.node
+      };
+      modal.open(modalId, modalData)
+        .then(function (selectedPicture) {
+          if (selectedPicture) {
+            console.log(selectedPicture);
+            vm.node.image = selectedPicture.image;
+          }
+        });
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  controller.$inject = ["nodeManager", "neo", "modal"];
+  angular.module('neograph.node.edit.image.select.controller', [])
+    .controller('NodeImageSelectCtrl', controller);
+
+  function controller(nodeManager, neo, modal) {
+
+    var vm = this;
+    var modalId = 'node.image.select';
+    vm.onSelected = onSelected;
+    vm.selectConfirm = selectConfirm;
+
+    activate();
+
+    function activate() {
+      vm.node = modal.getData(modalId).node;
+      neo.getPictures(vm.node.label).then(function(pictureData) {
+        vm.pictures = pictureData.items;
+      });
+    }
+
+    function onSelected(picture) {
+      vm.selectedPicture = picture;
+    }
+
+    function selectConfirm() {
+      modal.close(modalId, vm.selectedPicture);
     }
 
   }
@@ -3504,6 +3671,7 @@ angular.module('neograph.queryInput',
     
   angular.module('neograph.node.image', [
     'neograph.node.edit.image.controller',
+    'neograph.node.edit.image.select.controller',
     'neograph.node.image.directive'
   ]);
     

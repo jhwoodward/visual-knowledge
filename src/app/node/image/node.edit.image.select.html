@@ -1,0 +1,26 @@
+<div class="modal-header" >
+    <button type="button" class="close ion-close-round" modal-close>
+    </button>
+    <h3 class="modal-title">Select image</h3>
+</div>
+
+<div class="modal-body creative-modal">
+   
+   <div pictures="vm.pictures"  on-selected="vm.onSelected(picture)"></div>
+
+</div>
+
+<div class="modal-footer">
+    <button type="button"
+        class="btn btn-success" 
+        ng-click="vm.selectConfirm()"
+        ng-disabled="!vm.selectedPicture"
+        >
+        Select
+    </button>
+    <button type="button"
+        class="btn btn-default"
+        modal-close>
+        Cancel
+    </button>
+</div>

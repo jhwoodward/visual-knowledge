@@ -16,7 +16,8 @@
     'neograph.map',
     'neograph.routes',
     'neograph.constant',
-    'neograph.admin.controller'
+    'neograph.admin.controller',
+    'ui.bootstrap'
     ]);
 
 })();

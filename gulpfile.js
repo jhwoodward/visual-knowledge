@@ -53,7 +53,8 @@ gulp.task('app-js', function(cb){
 gulp.task('lib-js', function(){
   return gulp.src([
     './lib/jquery/dist/jquery.js',
-    './lib/bootstrap2.js',
+    './lib/bootstrap-typeahead.js',
+    
     './lib/vis/dist/vis.js',
     './lib/lodash/dist/lodash.js',
     './lib/angular/angular.js',
@@ -61,6 +62,8 @@ gulp.task('lib-js', function(){
     './lib/angular-sanitize/angular-sanitize.js',
     './lib/angular-animate/angular-animate.js',
     './lib/angular-ui-router/release/angular-ui-router.js',
+    './lib/angular-bootstrap/ui-bootstrap.js',
+    './lib/angular-bootstrap/ui-bootstrap-tpls.js',
     './lib/jquery.debouncedresize/js/jquery.debouncedresize.js',
     './lib/jquery.masonry/jquery.masonry.js',
     './lib/jquery-ui/jquery-ui.js'

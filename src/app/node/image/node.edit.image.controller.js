@@ -4,26 +4,33 @@
   angular.module('neograph.node.edit.image.controller', [])
     .controller('EditImageCtrl', controller);
 
-  function controller(nodeManager, neo) {
+  function controller(nodeManager, neo, modal) {
 
     var vm = this;
+    var modalId = 'node.image.select';
     vm.active = false;
-    vm.onSelected = onSelected;
+    vm.openModal = openModal;
 
     nodeManager.subscribe('loaded', function(state) {
       vm.node = state.node;
-      neo.getPictures(vm.node.label).then(function(pictureData) {
-        vm.pictures = pictureData.items;
-      });
     });
 
-    nodeManager.subscribe('tabChanged', function(state) {
-      vm.active = state.tab === 'Image';
-    });
 
     function onSelected(picture) {
       vm.node.image = picture.image;
     }
 
+    function openModal() {
+      var modalData = {
+        node: vm.node
+      };
+      modal.open(modalId, modalData)
+        .then(function (selectedPicture) {
+          if (selectedPicture) {
+            console.log(selectedPicture);
+            vm.node.image = selectedPicture.image;
+          }
+        });
+    }
   }
 })();
