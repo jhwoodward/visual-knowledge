@@ -1,24 +1,33 @@
 ﻿<div  class="properties">
 
-  <div class="row form-group">
-    <div class="col-sm-12">
+  <div class="row">
+
+    <div class="col-xs-9 form-group">
+      <label>Type</label>
+      <div>
+        <a class="label label-warning clickable">{{vm.node.type.lookup}}</a>
+        <a class="label label-inverse clickable" ng-repeat="subtype in vm.node.type.subtypes">{{subtype}}</a>
+      </div>
+    </div>
+    <div class="col-xs-3 form-group">
+      <label>Id</label>
+      <div>
+        {{vm.node.id}} 
+      </div>
+    </div>
+
+    <div class="col-sm-12 form-group">
       <labels navpath="/admin/node/{label}" 
-        labels="vm.node.labels" 
+        labels="vm.node.customLabels" 
         highlight="{{vm.node.type.lookup}}">
       </labels>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col-xs-3 form-group">
-      <label>Type</label>
-      <div>{{vm.node.type.lookup}}</div>
-    </div>
     <div ng-repeat="(key, value) in vm.node.type.props" class="form-group"
           ng-switch="key"
           ng-class="{
             'col-xs-3':  value.type==='number',
-            'col-xs-4' :  value.type==='string' && value.maxLength <= 50,
+            'col-xs-4' : value.type==='string' && value.maxLength <= 50,
             'col-xs-8' : value.type==='string' && value.maxLength > 50 && value.maxLength<200,
             'col-xs-12': value.maxLength >= 200 
           }">

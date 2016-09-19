@@ -2,15 +2,17 @@
   data="vm.data"
   on-select="vm.onGraphSelect(node, edges)">
 </graph>
-<div class="graph-preview">
+<div class="panel panel-slide-right"
+  ng-class="{
+  'panel-collapsed': !vm.selectedNode
+  }"
+>
   <div class="tfade" ng-show="vm.selectedNode">
-    <div class="header">
-      {{vm.selectedNode.label || vm.selectedNode.lookup | startcase}}
-    </div>
-    <div>
-      <p>{{vm.selectedNode.description}}</p>
-      <p>{{vm.selectedNode.text}}</p>
-    </div>
+    <node-image-display url="vm.selectedNode.image.full.url">
+    </node-image-display>
+    
+    <node node="vm.selectedNode" editing="false" />
+    
     <div>
       <button class="btn btn-primary"  ng-click="vm.goToSelected()">Go to {{vm.selectedNode.label || vm.selectedNode.lookup  | startcase}}</button>
     </div>
@@ -23,7 +25,9 @@
     </div>
   </div>
 </div>
+
 <ul class="graph-types">
+ <!-- <li><button ng-click="vm.graphql()">GraphQL</button></li>-->
   <li ng-repeat="map in vm.maps" ng-click="vm.selectedMap = map" ng-class="{selected: vm.selectedMap === map}">
     {{map.name}}
   </li>

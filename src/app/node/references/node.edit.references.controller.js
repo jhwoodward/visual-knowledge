@@ -8,10 +8,13 @@
 
     var vm = this;
     vm.node = {};
+
+    /*
     //set node when loaded by parent controller
     $scope.$watch('node', function(node) {
       vm.node = node;
     });
+    */
 
   }
 })();

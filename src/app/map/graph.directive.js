@@ -5,7 +5,52 @@
   angular.module('neograph.map.graph.directive', [])
     .directive('graph', directive);
 
-  function directive(graphService, $state, $window, $timeout) {
+  function directive(graphService, nodeManager, $window, $timeout) {
+   
+    var options = {
+        edges: { widthSelectionMultiplier: 4 },
+        hierarchicalLayout: {
+          enabled: false,
+          levelSeparation: 10, // make this inversely proportional to number of nodes
+          nodeSpacing: 200,
+          direction: 'UD', //LR
+                  //    layout: "hubsize"
+        },
+        dataManipulation: {
+          enabled: true,
+          initiallyVisible: true
+        },
+              // stabilize: true,
+              // stabilizationIterations: 1000,
+        physics: {
+          barnesHut: {
+            enabled: true,
+            gravitationalvarant: -6000,
+            centralGravity: 1,
+            springLength: 20,
+            springvarant: 0.04,
+            damping: 0.09
+          },
+          repulsion: {
+            centralGravity: 0.1,
+            springLength: 0.5,
+            springvarant: 0.05,
+            nodeDistance: 100,
+            damping: 0.09
+          },
+          hierarchicalRepulsion: {
+            enabled: false,
+            centralGravity: 0,
+            springLength: 270,
+            springvarant: 0.01,
+            nodeDistance: 300,
+            damping: 0.09
+          }
+        },
+        onDelete: function(data, callback) {
+        }
+      }
+
     return {
       restrict: 'E',
       replace: true,
@@ -26,7 +71,9 @@
         nodes: {},
         edges: {}
       };
-      var options = graphService.options;
+
+      var currentNode;
+
       options.onConnect = onNetworkConnect;
       var network = new vis.Network(element[0], graph, options);
       $timeout(setGraphSize);
@@ -35,7 +82,10 @@
 
       // Add event listeners
       scope.$watch('data', onDataChanged);
-      scope.$on('$stateChangeSuccess', focusCurrentNode);
+      nodeManager.subscribe('loaded', function(state) {
+        currentNode = state.node;
+        focusNode(currentNode);
+      });
       angular.element($window).on('resize', setGraphSize);
       // Fit to screen on resize
       network.on('resize', onNetworkResize);
@@ -68,14 +118,17 @@
         return undefined;
       };
 
-      function focusCurrentNode() {
-        if ($state.params.node) {
+      function focusNode(node) {
+        if (node) {
           Object.keys(scope.data.nodes).forEach(function(key) {
-            if (scope.data.nodes[key].label === $state.params.node) {
+            if (scope.data.nodes[key].label === node.label) {
               if (scope.data.nodes[key].id !== getSelectedNodeId()) {
+
+          //      scope.data.nodes[key].fontSize = 100;
+
                 network.selectNodes([key]);
                 network.focusOnNode(key, {
-                  scale: 1.5,
+                  //scale: 1.5,
                   animation: {
                     duration: 1000,
                     easingFunction: 'easeOutCubic'
@@ -175,12 +228,14 @@
       }
 
       function onDataChanged()  {
-        console.log('new data');
         graph.nodes.clear();
         graph.edges.clear();
         var gArr = graphService.toVisNetworkData(scope.data);
+        console.log(gArr,'network data');
         graph.nodes.add(gArr.nodes);
         graph.edges.add(gArr.edges);
+        console.log(currentNode);
+        focusNode(currentNode);
       }
 
       function onGlobalDataUpdate(g) {

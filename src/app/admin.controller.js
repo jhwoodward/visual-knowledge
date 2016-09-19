@@ -10,6 +10,7 @@
       vm.togglePanel = function() {
         vm.panelVisible = !vm.panelVisible;
       }
+      
 
       nodeManager.subscribe('loaded', function(state) {
         vm.node = state.node;

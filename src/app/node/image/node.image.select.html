@@ -1,13 +1,13 @@
 <div class="modal-header" >
     <button type="button" class="close ion-close-round" modal-close>
     </button>
-    <h3 class="modal-title">Select image</h3>
+    <filter labels="vm.filters" enabled="vm.enabledFilters" on-change="vm.filterChanged(filters)"></filter>
 </div>
 
-<div class="modal-body creative-modal">
+<div class="modal-body creative-modal" scroll-bottom="vm.getMorePictures()">
    
-   <div pictures="vm.pictures"  on-selected="vm.onSelected(picture)"></div>
-
+   <div pictures="vm.pictures" append="vm.more" on-selected="vm.onSelected(picture)"></div>
+   <button ng-if="vm.canGetMorePictures" ng-click="vm.getMorePictures()" >More...</button>
 </div>
 
 <div class="modal-footer">

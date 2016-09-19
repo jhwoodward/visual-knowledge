@@ -5,7 +5,7 @@
   </div>
 
   <div class="row" >
-    <div ng-repeat="(key,value) in vm.node.relationships">
+    <div ng-repeat="(key,value) in vm.node.relationships" ng-if="key != 'INSTANCE_OF'">
 
       <div 
         ng-if="value.predicate.lookup.toLowerCase()!='created'" 

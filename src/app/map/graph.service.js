@@ -34,7 +34,6 @@
       var node = {
         id: neoNode.id,
         label: neoNode.label || neoNode.lookup,
-          fontFill: '#8fb1ca',
         size: neoNode.status / 10,
         group: neoNode.class,
         mass: type === 'Group' ? 0.5 : 1,
@@ -46,15 +45,19 @@
 
       var image;// = (type === 'Painting' || type === 'Picture') ? neoNode.temp.thumbUrl : null;
 
+      node.color = '#5696ce';
+      node.fontColor = '#3e82bd';
+
       if (image) {
         node.image = image;
         node.shape = 'image';
       } else if (type === 'Provenance') {
-        node.fontSize = 50;
-        node.fontColor = 'lightgray';
+        node.fontSize = 100;
+        node.fontColor = '#5696ce';
         node.color = 'transparent';
       } else if (type === 'Iconography' || type === 'Place') {
         node.shape = 'ellipse';
+           node.fontColor = '#c5d9ec';
       } else if (type === 'Quotation') {
         node.shape = 'box';
         node.color = 'transparent';
@@ -68,16 +71,20 @@
         node.color = 'transparent';
       } else if (neoNode.isPerson()) {
         node.shape = 'dot';
+        node.fontFill = '#8fb1ca';
       } else if (neoNode.isProperty()) {
-        node.shape = 'circle';
+             node.color = 'transparent';
+       // node.shape = 'circle';
+       // node.color = '#b3cae0';
       } else {
         node.shape = 'box';
+        node.fontColor = '#c5d9ec';
+        node.fontFill = node.color;
       }
 
-      node.color = { background: node.color || '#3e82bd', border: 'transparent' };
-      if (neoNode.isProperty()) {
-        node.color.background = 'lightgreen';
-      }
+      node.color = { background: node.color, border: 'transparent' };
+
+ 
       return node;
     };
 
@@ -152,49 +159,6 @@
           return 'INFLUENCES';
         }
         return 'ASSOCIATED_WITH';
-      },
-      options: {
-        edges: { widthSelectionMultiplier: 4 },
-        hierarchicalLayout: {
-          enabled: false,
-          levelSeparation: 10, // make this inversely proportional to number of nodes
-          nodeSpacing: 200,
-          direction: 'UD', //LR
-                  //    layout: "hubsize"
-        },
-        dataManipulation: {
-          enabled: true,
-          initiallyVisible: true
-        },
-              // stabilize: true,
-              // stabilizationIterations: 1000,
-        physics: {
-          barnesHut: {
-            enabled: true,
-            gravitationalvarant: -6000,
-            centralGravity: 1,
-            springLength: 20,
-            springvarant: 0.04,
-            damping: 0.09
-          },
-          repulsion: {
-            centralGravity: 0.1,
-            springLength: 0.5,
-            springvarant: 0.05,
-            nodeDistance: 100,
-            damping: 0.09
-          },
-          hierarchicalRepulsion: {
-            enabled: false,
-            centralGravity: 0,
-            springLength: 270,
-            springvarant: 0.01,
-            nodeDistance: 300,
-            damping: 0.09
-          }
-        },
-        onDelete: function(data, callback) {
-        }
       },
       // Transforms neo graph data object into object
       // containing array of nodes and array of edges renderable by vis network

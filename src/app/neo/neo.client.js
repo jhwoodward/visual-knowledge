@@ -26,83 +26,67 @@
 
         method: 'POST',
         isArray: true
-      }
-            ,
+      },
       get: {
         url: root + '/node/get/:id',
         method: 'GET',
-      }
-            ,
+      },
       getWithRels: {
         url: root + '/node/getWithRels/:id',
         method: 'GET',
-      }
-                   ,
+      } ,
       getRelationships: {
         url: root + '/node/relationships/:id',
         method: 'GET',
-      }
-            ,
+      },
       getOne: {
         url: root + '/node/single',
         method: 'POST',
-      }
-            ,
+      },
       getList: {
         url: root + '/node/list',
         method: 'POST',
         isArray:true
-      }
-            ,
+      },
       save: {
         url: root + '/node/save',
-
+        method: 'POST'
+      },
+      saveImage: {
+        url: root + '/node/saveImage',
         method: 'POST'
       },
       saveProps: {
         url: root + '/node/saveProps',
-
         method: 'POST'
       },
       saveRels: {
         url: root + '/node/saveRels',
-
         method: 'POST'
       },
       saveWikipagename: {
         url: root + '/node/saveWikipagename',
-
         method:'POST'
-      }
-            ,
+      },
       saveMultiple: {
         url: root + '/node/saveMultiple',
-
         method: 'POST'
-      }
-            ,
+      },
       del: {
         url: root + '/node/delete',
-
         method: 'POST'
-      }
-            ,
+      },
       destroy: {
         url: root + '/node/destroy',
-
         method: 'POST'
       },
       restore: {
         url: root + '/node/restore',
-
         method: 'POST'
-      }
-            ,
+      },
       getProps: {
         url: root + '/node/getProps',
-
         method: 'POST'
-
       }
 
     }),
@@ -110,6 +94,10 @@
       labelled: {
         url: root + '/pictures/labelled/:label',
         method: 'GET'
+      },
+      search: {
+        url: root + '/pictures/search',
+        method: 'POST'
       }
     }),
     edge: $resource(null, null, {
@@ -164,11 +152,16 @@
         method: 'GET'
       }
     })
-        ,
+    ,
     utils:$resource(null, null, {
       getDistinctLabels: {
-        url: root + '/utils/distinctLabels',
-        isArray:true,
+        url: root + '/labels/distinct',
+        method: 'POST'
+      }
+    }) ,
+    graphql:$resource(null, null, {
+      query: {
+        url: root + '/graphql',
         method: 'POST'
       }
     })

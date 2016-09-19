@@ -7,8 +7,10 @@
   function service(neoClient, utils, $q, predicateFactory) {
 
     function Node(data) {
+
       this.labels = [];
       this.id = -1;
+
       _.extend(this, data);
 
       for (var relKey in this.relationships) {
@@ -18,7 +20,13 @@
       if (!this.label && this.lookup) {
         this.label = this.lookup;
       }
-   
+
+      if (this.type) {
+        this.customLabels = this.labels.filter(function(label) {
+          return this.type.subtypes.indexOf(label) === -1 && label != this.type.lookup;
+        }.bind(this));
+      }
+  
       this.original = angular.copy(this);
     }
 
@@ -67,15 +75,15 @@
     };
     
     Node.prototype.isPicture = function () {
-      return this.labels.indexOf('Picture') > -1;
+      return this.type ? this.type.subtypes.indexOf('Picture') > -1 : false;
     };
 
     Node.prototype.isPerson = function () {
-      return this.labels.indexOf('Person') > -1;
+      return this.type ? this.type.subtypes.indexOf('Person') > -1 : false;
     };
 
     Node.prototype.isProperty = function () {
-      return this.labels.indexOf('Property') > -1;
+      return this.type ? this.type.lookup === 'Property' : false;
     };
 
  

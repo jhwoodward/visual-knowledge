@@ -8,24 +8,8 @@
           url:'/create/node',
           views:{
             'panel@admin': {
-              templateUrl: 'app/node/node.html',
+              template: '<node node="vm.node" editing="true" on-toggle-edit="vm.onToggleEdit(editing)" />',
               controller: 'NodeCreateCtrl as vm'
-            },
-            'header@admin.createNode': {
-              templateUrl: 'app/node/node.create.header.html',
-              controller:'NodeCreateHeaderCtrl as vm'
-            },
-            'properties@admin.createNode':{
-              templateUrl:'app/node/properties/node.edit.properties.html',
-              controller:'EditPropertiesCtrl as vm'
-            },
-            'relationships@admin.createNode':{
-              templateUrl:'app/node/relationships/node.edit.relationships.html',
-              controller:'EditRelationshipsCtrl as vm'
-            },
-            'references@admin.createNode':{
-              templateUrl:'app/node/references/node.edit.references.html',
-              controller:'EditReferencesCtrl as vm'
             }
           }
         })
@@ -33,53 +17,17 @@
           url:'/node/:node',
           views: {
             'panel@admin': {
-              templateUrl: 'app/node/node.html',
+              template: '<node node="vm.node" editing="false" on-tab-changed="vm.onTabChanged(tab)" on-toggle-edit="vm.onToggleEdit(editing)" />',
               controller: 'NodeCtrl as vm'
-            },
-            'header@admin.node': {
-              templateUrl: 'app/node/node.header.html',
-              controller: 'NodeHeaderCtrl as vm'
-            },
-            'properties@admin.node': {
-              templateUrl: 'app/node/properties/node.properties.html',
-              controller: 'ChildNodeCtrl as vm'
-            },
-            'image@admin.node': {
-              templateUrl: 'app/node/image/node.image.html',
-              controller: 'ChildNodeCtrl as vm'
-            },
-            'relationships@admin.node':{
-              templateUrl:'app/node/relationships/node.relationships.html',
-              controller: 'ChildNodeCtrl as vm'
-            },
-            'references@admin.node':{
-              templateUrl:'app/node/references/node.references.html',
-              controller:'ChildNodeCtrl as vm'
             }
           }
         })
         .state('admin.node.edit', {
           url:'/edit',
           views:{
-            'header@admin.node': {
-              templateUrl: 'app/node/node.edit.header.html',
-              controller:'NodeEditHeaderCtrl as vm'
-            },
-            'properties@admin.node':{
-              templateUrl:'app/node/properties/node.edit.properties.html',
-              controller:'EditPropertiesCtrl as vm'
-            },
-            'image@admin.node': {
-              templateUrl: 'app/node/image/node.edit.image.html',
-              controller: 'EditImageCtrl as vm'
-            },
-            'relationships@admin.node':{
-              templateUrl:'app/node/relationships/node.edit.relationships.html',
-              controller:'EditRelationshipsCtrl as vm'
-            },
-            'references@admin.node':{
-              templateUrl:'app/node/references/node.edit.references.html',
-              controller:'EditReferencesCtrl as vm'
+            'panel@admin': {
+              template: '<node node="vm.node" editing="true"  on-tab-changed="vm.onTabChanged(tab)" on-toggle-edit="vm.onToggleEdit(editing)" />',
+              controller: 'NodeCtrl as vm'
             }
           }
         });

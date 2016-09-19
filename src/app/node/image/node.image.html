@@ -1,1 +1,8 @@
-﻿<div ng-include="'app/node/image/node.imageDetails.html'"></div>
+﻿<div>
+  <div ng-include="'app/node/image/node.imageDetails.html'"></div>
+  <button ng-click="vm.openModal()" >Select</button>
+  <div ng-if="vm.isDirty" class="pull-right">
+    <button  ng-click="vm.save()" >Confirm change</button>
+    <button  ng-click="vm.revert()" >Revert</button>
+  </div>
+</div>

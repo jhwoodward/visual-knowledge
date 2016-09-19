@@ -26,9 +26,11 @@
           {
             name: 'Schema',
             q: `
-            MATCH (n:Schema)  return n
-            `,
-            connectAll: true
+            MATCH (n:Class) - [r] -> (m:Class) 
+            with n,r,m OPTIONAL MATCH n - [pr:PROPERTY] -> (p:Property)  
+            with p,pr,n,r,m OPTIONAL MATCH m - [pr2:PROPERTY] -> (p2:Property)  
+            return p,pr,p2,pr2,n,r,m
+            `
           });
       }
 
@@ -64,24 +66,54 @@
         });
       }
 
-      if (labels.indexOf('Person') > -1) {
+     if (labels.indexOf('Person') > -1) {
         queries.push({
           name: 'Outbound Influence',
           q: `
-            MATCH (c {Label:'${label}'})-[r]->(d:Painter) 
-            with c,d,r optional  match(d) -[s]->(e:Painter) return c,d,r,s,e `,
+            MATCH (c {Label:'${label}'})-[r]->(d:Label)
+              where  type(r) = 'INFLUENCES'  OR type(r) = 'INSPIRES'   
+            with c,d,r optional  match(d) -[s]->(e:Label)
+              where  type(s) = 'INFLUENCES'  OR type(s) = 'INSPIRES'    
+              return c,d,r,s,e `,
           connectAll: true
         });
         queries.push({
           name: 'Inbound Influence',
           q: `
-            MATCH (c {Label:'${label}'})<-[r]-(d:Painter) 
-            with c,d,r optional  match(d) <-[s]-(e:Painter) return c,d,r,s,e 
+            MATCH (c {Label:'${label}'})<-[r]-(d:Label) 
+              where  type(r) = 'INFLUENCES'  OR type(r) = 'INSPIRES'  
+            with c,d,r optional  match(d) <-[s]-(e:Label)   
+              where  type(s) = 'INFLUENCES'  OR type(s) = 'INSPIRES'  
+              return c,d,r,s,e 
             `,
           connectAll: true
         });
       }
-
+/*
+      if (labels.indexOf('Person') > -1) {
+        queries.push({
+          name: 'Outbound Influence',
+          q: `
+            MATCH (c {Label:'${label}'})-[r]->(d:Label)  
+              where  type(r) = 'INFLUENCES'  OR type(r) = 'INSPIRES'   
+            with c,d,r optional  match(d) -[s]->(e:Label)  
+              where  type(s) = 'INFLUENCES'  OR type(s) = 'INSPIRES'    
+              return c,d,r,s,e `,
+          connectAll: true
+        });
+        queries.push({
+          name: 'Inbound Influence',
+          q: `
+            MATCH (c {Label:'${label}'})<-[r]-(d:Label) 
+              where  type(r) = 'INFLUENCES'  OR type(r) = 'INSPIRES'  
+            with c,d,r optional  match(d) <-[s]-(e:Label)   
+              where  type(s) = 'INFLUENCES'  OR type(s) = 'INSPIRES'  
+              return c,d,r,s,e 
+            `,
+          connectAll: true
+        });
+      }
+*/
       if (labels.indexOf('Group') > -1) {
         queries.push({
           name: 'Group',

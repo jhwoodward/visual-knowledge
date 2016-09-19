@@ -8,21 +8,7 @@
     var vm = this;
     vm.node = {};
 
-    nodeManager.subscribe('loaded', function(state) {
-      vm.node = state.node;
-    });
-
     vm.nodeTypes = [];
-
-/*
-    $scope.$watch('vm.node', function(node) {
-      if (node) {
-        node.labelled = node.labelled || [];
-        $('.labelEdit input').val('');
-        vm.deleted = node.labels.indexOf('Deleted') > -1;
-      }
-    });
-    */
 
     $scope.$watch('newPredicate', function(predicate) {
       if (predicate) {

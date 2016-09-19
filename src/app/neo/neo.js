@@ -2,11 +2,31 @@
 .factory('neo', ['neoClient', 'utils', function (neoClient, utils) {
 
   var api = {
+    graphql: function(q) {
+      q = 'query { store { ' + q + ' } }';
+      return neoClient.graphql.query({ query: q })
+        .$promise.then(function (data) {
+          var out = data.toJSON();
+          return out.data.store;
+        });
+    },
     getGraph: function (q, returnArray) {
       return neoClient.graph.get({ q: q, returnArray: returnArray })
         .$promise.then(function (data) {
           var out = data.toJSON();
-          return out;
+          return utils.getTypes().then(function(types) {
+            if (returnArray) {
+              out.nodes.map(function(n) {
+                n.type = types[n.class];
+              });
+            } else {
+              Object.keys(out.nodes).forEach(function(key) {
+                var n = out.nodes[key];
+                n.type = types[n.class];
+              });
+            }
+            return out;
+          });
         });
     },
     // returns all relationships between supplied nodes, which can be vis.Dataset or graph data object
@@ -33,6 +53,12 @@
           return data.toJSON();
         });
     },
+    searchPictures : function(query, options) {
+      return neoClient.picture.search({query: query, options: options})
+        .$promise.then(function (data) {
+          return data.toJSON();
+        });
+    },
     getPictures: function (label) {
       return neoClient.picture.labelled({ label: label })
         .$promise.then(function (data) {
@@ -41,6 +67,12 @@
     },
     saveMultiple: function (multiple) {
       return neoClient.node.saveMultiple({ multiple: multiple })
+        .$promise.then(function (data) {
+          return data.toJSON();
+        });
+    },
+    saveImage: function (node) {
+      return neoClient.node.saveImage({ node: node })
         .$promise.then(function (data) {
           return data.toJSON();
         });
@@ -91,7 +123,10 @@
     },
     // Alternatively i could query the actual labels and merge them into a distinct array
     getDistinctLabels: function (labels) {
-      return neoClient.utils.getDistinctLabels({ labels: labels }).$promise;// returns array
+      return neoClient.utils.getDistinctLabels({ labels: labels })
+        .$promise.then(function(data) {
+          return data.toJSON().labels;
+        });
     },
     getDistinctLabelsQuery: function (q) {
       return neoClient.utils.getDistinctLabels({ q: q }).$promise;// returns array

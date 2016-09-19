@@ -10,13 +10,15 @@
     'neograph.common.typeahead',
     'neograph.common.typeaheadSimple',
     'neograph.common.focusTo',
-    'neograph.common.modal'
+    'neograph.common.modal',
+    'neograph.common.scrollBottom',
+    'neograph.common.onImageLoaded'
   ]).config(config);
 
   function config(modalProvider) {
 
     modalProvider.add('node.image.select', {
-      templateUrl: 'app/node/image/node.edit.image.select.html',
+      templateUrl: 'app/node/image/node.image.select.html',
       controller: 'NodeImageSelectCtrl',
       controllerAs: 'vm',
       animation: false,

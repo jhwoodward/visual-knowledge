@@ -1,12 +1,19 @@
 ﻿<div>
-  <ul class="images" selectable selected="selected"  ng-class="{'noanimation':!updatemasonry}" >
-    <li  ng-repeat="picture in pictures" nodeindex="{{$index}}"
-     style="width: {{imageWidth}}px"
-      title="{{picture.title}}">
+  <ul class="images" selectable selected="selected"   >
+    <li  ng-repeat="picture in items" 
+      nodeindex="{{$index}}"
+      style="width: {{imageWidth}}px"
+      title="{{picture.title}}"
+      ng-class="{
+      'image-loaded': picture.image.loaded
+      }"
+      >
 
       <img 
         ng-src="{{picture.image.thumb.url}}" 
-        style="width: {{imageWidth}}px; height: {{(picture.image.thumb.height * imageWidth) / picture.image.thumb.width}}px" />
+        style="width: {{imageWidth}}px; height: {{(picture.image.thumb.height * imageWidth) / picture.image.thumb.width}}px"
+        on-image-loaded="onImageLoaded(picture)"
+         />
 
       <div style="padding: 10px 16px;">
         {{picture.title}}

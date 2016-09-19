@@ -9,9 +9,11 @@
     var vm = this;
     vm.node = {};
 
+    /*
     nodeManager.subscribe('loaded', function(state) {
       vm.node = state.node;
     });
+    */
 
     vm.nodeTypes = [];
     // Can be called from clicking label,

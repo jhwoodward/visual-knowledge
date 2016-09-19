@@ -26,6 +26,14 @@
         return nodeService.get(id).then(function (node) {
            state.node = node;
            raiseEvent('loaded');
+           return node;
+        });
+      },
+      compare: function(id) {
+        return nodeService.get(id).then(function (node) {
+           state.comparison = node;
+           raiseEvent('comparison');
+           return node;
         });
       },
       new: function () {
