@@ -15,20 +15,33 @@
     vm.save = save;
     vm.restore = restore;
     vm.selectTab = selectTab;
+    vm.closeTabs = closeTabs;
     vm.node = {};
-    vm.tabs = ['Properties', 'Image', 'Relationships', 'References'];
-    vm.selectedTab = 'Properties';
+    vm.tabs = ['Properties', 'Image', 'Relationships', 'Refs'];
+    //vm.selectedTab = 'Properties';
 
     function selectTab(tab) {
       vm.selectedTab = tab;
+    }
+
+   
+
+    function closeTabs() {
+      vm.selectedTab = undefined;
+    }
+
+    $scope.$watch('vm.selectedTab',function(tab) {
       if (vm.onTabChanged) {
         vm.onTabChanged({tab: tab});
       }
-    }
+    });
 
     function edit() {
       if (vm.onToggleEdit) {
         vm.onToggleEdit({editing:true});
+        if (!vm.selectedTab) {
+          vm.selectedTab = 'Properties';
+        }
       } else {
         vm.editing = true;
       }

@@ -8,13 +8,9 @@
     var vm = this;
 
     vm.node = nodeManager.new();
-    vm.onToggleEdit = onToggleEdit;
-
-    function onToggleEdit(editing) {
-      if (!editing) {
-        $state.go('admin.node', { node: node.label });
-      }
-    }
+   
+    nodeManager.setNodeEditing(true);
+   
 
 
   }

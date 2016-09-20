@@ -17,9 +17,9 @@
 
   function config(modalProvider) {
 
-    modalProvider.add('node.image.select', {
-      templateUrl: 'app/node/image/node.image.select.html',
-      controller: 'NodeImageSelectCtrl',
+    modalProvider.add('node.images', {
+      templateUrl: 'app/node/image/node.images.modal.html',
+      controller: 'NodeImagesModalCtrl',
       controllerAs: 'vm',
       animation: false,
       backdrop: 'static',

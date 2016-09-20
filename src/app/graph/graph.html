@@ -1,0 +1,13 @@
+<div>
+  <div class="graphContainer"></div>
+
+  <ul class="graph-types">
+  <!-- <li><button ng-click="vm.graphql()">GraphQL</button></li>-->
+    <li ng-repeat="graph in vm.graphs" 
+      ng-click="vm.selectedGraph = graph" 
+      ng-class="{selected: vm.selectedGraph === graph}">
+      {{graph.name}}
+    </li>
+  </ul>
+
+</div>

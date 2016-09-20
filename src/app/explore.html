@@ -1,0 +1,57 @@
+﻿<graph node="vm.node" 
+  on-selection-changed="vm.graphSelectionChanged(node, edges)"
+  on-node-activated="vm.graphNodeActivated(node)"
+  class="map"
+  />
+<button style='top:0;left:700px;position:absolute' ng-click='vm.comparePictures()'>Compare pictures</button>
+<div class="panel panel-slide-left" 
+    ng-class="{
+    'panel-collapsed': !vm.leftPanelVisible,
+    'panel-editing': vm.leftPanelEditing,
+    'panel-empty': !vm.node.id ,
+    'panel-tabs-active' :vm.nodeActiveTab != undefined,
+    'panel-half' : vm.leftPanelHalf,
+    'panel-wide' : vm.leftPanelWide
+    }">
+    
+  <search on-selected="vm.searchSelectionChanged(node)"  />
+
+  <div class="panel-toggle-button-container"> 
+    <button 
+      class="panel-toggle-button ion-arrow-left-b" 
+      ng-click="vm.toggleLeftPanel()">
+    </button> 
+  </div>
+
+  <node-image-display url="vm.nodeImageUrl">
+  </node-image-display>
+
+  <div class="actions">
+    <button class="btn" ng-click="vm.viewImages(vm.node)">Pictures</button>
+  </div>
+  <ui-view name="leftpanel"></ui-view>
+  
+</div>
+
+<div class="panel panel-slide-right" 
+    ng-class="{
+    'panel-collapsed': !vm.comparison.id,
+    'panel-editing': vm.rightPanelEditing,
+    'panel-tabs-active' :vm.comparisonActiveTab != undefined,
+    'panel-half' : vm.rightPanelHalf,
+    'panel-wide' : vm.rightPanelWide
+    }"
+  >
+
+  <node-image-display url="vm.comparisonImageUrl">
+  </node-image-display>
+
+  <div class="actions">
+    <button class="btn" ng-click="vm.viewImages(vm.comparison)">Pictures</button>
+  </div>
+
+  <ui-view name="rightpanel"></ui-view>
+ 
+</div>
+
+

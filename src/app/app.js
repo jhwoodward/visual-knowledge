@@ -13,10 +13,10 @@
     'neograph.neo',
     'neograph.node',
     'neograph.search',
-    'neograph.map',
+    'neograph.graph',
     'neograph.routes',
     'neograph.constant',
-    'neograph.admin.controller',
+    'neograph.explore.controller',
     'ui.bootstrap'
     ]);
 

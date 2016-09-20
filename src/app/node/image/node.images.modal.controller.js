@@ -1,13 +1,13 @@
 ﻿(function() {
   'use strict';
 
-  angular.module('neograph.node.image.select.controller', [])
-    .controller('NodeImageSelectCtrl', controller);
+  angular.module('neograph.node.images.modal.controller', [])
+    .controller('NodeImagesModalCtrl', controller);
 
   function controller(nodeManager, neo, modal) {
 
     var vm = this;
-    var modalId = 'node.image.select';
+    var modalId = 'node.images';
     vm.onSelected = onSelected;
     vm.selectConfirm = selectConfirm;
     vm.getMorePictures = getMorePictures;
@@ -18,6 +18,8 @@
     vm.filters = [];
     vm.enabledFilters = [];
 
+    vm.selectable = false;
+
     activate();
 
     var pageNum = 1;
@@ -27,6 +29,7 @@
 
     function activate() {
       vm.node = modal.getData(modalId).node;
+      vm.selectable = modal.getData(modalId).selectable;
       getFilters();
       getPictures();
     }
@@ -46,7 +49,6 @@
       if (currentFilters && currentFilters.length) {
         labels = labels.concat(currentFilters);
       }
-      console.log(labels);
       var query = {labels: labels};
       var options = {pageNum: pageNum, pageSize: pageSize};
       neo.searchPictures(query, options)
@@ -58,9 +60,6 @@
           } else {
             vm.more = pictureData.items;
           }
-
-          console.log(vm.pictures);
-
           if (currentFilters && currentFilters.length) {
             neo.getDistinctLabels(labels)
               .then(function(distinctLabels) { 
@@ -69,8 +68,6 @@
           } else {
             vm.enabledFilters = [];
           }
-
-
         });
     }
 

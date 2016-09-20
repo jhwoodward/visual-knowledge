@@ -15,12 +15,9 @@
         bindToController: true,
         replace: 'true',
         templateUrl: 'app/node/node.html',
-        restrict: 'E',
-        link: link
+        restrict: 'E'
       };
 
-      function link(scope, element, attrs, ctrl) {
-      }
    
   }
 

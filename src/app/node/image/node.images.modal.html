@@ -10,7 +10,7 @@
    <button ng-if="vm.canGetMorePictures" ng-click="vm.getMorePictures()" >More...</button>
 </div>
 
-<div class="modal-footer">
+<div class="modal-footer" ng-if="vm.selectable">
     <button type="button"
         class="btn btn-success" 
         ng-click="vm.selectConfirm()"

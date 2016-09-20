@@ -1,8 +1,8 @@
 (function() {
   'use strict';
 
-  angular.module('neograph.node.controller', [])
-    .controller('NodeCtrl', controller);
+  angular.module('neograph.comparison.controller', [])
+    .controller('ComparisonCtrl', controller);
 
   function controller($scope, $stateParams, $state, nodeManager) {
     var vm = this;
@@ -13,20 +13,21 @@
 
     activate();
     function activate() {
-      nodeManager.load($stateParams.node).then(function(node) {
+
+      nodeManager.compare($stateParams.comparison).then(function(node) {
         vm.node = node;
       });
+
     }
 
     function onTabChanged(tab) {
-      nodeManager.setNodeActiveTab(tab);
+      nodeManager.setComparisonActiveTab(tab);
     }
 
     function onToggleEdit(editing) {
       vm.editing = editing;
-      nodeManager.setNodeEditing(editing);
+      nodeManager.setComparisonEditing(editing);
     }
-
   }
 
 })();

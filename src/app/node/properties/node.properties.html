@@ -17,22 +17,22 @@
     </div>
 
     <div class="col-sm-12 form-group">
-      <labels navpath="/admin/node/{label}" 
+      <labels navpath="/explore/node/{label}" 
         labels="vm.node.customLabels" 
         highlight="{{vm.node.type.lookup}}">
       </labels>
     </div>
 
     <div ng-repeat="(key, value) in vm.node.type.props" class="form-group"
-          ng-switch="key"
-          ng-class="{
-            'col-xs-3':  value.type==='number',
-            'col-xs-4' : value.type==='string' && value.maxLength <= 50,
-            'col-xs-8' : value.type==='string' && value.maxLength > 50 && value.maxLength<200,
-            'col-xs-12': value.maxLength >= 200 
-          }">
-        <label>{{key | startcase}}</label>
-        <div>{{vm.node[key]}}</div>
+        ng-switch="key"
+        ng-class="{
+          'col-xs-3':  value.type==='number',
+          'col-xs-4' : value.type==='string' && value.maxLength <= 50,
+          'col-xs-8' : value.type==='string' && value.maxLength > 50 && value.maxLength<200,
+          'col-xs-12': value.maxLength >= 200 
+        }">
+      <label>{{key | startcase}}</label>
+      <div>{{vm.node[key]}}</div>
     </div>
   </div>
 

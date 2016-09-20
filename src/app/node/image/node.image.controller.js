@@ -7,7 +7,7 @@
   function controller(nodeManager, neo, modal) {
 
     var vm = this;
-    var modalId = 'node.image.select';
+    var modalId = 'node.images';
     vm.active = false;
     vm.openModal = openModal;
     vm.isDirty = false;
@@ -28,7 +28,8 @@
 
     function openModal() {
       var modalData = {
-        node: vm.node
+        node: vm.node,
+        selectable: true
       };
       modal.open(modalId, modalData)
         .then(function (selectedPicture) {
