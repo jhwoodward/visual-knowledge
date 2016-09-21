@@ -3,7 +3,7 @@
   on-node-activated="vm.nodeActivated(node)"
   class="map"
   />
-<button ng-show='vm.leftPanelFull || vm.rightPanelHalf' class="btn btn-close-pictures io-close-round" 
+<button ng-show='vm.leftPanelFull || vm.rightPanelHalf' class="btn btn-close-pictures ion-close-round" 
   ng-click='vm.closePictures()'></button>
 
 <div class="panel panel-slide-left" 
@@ -18,7 +18,7 @@
     'panel-no-shadow': vm.panelNoShadow
     }">
     
-  <search on-selected="vm.loadNode(node)"  >
+  <search on-selected="vm.loadNode(node)"  ng-class="{'search-box-shadow': !vm.node.id}"  >
 
      <button 
         class="btn ion-arrow-swap" 
@@ -57,7 +57,7 @@
     }"
   >
 
-  <search on-selected="vm.loadComparison(node)"  >
+  <search on-selected="vm.loadComparison(node)"  ng-class="{'search-box-shadow': !vm.comparison.id}" >
 
       <button 
         class="btn ion-arrow-swap" 

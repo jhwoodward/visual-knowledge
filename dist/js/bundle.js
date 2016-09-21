@@ -1237,6 +1237,81 @@ angular.module('neograph.common.typeaheadSimple', [])
 }]);
 
 (function() {
+
+    controller.$inject = ["$scope"];
+    childController.$inject = ["$scope", "$stateParams"];
+  angular.module('neograph.edge.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
+    .controller('EdgeCtrl', controller)
+    .controller('ChildEdgeCtrl', childController);
+
+    function controller ($scope) {
+      var vm = this;
+      vm.tabs = ['Properties'];
+      vm.selectedTab = 'Properties';
+      vm.selectTab = function (tab) {
+        vm.selectedTab = tab;
+      };
+    }
+
+    function childController ($scope, $stateParams) {
+      var vm = this;
+      if ($stateParams.edge) {
+        vm.edge = JSON.parse($stateParams.edge);
+      }
+    }
+
+  })();
+
+(function() {
+
+  angular.module('neograph.edge', [
+    'neograph.edge.routes', 
+    'neograph.edge.controller',
+    'neograph.edge.edit.properties.controller'
+  ]);
+
+
+})();
+   
+(function() {
+
+  angular.module('neograph.edge.routes', ['neograph.neo', 'neograph.utils', 'ui.router'])
+    .config(["$stateProvider", function ($stateProvider) {
+      $stateProvider
+      .state('admin.edge', {
+        url:'/edge/:edge',
+        views: {
+          'panel@admin':{
+            templateUrl:'app/edge/edge.html',
+            controller: 'EdgeCtrl as vm'
+          },
+          'header@admin.edge':{
+            templateUrl:'app/edge/edge.header.html',
+            controller: 'EdgeCtrl as vm'
+          },
+          'properties@admin.edge':{
+            templateUrl:'app/edge/properties/edge.properties.html',
+            controller: 'ChildEdgeCtrl as vm'
+          }
+        }
+      })
+      .state('admin.edge.edit', {
+          url:'/edit',
+          views: {
+            'header@admin.edge':{
+              templateUrl:'app/edge/edge.edit.header.html',
+              controller: 'EdgeCtrl as vm'
+            },
+            'properties@admin.edge':{
+              templateUrl:'app/edge/properties/edge.edit.properties.html',
+              controller:'EditEdgeCtrl as vm'
+            }
+          }
+        });
+    }]);
+
+})();
+(function() {
   'use strict';
   
   angular
@@ -2204,81 +2279,6 @@ angular.module('neograph.graph', [
   }
 
 })();
-(function() {
-
-    controller.$inject = ["$scope"];
-    childController.$inject = ["$scope", "$stateParams"];
-  angular.module('neograph.edge.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
-    .controller('EdgeCtrl', controller)
-    .controller('ChildEdgeCtrl', childController);
-
-    function controller ($scope) {
-      var vm = this;
-      vm.tabs = ['Properties'];
-      vm.selectedTab = 'Properties';
-      vm.selectTab = function (tab) {
-        vm.selectedTab = tab;
-      };
-    }
-
-    function childController ($scope, $stateParams) {
-      var vm = this;
-      if ($stateParams.edge) {
-        vm.edge = JSON.parse($stateParams.edge);
-      }
-    }
-
-  })();
-
-(function() {
-
-  angular.module('neograph.edge', [
-    'neograph.edge.routes', 
-    'neograph.edge.controller',
-    'neograph.edge.edit.properties.controller'
-  ]);
-
-
-})();
-   
-(function() {
-
-  angular.module('neograph.edge.routes', ['neograph.neo', 'neograph.utils', 'ui.router'])
-    .config(["$stateProvider", function ($stateProvider) {
-      $stateProvider
-      .state('admin.edge', {
-        url:'/edge/:edge',
-        views: {
-          'panel@admin':{
-            templateUrl:'app/edge/edge.html',
-            controller: 'EdgeCtrl as vm'
-          },
-          'header@admin.edge':{
-            templateUrl:'app/edge/edge.header.html',
-            controller: 'EdgeCtrl as vm'
-          },
-          'properties@admin.edge':{
-            templateUrl:'app/edge/properties/edge.properties.html',
-            controller: 'ChildEdgeCtrl as vm'
-          }
-        }
-      })
-      .state('admin.edge.edit', {
-          url:'/edit',
-          views: {
-            'header@admin.edge':{
-              templateUrl:'app/edge/edge.edit.header.html',
-              controller: 'EdgeCtrl as vm'
-            },
-            'properties@admin.edge':{
-              templateUrl:'app/edge/properties/edge.edit.properties.html',
-              controller:'EditEdgeCtrl as vm'
-            }
-          }
-        });
-    }]);
-
-})();
   angular.module('neograph.models.predicate', [])
   .factory('predicateFactory', function () {
 
@@ -2351,144 +2351,6 @@ angular.module('neograph.graph', [
 
 
 
-
-angular.module('neograph.layout', [])
-.directive('tabs', function () {
-  return {
-    restrict: 'E',
-    transclude: true,
-    scope: {
-      tabs:'=', // required to remove panes no longer available
-      selected: '=?'
-    },
-    controller: ["$scope", function ($scope) {
-      var panes = $scope.panes = [];
-      var self = this;
-
-      $scope.select = function (pane) {
-        angular.forEach(panes, function (pane) {
-          pane.selected = false;
-        });
-        pane.selected = true;
-        $scope.selected = pane.key;
-      };
-
-      this.add = function (pane) {
-        if (panes.length === 0) {
-          $scope.select(pane);
-        }
-        panes.push(pane);
-      };
-
-      this.remove = function (pane) {
-                // console.log('remove')
-                // console.log(pane);
-        angular.forEach(panes, function (p, i) {
-          if (pane.key == p.key) {
-            panes.splice(i, 1);
-            if (pane.selected) {
-              pane.selected = false;
-              $scope.select($scope.panes[0]);
-            }
-
-
-          }
-        });
-
-      };
-
-      $scope.$watch('selected', function (key) { // the title of the selected pane
-
-        if (key) {
-          angular.forEach(panes, function (pane) {
-
-            pane.selected = pane.key === key;
-          });
-        }
-
-      });
-
-
-            // remove tabs not in list (child pane only adds them)
-      $scope.$watch('tabs', function (tabs) { // the title of the selected pane
-
-        if (tabs) {
-          angular.forEach(panes, function (pane) {
-
-            if (tabs.indexOf(pane.key) === -1) {
-
-              self.remove(pane);
-            }
-          });
-        }
-
-      });
-
-
-    }],
-    templateUrl: 'app/layout/tabs.html'
-  };
-})
-.directive('tabPane', function () {
-  return {
-    require: '^tabs',
-    restrict: 'E',
-    transclude: true,
-    scope: {
-      key:'@',
-      title: '=',
-      visible: '=',
-      active: '=?',
-      window:'='
-    },
-    link: function ($scope, element, attrs, tabsCtrl) {
-
-
-      tabsCtrl.add($scope);
-
-
-            // $scope.$watch('visible', function (visible) {
-
-            //    if (visible) {
-            //        tabsCtrl.addPane($scope);
-            //    }
-            //    else {
-            //        tabsCtrl.removePane($scope);
-
-            //    }
-
-            // });
-
-
-      $scope.$watch('active', function (active) { // the title of the selected pane
-
-        $scope.selected = active;
-
-      });
-
-
-    },
-    templateUrl: 'app/layout/tabPane.html'
-  };
-})
-.directive('noBubble', function () {
-  return {
-
-    link: function ($scope, element, attrs, tabsCtrl) {
-
-
-
-      $(element).on('keydown', function (event) {
-
-        event.stopPropagation();
-      });
-
-    },
-    templateUrl: 'app/layout/tabPane.html'
-  };
-
-
-});
 
 angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
 .factory('neoClient', ['$resource', 'settings', function ($resource, settings) {
@@ -2984,6 +2846,144 @@ angular.module('neograph.utils', ['neograph.neo.client'])
   }
 
 })();
+angular.module('neograph.layout', [])
+.directive('tabs', function () {
+  return {
+    restrict: 'E',
+    transclude: true,
+    scope: {
+      tabs:'=', // required to remove panes no longer available
+      selected: '=?'
+    },
+    controller: ["$scope", function ($scope) {
+      var panes = $scope.panes = [];
+      var self = this;
+
+      $scope.select = function (pane) {
+        angular.forEach(panes, function (pane) {
+          pane.selected = false;
+        });
+        pane.selected = true;
+        $scope.selected = pane.key;
+      };
+
+      this.add = function (pane) {
+        if (panes.length === 0) {
+          $scope.select(pane);
+        }
+        panes.push(pane);
+      };
+
+      this.remove = function (pane) {
+                // console.log('remove')
+                // console.log(pane);
+        angular.forEach(panes, function (p, i) {
+          if (pane.key == p.key) {
+            panes.splice(i, 1);
+            if (pane.selected) {
+              pane.selected = false;
+              $scope.select($scope.panes[0]);
+            }
+
+
+          }
+        });
+
+      };
+
+      $scope.$watch('selected', function (key) { // the title of the selected pane
+
+        if (key) {
+          angular.forEach(panes, function (pane) {
+
+            pane.selected = pane.key === key;
+          });
+        }
+
+      });
+
+
+            // remove tabs not in list (child pane only adds them)
+      $scope.$watch('tabs', function (tabs) { // the title of the selected pane
+
+        if (tabs) {
+          angular.forEach(panes, function (pane) {
+
+            if (tabs.indexOf(pane.key) === -1) {
+
+              self.remove(pane);
+            }
+          });
+        }
+
+      });
+
+
+    }],
+    templateUrl: 'app/layout/tabs.html'
+  };
+})
+.directive('tabPane', function () {
+  return {
+    require: '^tabs',
+    restrict: 'E',
+    transclude: true,
+    scope: {
+      key:'@',
+      title: '=',
+      visible: '=',
+      active: '=?',
+      window:'='
+    },
+    link: function ($scope, element, attrs, tabsCtrl) {
+
+
+      tabsCtrl.add($scope);
+
+
+            // $scope.$watch('visible', function (visible) {
+
+            //    if (visible) {
+            //        tabsCtrl.addPane($scope);
+            //    }
+            //    else {
+            //        tabsCtrl.removePane($scope);
+
+            //    }
+
+            // });
+
+
+      $scope.$watch('active', function (active) { // the title of the selected pane
+
+        $scope.selected = active;
+
+      });
+
+
+    },
+    templateUrl: 'app/layout/tabPane.html'
+  };
+})
+.directive('noBubble', function () {
+  return {
+
+    link: function ($scope, element, attrs, tabsCtrl) {
+
+
+
+      $(element).on('keydown', function (event) {
+
+        event.stopPropagation();
+      });
+
+    },
+    templateUrl: 'app/layout/tabPane.html'
+  };
+
+
+});
+
 (function() {
   'use strict';
 
@@ -4026,16 +4026,18 @@ angular.module('neograph.queryInput',
           url: '='
         },
         replace: 'true',
-        template: '<div class="image" style="position:relative"></div>',
+        template: '<div class="image" style="position:relative"><div class="image-loader ion-ios-loop-strong spin"></div></div>',
         restrict: 'EA',
         link: link
       };
 
       function link(scope, element, attrs) {
         var url;
+        var loader = element.find('.image-loader');
+
         var image = angular.element('<img/>')
           .on('load',function() {
-            console.log(scope.url,'loaded');
+            loader.removeClass('loading');
             var imageElement = angular.element('<div/>').addClass("image layer");
             imageElement.css({
               'background-image': 'url("' + scope.url +'")'
@@ -4055,7 +4057,7 @@ angular.module('neograph.queryInput',
         $timeout(setImage);
 
         function setImage() {
-          console.log(scope.url);
+          loader.addClass('loading');
           if (scope.url) {
             image.attr('src', scope.url)
           } else {
@@ -4442,73 +4444,6 @@ angular.module('neograph.queryInput',
 (function() {
   'use strict';
     
-  controller.$inject = ["$scope", "predicateFactory", "nodeManager"];
-  angular.module('neograph.node.edit.relationships.controller', [])
-    .controller('EditRelationshipsCtrl', controller);
-
-  function controller($scope, predicateFactory, nodeManager) {
-    var vm = this;
-    vm.node = {};
-
-    vm.nodeTypes = [];
-
-    $scope.$watch('newPredicate', function(predicate) {
-      if (predicate) {
-        addRelationship({ lookup: predicate.toUpperCase().replace(/ /g, '_') });
-      }
-    });
-
-    function addRelationship(item) {
-      var p = predicateFactory.create({ lookup: item.lookup, direction: 'out' });// currently no way to select 'in' relationships
-      vm.node.relationships = vm.node.relationships || {};
-      if (!vm.node.relationships[p.toString()]) {
-        vm.node.relationships[p.toString()] = { predicate: p, items: [] };
-      }
-    }
-  }
-
-})();
-
-(function() {
-  'use strict';
-  angular.module('neograph.node.relationships.directive', [])
-    .directive('nodeRelationships', directive);
-
-    function directive() {
-      return {
-        scope: {
-          node: '=',
-          editing: '='
-        },
-        controller: 'EditRelationshipsCtrl as vm',
-        bindToController: true,
-        replace: 'true',
-        template: `
-        <div>
-          <div ng-if="!vm.editing" ng-include="\'app/node/relationships/node.relationships.html\'"></div>
-          <div ng-if="vm.editing" ng-include="\'app/node/relationships/node.edit.relationships.html\'"></div>
-        </div>
-        `,
-        restrict: 'E'
-      };
-
-  }
-
-})();
-
-(function() {
-  'use strict';
-    
-  angular.module('neograph.node.relationships', [
-    'neograph.node.edit.relationships.controller',
-    'neograph.node.relationships.directive'
-  ]);
-    
-
-})();
-(function() {
-  'use strict';
-    
   angular.module('neograph.node.wikipedia', ['neograph.neo'])
       .factory('wikiservice', () => {
         const wikiTabs = (data, page) => {
@@ -4713,6 +4648,73 @@ angular.module('neograph.queryInput',
   );
 })();
 
+(function() {
+  'use strict';
+    
+  controller.$inject = ["$scope", "predicateFactory", "nodeManager"];
+  angular.module('neograph.node.edit.relationships.controller', [])
+    .controller('EditRelationshipsCtrl', controller);
+
+  function controller($scope, predicateFactory, nodeManager) {
+    var vm = this;
+    vm.node = {};
+
+    vm.nodeTypes = [];
+
+    $scope.$watch('newPredicate', function(predicate) {
+      if (predicate) {
+        addRelationship({ lookup: predicate.toUpperCase().replace(/ /g, '_') });
+      }
+    });
+
+    function addRelationship(item) {
+      var p = predicateFactory.create({ lookup: item.lookup, direction: 'out' });// currently no way to select 'in' relationships
+      vm.node.relationships = vm.node.relationships || {};
+      if (!vm.node.relationships[p.toString()]) {
+        vm.node.relationships[p.toString()] = { predicate: p, items: [] };
+      }
+    }
+  }
+
+})();
+
+(function() {
+  'use strict';
+  angular.module('neograph.node.relationships.directive', [])
+    .directive('nodeRelationships', directive);
+
+    function directive() {
+      return {
+        scope: {
+          node: '=',
+          editing: '='
+        },
+        controller: 'EditRelationshipsCtrl as vm',
+        bindToController: true,
+        replace: 'true',
+        template: `
+        <div>
+          <div ng-if="!vm.editing" ng-include="\'app/node/relationships/node.relationships.html\'"></div>
+          <div ng-if="vm.editing" ng-include="\'app/node/relationships/node.edit.relationships.html\'"></div>
+        </div>
+        `,
+        restrict: 'E'
+      };
+
+  }
+
+})();
+
+(function() {
+  'use strict';
+    
+  angular.module('neograph.node.relationships', [
+    'neograph.node.edit.relationships.controller',
+    'neograph.node.relationships.directive'
+  ]);
+    
+
+})();
 angular.module('neograph.query.generator.favouritesFilter', ['neograph.neo'])
 .directive('favouritesFilter', neo => ({
   restrict: 'E',

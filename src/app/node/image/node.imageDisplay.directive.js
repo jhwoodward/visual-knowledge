@@ -9,16 +9,18 @@
           url: '='
         },
         replace: 'true',
-        template: '<div class="image" style="position:relative"></div>',
+        template: '<div class="image" style="position:relative"><div class="image-loader ion-ios-loop-strong spin"></div></div>',
         restrict: 'EA',
         link: link
       };
 
       function link(scope, element, attrs) {
         var url;
+        var loader = element.find('.image-loader');
+
         var image = angular.element('<img/>')
           .on('load',function() {
-            console.log(scope.url,'loaded');
+            loader.removeClass('loading');
             var imageElement = angular.element('<div/>').addClass("image layer");
             imageElement.css({
               'background-image': 'url("' + scope.url +'")'
@@ -38,7 +40,7 @@
         $timeout(setImage);
 
         function setImage() {
-          console.log(scope.url);
+          loader.addClass('loading');
           if (scope.url) {
             image.attr('src', scope.url)
           } else {
