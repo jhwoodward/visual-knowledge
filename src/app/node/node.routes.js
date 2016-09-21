@@ -22,6 +22,19 @@
             }
           }
         })
+        .state('explore.compare', {
+          url:'/:node/:comparison',
+          views: {
+            'leftpanel@explore': {
+              template: '<node node="vm.node" editing="vm.editing" on-tab-changed="vm.onTabChanged(tab)" on-toggle-edit="vm.onToggleEdit(editing)" />',
+              controller: 'NodeCtrl as vm'
+            },
+            'rightpanel@explore': {
+              template: '<node node="vm.node" editing="vm.editing"  on-tab-changed="vm.onTabChanged(tab)"  on-toggle-edit="vm.onToggleEdit(editing)" />',
+              controller: 'ComparisonCtrl as vm'
+            }
+          }
+        })
         .state('explore.node.compare', {
           url:'/:comparison',
           views: {

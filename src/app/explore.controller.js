@@ -13,14 +13,26 @@
       vm.leftPanelEditing = false;
       vm.rightPanelEditing = false;
 
-      vm.searchSelectionChanged = searchSelectionChanged;
+      vm.loadNode = loadNode;
+      vm.loadComparison = loadComparison;
       vm.graphSelectionChanged = graphSelectionChanged;
-      vm.graphNodeActivated = graphNodeActivated;
+      vm.nodeActivated = nodeActivated;
 
       vm.leftPanelHalf = false;
       vm.rightPanelHalf = false;
       vm.leftPanelWide= false;
       vm.rightPanelWide = false;
+      vm.leftPanelFull = false;
+      vm.rightPanelFull = false;
+
+      vm.panelNoShadow = true;
+
+      vm.viewPictures = viewPictures;
+      vm.closePictures = closePictures;
+
+      vm.swapNodes = swapNodes;
+
+      var blank = '';
 
       var slideInterval = 12000;
 
@@ -31,16 +43,22 @@
 
       nodeManager.subscribe('loaded', function(state) {
         vm.node = state.node;
-        if (vm.node) {
+
+        if (vm.node && vm.node.image) {
           vm.nodeImageUrl = vm.node.image.full.url;
+        } else {
+          vm.nodeImageUrl = blank;
         }
     
       });
 
       nodeManager.subscribe('comparison', function(state) {
         vm.comparison = state.comparison;
-        if (vm.comparison) {
+
+        if (vm.comparison && vm.comparison.image) {
           vm.comparisonImageUrl = vm.comparison.image.full.url;
+        } else {
+          vm.comparisonImageUrl = blank;
         }
         
       });
@@ -58,38 +76,91 @@
 
       nodeManager.subscribe('nodePictures', function(state) {
         vm.nodePictures = state.nodePictures;
-        $timeout(showNextNodePicture, slideInterval);
       });
+      nodeManager.subscribe('comparisonPictures', function(state) {
+        vm.comparisonPictures = state.comparisonPictures;
+      });
+
+
+      var nodeSlideShowOn = false;
+      var comparisonSlideShowOn = false;
+      var nodeSlideTimeout;
+      var comparisonSlideTimeout;
+      
+      function closePictures() {
+        nodeSlideShowOn = false;
+        comparisonSlideShowOn = false;
+        vm.leftPanelHalf = false;
+        vm.rightPanelHalf = false;
+        vm.leftPanelFull = false;
+
+        if (vm.node && vm.node.image) {
+          vm.nodeImageUrl = vm.node.image.full.url;
+        } else {
+          vm.nodeImageUrl = blank;
+        }
+
+        if (vm.comparison && vm.comparison.image) {
+          vm.comparisonImageUrl = vm.comparison.image.full.url;
+        } else {
+          vm.comparisonImageUrl = blank;
+        }
+      }
+
+      function viewPictures() {
+        if (vm.comparison && vm.node) {
+          vm.leftPanelHalf = true;
+          vm.rightPanelHalf = true;
+          vm.panelNoShadow = true;
+          nodeSlideShowOn = true;
+          comparisonSlideShowOn = true;
+          showNextNodePicture();
+          showNextComparisonPicture();
+        } else {
+          vm.leftPanelFull = true;
+          nodeSlideShowOn = true;
+          showNextNodePicture();
+        }
+    
+      
+
+
+      }
 
       var currentNodeImageIndex = 0;
       function showNextNodePicture() {
-        if (currentNodeImageIndex > vm.nodePictures.length -1) {
-          currentNodeImageIndex = 0;
+        if (nodeSlideShowOn) {
+          if (currentNodeImageIndex > vm.nodePictures.length -1) {
+            currentNodeImageIndex = 0;
+          }
+          vm.nodeImageUrl = vm.nodePictures[currentNodeImageIndex].image.full.url;
+          currentNodeImageIndex += 1;
+          $timeout(showNextNodePicture, slideInterval);
         }
-        vm.nodeImageUrl = vm.nodePictures[currentNodeImageIndex].image.full.url;
-        currentNodeImageIndex += 1;
-        $timeout(showNextNodePicture, slideInterval);
       }
-
-      nodeManager.subscribe('comparisonPictures', function(state) {
-        vm.comparisonPictures = state.comparisonPictures;
-        $timeout(showNextComparisonPicture, slideInterval);
-      });
-
       var currentComparisonImageIndex = 0;
       function showNextComparisonPicture() {
-        if (currentComparisonImageIndex > vm.comparisonPictures.length -1) {
-          currentComparisonImageIndex = 0;
+        if (comparisonSlideShowOn) {
+          if (currentComparisonImageIndex > vm.comparisonPictures.length -1) {
+            currentComparisonImageIndex = 0;
+          }
+          vm.comparisonImageUrl = vm.comparisonPictures[currentComparisonImageIndex].image.full.url;
+          currentComparisonImageIndex += 1;
+          $timeout(showNextComparisonPicture, slideInterval);
         }
-        vm.comparisonImageUrl = vm.comparisonPictures[currentComparisonImageIndex].image.full.url;
-        currentComparisonImageIndex += 1;
-        $timeout(showNextComparisonPicture, slideInterval);
+    
       }
 
-      function searchSelectionChanged(node) {
+      function loadNode(node) {
         if (node && node.label) {
           $state.go('explore.node', { node: node.label });
           nodeManager.clearComparison();
+        }
+      }
+
+      function loadComparison(node) {
+        if (node && node.label) {
+          $state.go('explore.node.compare', { comparison: node.label });
         }
       }
 
@@ -97,16 +168,19 @@
         //load node into right panel
         console.log(node, 'graph selection changed');
         if (node) {
-          $state.go('explore.node.compare', { comparison: node.label });
+          loadComparison(node)
         } else {
-          $state.go('explore.node', { node: vm.node.label});
-          nodeManager.clearComparison();
+          loadNode(vm.node);
         }
      
       }
 
-      function graphNodeActivated(node) {
-        console.log(node,'node activated');
+      function swapNodes() {
+        $state.go('explore.compare', { node: vm.comparison.label, comparison: vm.node.label });
+
+      }
+
+      function nodeActivated(node) {
         $state.go('explore.node', { node: node.label});
         nodeManager.clearComparison();
       }

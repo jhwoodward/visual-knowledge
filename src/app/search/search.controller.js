@@ -4,7 +4,7 @@
   angular.module('neograph.search.controller',['neograph.node.service', 'ui.router'])
     .controller('SearchCtrl', controller);
 
-  function controller($scope, $state, nodeService) {
+  function controller($scope) {
       var vm = this;
       vm.node = undefined;
 

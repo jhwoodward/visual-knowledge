@@ -14,6 +14,7 @@
         var focusElement = element.closest(attrs.focusTo);
         element.on('focus', function(){
           focusElement.addClass('focus');
+          focusElement.removeClass('unfocus');
         })
         element.on('blur', function(){
           focusElement.removeClass('focus');

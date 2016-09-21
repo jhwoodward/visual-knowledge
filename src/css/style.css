@@ -574,12 +574,27 @@ label {
   width: 50vw;
 }
 
- .panel.panel-wide .image {
-   background-size:contain;
-   background-color:#346ea0;
-   background-repeat: no-repeat;
-   
- }
+.panel.panel-full, .panel.panel-full .image, .panel.panel-full .nav-tabs {
+  width: 100vw;
+}
+
+.panel.panel-full .image {
+  height: 100vh;
+}
+.panel.panel-full .nav-tabs {
+  display:none;
+}
+
+.panel.panel-no-shadow {
+  box-shadow:none;
+}
+
+.panel.panel-wide .image {
+  background-size:contain;
+  background-color:#346ea0;
+  background-repeat: no-repeat;
+  
+}
 
 .panel-slide-left.panel-collapsed {
     box-shadow: none;
@@ -613,6 +628,16 @@ label {
     transform: translateX(50vw);
 }
 
+.panel-full.panel-slide-left.panel-collapsed {
+    -webkit-transform: translateX(100vw);
+    transform: translateX(100vw);
+}
+
+.panel-full.panel-slide-right.panel-collapsed {
+    -webkit-transform: translateX(100vw);
+    transform: translateX(100vw);
+}
+
 .panel-collapsed .panel-toggle-button {
     -webkit-transform: scaleX(-1);
     transform: scaleX(-1);
@@ -626,6 +651,10 @@ label {
     display: block;
     opacity: 1;
     transition: 200ms opacity linear;
+}
+
+.panel-toggle-button-container.right {
+    left:0;
 }
 
 .panel-toggle-button {
@@ -664,6 +693,34 @@ label {
     border-radius: 2px;
     transition: 300ms background linear;
 }
+
+.action-box {
+    z-index: 10;
+    margin: 0;
+    position: absolute;
+    left: 0px;
+    top: 50px;
+    z-index: 10;
+    height: 48px;
+    background-position-y: rgba(255,255,255,0.2);
+    width: 80px;
+    border-radius: 2px;
+    transition: 300ms background linear;
+}
+
+.action-box .btn {
+  border-radius: 2px;
+  margin-bottom:0;
+  color: #fff;
+  background: rgba(0,0,0,0.2);
+  font-size: 26px;
+  width:50px;
+  height:50px;
+
+  outline:none !important;
+  box-shadow: none !important;
+}
+
 .search-box-shadow {
   box-shadow: 0 2px 4px rgba(0,0,0,0.2),0 -1px 0px rgba(0,0,0,0.02);
 }
@@ -684,27 +741,34 @@ label {
   position: relative;
   width:380px
 }
-.btn-menu, .input-search, .btn-search {
-  position:absolute;
-}
+
 .input-search {
   background:transparent;
   border: none !important;
   box-shadow: none !important;
   position:absolute;
-  left: 41px;
+  left: 10px;
   padding-left: 0;
   height: 48px;
-  width: 300px;
+  width: 200px;
   outline: none;
 }
-.search-box.focus {
+.search-box.focus, .search-box:hover {
   background: #fff;
 }
-.btn-search {
-  right: 0;
+.search-box.unfocus {
+  background:transparent !important;
+}
+.search-box .btn {
+  float:right;
 }
 
+.btn-close-pictures {
+  top:0;
+  right:0;
+  z-index:10;
+  position:absolute
+}
 
 .graph-types {
   z-index:1;

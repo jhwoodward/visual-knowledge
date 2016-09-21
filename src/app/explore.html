@@ -1,9 +1,11 @@
 ﻿<graph node="vm.node" 
   on-selection-changed="vm.graphSelectionChanged(node, edges)"
-  on-node-activated="vm.graphNodeActivated(node)"
+  on-node-activated="vm.nodeActivated(node)"
   class="map"
   />
-<button style='top:0;left:700px;position:absolute' ng-click='vm.comparePictures()'>Compare pictures</button>
+<button ng-show='vm.leftPanelFull || vm.rightPanelHalf' class="btn btn-close-pictures io-close-round" 
+  ng-click='vm.closePictures()'></button>
+
 <div class="panel panel-slide-left" 
     ng-class="{
     'panel-collapsed': !vm.leftPanelVisible,
@@ -11,10 +13,23 @@
     'panel-empty': !vm.node.id ,
     'panel-tabs-active' :vm.nodeActiveTab != undefined,
     'panel-half' : vm.leftPanelHalf,
-    'panel-wide' : vm.leftPanelWide
+    'panel-wide' : vm.leftPanelWide,
+    'panel-full' : vm.leftPanelFull,
+    'panel-no-shadow': vm.panelNoShadow
     }">
     
-  <search on-selected="vm.searchSelectionChanged(node)"  />
+  <search on-selected="vm.loadNode(node)"  >
+
+     <button 
+        class="btn ion-arrow-swap" 
+        ng-click="vm.swapNodes()">
+      </button> 
+      <button 
+      class="btn ion-eye" 
+      ng-click='vm.viewPictures()'>
+      </button>
+
+  </search>
 
   <div class="panel-toggle-button-container"> 
     <button 
@@ -26,9 +41,7 @@
   <node-image-display url="vm.nodeImageUrl">
   </node-image-display>
 
-  <div class="actions">
-    <button class="btn" ng-click="vm.viewImages(vm.node)">Pictures</button>
-  </div>
+
   <ui-view name="leftpanel"></ui-view>
   
 </div>
@@ -39,16 +52,45 @@
     'panel-editing': vm.rightPanelEditing,
     'panel-tabs-active' :vm.comparisonActiveTab != undefined,
     'panel-half' : vm.rightPanelHalf,
-    'panel-wide' : vm.rightPanelWide
+    'panel-wide' : vm.rightPanelWide,
+    'panel-no-shadow': vm.panelNoShadow
     }"
   >
 
+  <search on-selected="vm.loadComparison(node)"  >
+
+      <button 
+        class="btn ion-arrow-swap" 
+        ng-click="vm.swapNodes()">
+      </button> 
+      <button 
+      class="btn ion-eye" 
+      ng-click='vm.viewPictures()'>
+      </button>
+
+  </search>
+
+
+<!--
+
+  <div class="action-box" > 
+    <div class="action-box-inner">
+      <button 
+        class="btn ion-arrow-swap" 
+        ng-click="vm.swapNodes()">
+      </button> 
+      <button 
+      class="btn ion-eye" 
+      ng-click='vm.viewPictures()'>
+      </button>
+    </div>
+  </div>
+-->
   <node-image-display url="vm.comparisonImageUrl">
   </node-image-display>
 
-  <div class="actions">
-    <button class="btn" ng-click="vm.viewImages(vm.comparison)">Pictures</button>
-  </div>
+
+
 
   <ui-view name="rightpanel"></ui-view>
  

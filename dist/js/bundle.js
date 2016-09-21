@@ -37,14 +37,26 @@
       vm.leftPanelEditing = false;
       vm.rightPanelEditing = false;
 
-      vm.searchSelectionChanged = searchSelectionChanged;
+      vm.loadNode = loadNode;
+      vm.loadComparison = loadComparison;
       vm.graphSelectionChanged = graphSelectionChanged;
-      vm.graphNodeActivated = graphNodeActivated;
+      vm.nodeActivated = nodeActivated;
 
       vm.leftPanelHalf = false;
       vm.rightPanelHalf = false;
       vm.leftPanelWide= false;
       vm.rightPanelWide = false;
+      vm.leftPanelFull = false;
+      vm.rightPanelFull = false;
+
+      vm.panelNoShadow = true;
+
+      vm.viewPictures = viewPictures;
+      vm.closePictures = closePictures;
+
+      vm.swapNodes = swapNodes;
+
+      var blank = '';
 
       var slideInterval = 12000;
 
@@ -55,16 +67,22 @@
 
       nodeManager.subscribe('loaded', function(state) {
         vm.node = state.node;
-        if (vm.node) {
+
+        if (vm.node && vm.node.image) {
           vm.nodeImageUrl = vm.node.image.full.url;
+        } else {
+          vm.nodeImageUrl = blank;
         }
     
       });
 
       nodeManager.subscribe('comparison', function(state) {
         vm.comparison = state.comparison;
-        if (vm.comparison) {
+
+        if (vm.comparison && vm.comparison.image) {
           vm.comparisonImageUrl = vm.comparison.image.full.url;
+        } else {
+          vm.comparisonImageUrl = blank;
         }
         
       });
@@ -82,38 +100,91 @@
 
       nodeManager.subscribe('nodePictures', function(state) {
         vm.nodePictures = state.nodePictures;
-        $timeout(showNextNodePicture, slideInterval);
       });
+      nodeManager.subscribe('comparisonPictures', function(state) {
+        vm.comparisonPictures = state.comparisonPictures;
+      });
+
+
+      var nodeSlideShowOn = false;
+      var comparisonSlideShowOn = false;
+      var nodeSlideTimeout;
+      var comparisonSlideTimeout;
+      
+      function closePictures() {
+        nodeSlideShowOn = false;
+        comparisonSlideShowOn = false;
+        vm.leftPanelHalf = false;
+        vm.rightPanelHalf = false;
+        vm.leftPanelFull = false;
+
+        if (vm.node && vm.node.image) {
+          vm.nodeImageUrl = vm.node.image.full.url;
+        } else {
+          vm.nodeImageUrl = blank;
+        }
+
+        if (vm.comparison && vm.comparison.image) {
+          vm.comparisonImageUrl = vm.comparison.image.full.url;
+        } else {
+          vm.comparisonImageUrl = blank;
+        }
+      }
+
+      function viewPictures() {
+        if (vm.comparison && vm.node) {
+          vm.leftPanelHalf = true;
+          vm.rightPanelHalf = true;
+          vm.panelNoShadow = true;
+          nodeSlideShowOn = true;
+          comparisonSlideShowOn = true;
+          showNextNodePicture();
+          showNextComparisonPicture();
+        } else {
+          vm.leftPanelFull = true;
+          nodeSlideShowOn = true;
+          showNextNodePicture();
+        }
+    
+      
+
+
+      }
 
       var currentNodeImageIndex = 0;
       function showNextNodePicture() {
-        if (currentNodeImageIndex > vm.nodePictures.length -1) {
-          currentNodeImageIndex = 0;
+        if (nodeSlideShowOn) {
+          if (currentNodeImageIndex > vm.nodePictures.length -1) {
+            currentNodeImageIndex = 0;
+          }
+          vm.nodeImageUrl = vm.nodePictures[currentNodeImageIndex].image.full.url;
+          currentNodeImageIndex += 1;
+          $timeout(showNextNodePicture, slideInterval);
         }
-        vm.nodeImageUrl = vm.nodePictures[currentNodeImageIndex].image.full.url;
-        currentNodeImageIndex += 1;
-        $timeout(showNextNodePicture, slideInterval);
       }
-
-      nodeManager.subscribe('comparisonPictures', function(state) {
-        vm.comparisonPictures = state.comparisonPictures;
-        $timeout(showNextComparisonPicture, slideInterval);
-      });
-
       var currentComparisonImageIndex = 0;
       function showNextComparisonPicture() {
-        if (currentComparisonImageIndex > vm.comparisonPictures.length -1) {
-          currentComparisonImageIndex = 0;
+        if (comparisonSlideShowOn) {
+          if (currentComparisonImageIndex > vm.comparisonPictures.length -1) {
+            currentComparisonImageIndex = 0;
+          }
+          vm.comparisonImageUrl = vm.comparisonPictures[currentComparisonImageIndex].image.full.url;
+          currentComparisonImageIndex += 1;
+          $timeout(showNextComparisonPicture, slideInterval);
         }
-        vm.comparisonImageUrl = vm.comparisonPictures[currentComparisonImageIndex].image.full.url;
-        currentComparisonImageIndex += 1;
-        $timeout(showNextComparisonPicture, slideInterval);
+    
       }
 
-      function searchSelectionChanged(node) {
+      function loadNode(node) {
         if (node && node.label) {
           $state.go('explore.node', { node: node.label });
           nodeManager.clearComparison();
+        }
+      }
+
+      function loadComparison(node) {
+        if (node && node.label) {
+          $state.go('explore.node.compare', { comparison: node.label });
         }
       }
 
@@ -121,16 +192,19 @@
         //load node into right panel
         console.log(node, 'graph selection changed');
         if (node) {
-          $state.go('explore.node.compare', { comparison: node.label });
+          loadComparison(node)
         } else {
-          $state.go('explore.node', { node: vm.node.label});
-          nodeManager.clearComparison();
+          loadNode(vm.node);
         }
      
       }
 
-      function graphNodeActivated(node) {
-        console.log(node,'node activated');
+      function swapNodes() {
+        $state.go('explore.compare', { node: vm.comparison.label, comparison: vm.node.label });
+
+      }
+
+      function nodeActivated(node) {
         $state.go('explore.node', { node: node.label});
         nodeManager.clearComparison();
       }
@@ -188,81 +262,6 @@
 (function() {
 
   angular.module('templates', []);
-
-})();
-(function() {
-
-    controller.$inject = ["$scope"];
-    childController.$inject = ["$scope", "$stateParams"];
-  angular.module('neograph.edge.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
-    .controller('EdgeCtrl', controller)
-    .controller('ChildEdgeCtrl', childController);
-
-    function controller ($scope) {
-      var vm = this;
-      vm.tabs = ['Properties'];
-      vm.selectedTab = 'Properties';
-      vm.selectTab = function (tab) {
-        vm.selectedTab = tab;
-      };
-    }
-
-    function childController ($scope, $stateParams) {
-      var vm = this;
-      if ($stateParams.edge) {
-        vm.edge = JSON.parse($stateParams.edge);
-      }
-    }
-
-  })();
-
-(function() {
-
-  angular.module('neograph.edge', [
-    'neograph.edge.routes', 
-    'neograph.edge.controller',
-    'neograph.edge.edit.properties.controller'
-  ]);
-
-
-})();
-   
-(function() {
-
-  angular.module('neograph.edge.routes', ['neograph.neo', 'neograph.utils', 'ui.router'])
-    .config(["$stateProvider", function ($stateProvider) {
-      $stateProvider
-      .state('admin.edge', {
-        url:'/edge/:edge',
-        views: {
-          'panel@admin':{
-            templateUrl:'app/edge/edge.html',
-            controller: 'EdgeCtrl as vm'
-          },
-          'header@admin.edge':{
-            templateUrl:'app/edge/edge.header.html',
-            controller: 'EdgeCtrl as vm'
-          },
-          'properties@admin.edge':{
-            templateUrl:'app/edge/properties/edge.properties.html',
-            controller: 'ChildEdgeCtrl as vm'
-          }
-        }
-      })
-      .state('admin.edge.edit', {
-          url:'/edit',
-          views: {
-            'header@admin.edge':{
-              templateUrl:'app/edge/edge.edit.header.html',
-              controller: 'EdgeCtrl as vm'
-            },
-            'properties@admin.edge':{
-              templateUrl:'app/edge/properties/edge.edit.properties.html',
-              controller:'EditEdgeCtrl as vm'
-            }
-          }
-        });
-    }]);
 
 })();
 (function () {
@@ -395,6 +394,7 @@
         var focusElement = element.closest(attrs.focusTo);
         element.on('focus', function(){
           focusElement.addClass('focus');
+          focusElement.removeClass('unfocus');
         })
         element.on('blur', function(){
           focusElement.removeClass('focus');
@@ -1301,6 +1301,131 @@ angular.module('neograph.common.typeaheadSimple', [])
     };
   }
 })();
+angular.module('neograph.interaction.draggable', [])
+    .directive('draggable', function () {
+      return {
+
+        link: function ($scope, element, attrs) {
+
+          var initLeft = $(element).position().left;
+
+          $(element).draggable({
+            axis: 'x',
+            drag: function () {
+
+              var change = initLeft - $(element).position().left;
+
+              $scope.$apply(function () {
+                $scope.window.tabsWidth = $scope.window.tabsWidth + change;
+              });
+
+
+              initLeft = $(element).position().left;
+
+            }
+          });
+        }
+      };
+    });
+
+angular.module('neograph.interaction', [
+  'neograph.interaction.draggable',
+  'neograph.interaction.resizable',
+  'neograph.interaction.selectable'
+]);
+
+angular.module('neograph.interaction.resizable', [])
+.directive('resizable', ["$window", function ($window) {
+  return {
+    scope: {
+      window: '='
+    },
+    controller: ["$scope", "$element", function ($scope, $element) {
+
+      var w = angular.element($window);
+      var getWindowDimensions = function () {
+        var width = w.width();
+        var height = w.height();
+        return {
+          'height': height,
+          'width': width,
+          'tabsWidth': $scope.window.tabsWidth,
+          'tabsWidthInner': $scope.window.tabsWidth - 10,
+          'graphWidth': width - $scope.window.tabsWidth,
+          'graphHeight': height - $scope.window.topBarHeight,
+          'topBarHeight': $scope.window.topBarHeight,
+          'tabsHeight': height - $scope.window.topBarHeight
+        };
+      };
+
+      $scope.window = getWindowDimensions();
+
+      $scope.$watch(getWindowDimensions, function (newValue, oldValue) {
+
+        $scope.window = newValue;
+
+      }, true);
+
+      w.bind('resize', function () {
+        $scope.$apply();
+      });
+
+            // w.bind("debouncedresize", function (event) {
+            //    $scope.$apply();
+
+            // });
+
+    }]
+  };
+}]);
+
+
+angular.module('neograph.interaction.selectable', [])
+.directive('selectable', function () {
+  return {
+    scope: {
+      selected: '='
+
+    },
+    link: function ($scope, element, attrs) {
+
+      $scope.$watch($(element).find('li.ui-selected').length, function (i) {
+
+        $(element).selectable({
+          filter: 'li',
+          stop: function (event, ui) {
+            var selected = [];
+            $(element).find('li.ui-selected').each(function (i, e) {
+              selected.push(parseInt($(e).attr('nodeindex')));
+            });
+
+            $scope.$apply(function () {
+
+              $scope.selected = selected;
+
+            });
+
+          }
+                    ,
+          cancel: '.badge, .label'
+
+
+
+        });
+
+
+      });
+
+
+    }
+  };
+});
+
+
+
+
+
+
 (function() {
   'use strict';
     
@@ -1409,24 +1534,22 @@ angular.module('neograph.common.typeaheadSimple', [])
     }
 */
     function addNewNodes() {
-      $timeout(function addNode() {
-        if (newnodes.length) {
-          var node = newnodes.pop();
-          var edges = newedges.filter(function(e) { 
-            return e.from === node.id || e.to === node.id;
-          });
-          newedges = newedges.filter(function(e) {
-            return  e.from !== node.id && e.to !== node.id;
-          });
-          vm.graph.nodes.add(node);
-          vm.graph.edges.add(edges);
-        } else if (newedges.length) {
-            vm.graph.edges.add(newedges);
-        }
-        if (newnodes.length) {
-          addNewNodes();
-        }
-      }, 200);
+      if (newnodes.length) {
+        var node = newnodes.pop();
+        var edges = newedges.filter(function(e) { 
+          return e.from === node.id || e.to === node.id;
+        });
+        newedges = newedges.filter(function(e) {
+          return  e.from !== node.id && e.to !== node.id;
+        });
+        vm.graph.nodes.add(node);
+        vm.graph.edges.add(edges);
+      } else if (newedges.length) {
+          vm.graph.edges.add(newedges);
+      }
+      if (newnodes.length) {
+        $timeout(addNewNodes, 200);
+      }
     }
 
     function newNode(node) {
@@ -2081,127 +2204,150 @@ angular.module('neograph.graph', [
   }
 
 })();
-angular.module('neograph.interaction.draggable', [])
-    .directive('draggable', function () {
-      return {
+(function() {
 
-        link: function ($scope, element, attrs) {
+    controller.$inject = ["$scope"];
+    childController.$inject = ["$scope", "$stateParams"];
+  angular.module('neograph.edge.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
+    .controller('EdgeCtrl', controller)
+    .controller('ChildEdgeCtrl', childController);
 
-          var initLeft = $(element).position().left;
-
-          $(element).draggable({
-            axis: 'x',
-            drag: function () {
-
-              var change = initLeft - $(element).position().left;
-
-              $scope.$apply(function () {
-                $scope.window.tabsWidth = $scope.window.tabsWidth + change;
-              });
-
-
-              initLeft = $(element).position().left;
-
-            }
-          });
-        }
+    function controller ($scope) {
+      var vm = this;
+      vm.tabs = ['Properties'];
+      vm.selectedTab = 'Properties';
+      vm.selectTab = function (tab) {
+        vm.selectedTab = tab;
       };
-    });
+    }
 
-angular.module('neograph.interaction', [
-  'neograph.interaction.draggable',
-  'neograph.interaction.resizable',
-  'neograph.interaction.selectable'
-]);
+    function childController ($scope, $stateParams) {
+      var vm = this;
+      if ($stateParams.edge) {
+        vm.edge = JSON.parse($stateParams.edge);
+      }
+    }
 
-angular.module('neograph.interaction.resizable', [])
-.directive('resizable', ["$window", function ($window) {
-  return {
-    scope: {
-      window: '='
-    },
-    controller: ["$scope", "$element", function ($scope, $element) {
+  })();
 
-      var w = angular.element($window);
-      var getWindowDimensions = function () {
-        var width = w.width();
-        var height = w.height();
-        return {
-          'height': height,
-          'width': width,
-          'tabsWidth': $scope.window.tabsWidth,
-          'tabsWidthInner': $scope.window.tabsWidth - 10,
-          'graphWidth': width - $scope.window.tabsWidth,
-          'graphHeight': height - $scope.window.topBarHeight,
-          'topBarHeight': $scope.window.topBarHeight,
-          'tabsHeight': height - $scope.window.topBarHeight
-        };
-      };
+(function() {
 
-      $scope.window = getWindowDimensions();
-
-      $scope.$watch(getWindowDimensions, function (newValue, oldValue) {
-
-        $scope.window = newValue;
-
-      }, true);
-
-      w.bind('resize', function () {
-        $scope.$apply();
-      });
-
-            // w.bind("debouncedresize", function (event) {
-            //    $scope.$apply();
-
-            // });
-
-    }]
-  };
-}]);
+  angular.module('neograph.edge', [
+    'neograph.edge.routes', 
+    'neograph.edge.controller',
+    'neograph.edge.edit.properties.controller'
+  ]);
 
 
-angular.module('neograph.interaction.selectable', [])
-.directive('selectable', function () {
-  return {
-    scope: {
-      selected: '='
+})();
+   
+(function() {
 
-    },
-    link: function ($scope, element, attrs) {
-
-      $scope.$watch($(element).find('li.ui-selected').length, function (i) {
-
-        $(element).selectable({
-          filter: 'li',
-          stop: function (event, ui) {
-            var selected = [];
-            $(element).find('li.ui-selected').each(function (i, e) {
-              selected.push(parseInt($(e).attr('nodeindex')));
-            });
-
-            $scope.$apply(function () {
-
-              $scope.selected = selected;
-
-            });
-
+  angular.module('neograph.edge.routes', ['neograph.neo', 'neograph.utils', 'ui.router'])
+    .config(["$stateProvider", function ($stateProvider) {
+      $stateProvider
+      .state('admin.edge', {
+        url:'/edge/:edge',
+        views: {
+          'panel@admin':{
+            templateUrl:'app/edge/edge.html',
+            controller: 'EdgeCtrl as vm'
+          },
+          'header@admin.edge':{
+            templateUrl:'app/edge/edge.header.html',
+            controller: 'EdgeCtrl as vm'
+          },
+          'properties@admin.edge':{
+            templateUrl:'app/edge/properties/edge.properties.html',
+            controller: 'ChildEdgeCtrl as vm'
           }
-                    ,
-          cancel: '.badge, .label'
-
-
-
+        }
+      })
+      .state('admin.edge.edit', {
+          url:'/edit',
+          views: {
+            'header@admin.edge':{
+              templateUrl:'app/edge/edge.edit.header.html',
+              controller: 'EdgeCtrl as vm'
+            },
+            'properties@admin.edge':{
+              templateUrl:'app/edge/properties/edge.edit.properties.html',
+              controller:'EditEdgeCtrl as vm'
+            }
+          }
         });
+    }]);
 
+})();
+  angular.module('neograph.models.predicate', [])
+  .factory('predicateFactory', function () {
 
-      });
+    function Predicate(data) {
 
+      Object.assign(this, data);
 
     }
-  };
-});
+
+    Predicate.prototype.setDirection = function (direction) {
+      this.direction = direction;
+      return this;
+    };
+
+    Predicate.prototype.toString = function () {
+      if (this.direction === 'in' && !this.symmetrical) {
+        if (this.reverse) { // use reverse if present
+          return this.reverse.replace(/_/g, ' ').toLowerCase();
+        }
+        else {
+          var lookup = this.lookup.toUpperCase();
+          if (lookup === 'CREATED' || lookup === 'CREATES')
+            return 'created by';
+          else if (lookup === 'INFLUENCES')
+            return 'influenced by';
+                else if (lookup === 'INSPIRES')
+                  return 'inspired by';
+                else if (lookup === 'ANTICIPATES')
+                  return 'anticipated by';
+                else if (lookup === 'DEVELOPS')
+                  return 'developed by';
+                else if (lookup === 'DEPICTS')
+                  return 'depicted by';
+                else if (lookup === 'TYPE_OF')
+                  return 'type(s)';
+                else
+                    return '(' + this.lookup.replace(/_/g, ' ').toLowerCase() + ')';
+        }
+      }
+
+       // if (!this.isDirectional || !this.direction || this.direction === "out") {
+      return this.lookup.replace(/_/g, ' ').toLowerCase();
 
 
+    };
+
+    Predicate.prototype.flip = function () {
+
+      if (!this.isDirectional) {
+        return;
+      }
+      if (this.direction === 'in') {
+        this.setDirection('out');
+      }
+      else {
+        this.setDirection('in');
+      }
+      return this;
+
+    };
+
+    return {
+      create:function (data) {
+        return new Predicate(data);
+      }
+    };
+
+
+  });
 
 
 
@@ -2343,79 +2489,6 @@ angular.module('neograph.layout', [])
 
 
 });
-
-  angular.module('neograph.models.predicate', [])
-  .factory('predicateFactory', function () {
-
-    function Predicate(data) {
-
-      Object.assign(this, data);
-
-    }
-
-    Predicate.prototype.setDirection = function (direction) {
-      this.direction = direction;
-      return this;
-    };
-
-    Predicate.prototype.toString = function () {
-      if (this.direction === 'in' && !this.symmetrical) {
-        if (this.reverse) { // use reverse if present
-          return this.reverse.replace(/_/g, ' ').toLowerCase();
-        }
-        else {
-          var lookup = this.lookup.toUpperCase();
-          if (lookup === 'CREATED' || lookup === 'CREATES')
-            return 'created by';
-          else if (lookup === 'INFLUENCES')
-            return 'influenced by';
-                else if (lookup === 'INSPIRES')
-                  return 'inspired by';
-                else if (lookup === 'ANTICIPATES')
-                  return 'anticipated by';
-                else if (lookup === 'DEVELOPS')
-                  return 'developed by';
-                else if (lookup === 'DEPICTS')
-                  return 'depicted by';
-                else if (lookup === 'TYPE_OF')
-                  return 'type(s)';
-                else
-                    return '(' + this.lookup.replace(/_/g, ' ').toLowerCase() + ')';
-        }
-      }
-
-       // if (!this.isDirectional || !this.direction || this.direction === "out") {
-      return this.lookup.replace(/_/g, ' ').toLowerCase();
-
-
-    };
-
-    Predicate.prototype.flip = function () {
-
-      if (!this.isDirectional) {
-        return;
-      }
-      if (this.direction === 'in') {
-        this.setDirection('out');
-      }
-      else {
-        this.setDirection('in');
-      }
-      return this;
-
-    };
-
-    return {
-      create:function (data) {
-        return new Predicate(data);
-      }
-    };
-
-
-  });
-
-
-
 
 angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
 .factory('neoClient', ['$resource', 'settings', function ($resource, settings) {
@@ -3276,6 +3349,19 @@ angular.module('neograph.utils', ['neograph.neo.client'])
             }
           }
         })
+        .state('explore.compare', {
+          url:'/:node/:comparison',
+          views: {
+            'leftpanel@explore': {
+              template: '<node node="vm.node" editing="vm.editing" on-tab-changed="vm.onTabChanged(tab)" on-toggle-edit="vm.onToggleEdit(editing)" />',
+              controller: 'NodeCtrl as vm'
+            },
+            'rightpanel@explore': {
+              template: '<node node="vm.node" editing="vm.editing"  on-tab-changed="vm.onTabChanged(tab)"  on-toggle-edit="vm.onToggleEdit(editing)" />',
+              controller: 'ComparisonCtrl as vm'
+            }
+          }
+        })
         .state('explore.node.compare', {
           url:'/:comparison',
           views: {
@@ -3726,11 +3812,11 @@ angular.module('neograph.queryInput',
 (function() {
   'use strict';
     
-    controller.$inject = ["$scope", "$state", "nodeService"];
+    controller.$inject = ["$scope"];
   angular.module('neograph.search.controller',['neograph.node.service', 'ui.router'])
     .controller('SearchCtrl', controller);
 
-  function controller($scope, $state, nodeService) {
+  function controller($scope) {
       var vm = this;
       vm.node = undefined;
 
@@ -3751,11 +3837,20 @@ angular.module('neograph.queryInput',
         scope: {
           onSelected: '&'
         },
+        transclude: true,
         controller: 'SearchCtrl as vm',
         bindToController: true,
         replace: 'true',
         templateUrl: 'app/search/search.html',
-        restrict: 'E'
+        restrict: 'E',
+        link: function(scope, element, attrs, vm) {
+
+          scope.$watch('vm.node', function (node) {
+            element.find('.btn-search').focus();
+            element.addClass('unfocus');
+          });
+
+        }
       };
   }
 
@@ -4347,6 +4442,73 @@ angular.module('neograph.queryInput',
 (function() {
   'use strict';
     
+  controller.$inject = ["$scope", "predicateFactory", "nodeManager"];
+  angular.module('neograph.node.edit.relationships.controller', [])
+    .controller('EditRelationshipsCtrl', controller);
+
+  function controller($scope, predicateFactory, nodeManager) {
+    var vm = this;
+    vm.node = {};
+
+    vm.nodeTypes = [];
+
+    $scope.$watch('newPredicate', function(predicate) {
+      if (predicate) {
+        addRelationship({ lookup: predicate.toUpperCase().replace(/ /g, '_') });
+      }
+    });
+
+    function addRelationship(item) {
+      var p = predicateFactory.create({ lookup: item.lookup, direction: 'out' });// currently no way to select 'in' relationships
+      vm.node.relationships = vm.node.relationships || {};
+      if (!vm.node.relationships[p.toString()]) {
+        vm.node.relationships[p.toString()] = { predicate: p, items: [] };
+      }
+    }
+  }
+
+})();
+
+(function() {
+  'use strict';
+  angular.module('neograph.node.relationships.directive', [])
+    .directive('nodeRelationships', directive);
+
+    function directive() {
+      return {
+        scope: {
+          node: '=',
+          editing: '='
+        },
+        controller: 'EditRelationshipsCtrl as vm',
+        bindToController: true,
+        replace: 'true',
+        template: `
+        <div>
+          <div ng-if="!vm.editing" ng-include="\'app/node/relationships/node.relationships.html\'"></div>
+          <div ng-if="vm.editing" ng-include="\'app/node/relationships/node.edit.relationships.html\'"></div>
+        </div>
+        `,
+        restrict: 'E'
+      };
+
+  }
+
+})();
+
+(function() {
+  'use strict';
+    
+  angular.module('neograph.node.relationships', [
+    'neograph.node.edit.relationships.controller',
+    'neograph.node.relationships.directive'
+  ]);
+    
+
+})();
+(function() {
+  'use strict';
+    
   angular.module('neograph.node.wikipedia', ['neograph.neo'])
       .factory('wikiservice', () => {
         const wikiTabs = (data, page) => {
@@ -4551,73 +4713,6 @@ angular.module('neograph.queryInput',
   );
 })();
 
-(function() {
-  'use strict';
-    
-  controller.$inject = ["$scope", "predicateFactory", "nodeManager"];
-  angular.module('neograph.node.edit.relationships.controller', [])
-    .controller('EditRelationshipsCtrl', controller);
-
-  function controller($scope, predicateFactory, nodeManager) {
-    var vm = this;
-    vm.node = {};
-
-    vm.nodeTypes = [];
-
-    $scope.$watch('newPredicate', function(predicate) {
-      if (predicate) {
-        addRelationship({ lookup: predicate.toUpperCase().replace(/ /g, '_') });
-      }
-    });
-
-    function addRelationship(item) {
-      var p = predicateFactory.create({ lookup: item.lookup, direction: 'out' });// currently no way to select 'in' relationships
-      vm.node.relationships = vm.node.relationships || {};
-      if (!vm.node.relationships[p.toString()]) {
-        vm.node.relationships[p.toString()] = { predicate: p, items: [] };
-      }
-    }
-  }
-
-})();
-
-(function() {
-  'use strict';
-  angular.module('neograph.node.relationships.directive', [])
-    .directive('nodeRelationships', directive);
-
-    function directive() {
-      return {
-        scope: {
-          node: '=',
-          editing: '='
-        },
-        controller: 'EditRelationshipsCtrl as vm',
-        bindToController: true,
-        replace: 'true',
-        template: `
-        <div>
-          <div ng-if="!vm.editing" ng-include="\'app/node/relationships/node.relationships.html\'"></div>
-          <div ng-if="vm.editing" ng-include="\'app/node/relationships/node.edit.relationships.html\'"></div>
-        </div>
-        `,
-        restrict: 'E'
-      };
-
-  }
-
-})();
-
-(function() {
-  'use strict';
-    
-  angular.module('neograph.node.relationships', [
-    'neograph.node.edit.relationships.controller',
-    'neograph.node.relationships.directive'
-  ]);
-    
-
-})();
 angular.module('neograph.query.generator.favouritesFilter', ['neograph.neo'])
 .directive('favouritesFilter', neo => ({
   restrict: 'E',

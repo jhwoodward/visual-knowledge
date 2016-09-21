@@ -105,24 +105,22 @@
     }
 */
     function addNewNodes() {
-      $timeout(function addNode() {
-        if (newnodes.length) {
-          var node = newnodes.pop();
-          var edges = newedges.filter(function(e) { 
-            return e.from === node.id || e.to === node.id;
-          });
-          newedges = newedges.filter(function(e) {
-            return  e.from !== node.id && e.to !== node.id;
-          });
-          vm.graph.nodes.add(node);
-          vm.graph.edges.add(edges);
-        } else if (newedges.length) {
-            vm.graph.edges.add(newedges);
-        }
-        if (newnodes.length) {
-          addNewNodes();
-        }
-      }, 200);
+      if (newnodes.length) {
+        var node = newnodes.pop();
+        var edges = newedges.filter(function(e) { 
+          return e.from === node.id || e.to === node.id;
+        });
+        newedges = newedges.filter(function(e) {
+          return  e.from !== node.id && e.to !== node.id;
+        });
+        vm.graph.nodes.add(node);
+        vm.graph.edges.add(edges);
+      } else if (newedges.length) {
+          vm.graph.edges.add(newedges);
+      }
+      if (newnodes.length) {
+        $timeout(addNewNodes, 200);
+      }
     }
 
     function newNode(node) {
