@@ -4,7 +4,7 @@
   angular.module('neograph.node.images.modal.controller', [])
     .controller('NodeImagesModalCtrl', controller);
 
-  function controller(nodeManager, neo, modal) {
+  function controller(neo, modal) {
 
     var vm = this;
     var modalId = 'node.images';

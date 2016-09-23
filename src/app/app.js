@@ -17,6 +17,7 @@
     'neograph.routes',
     'neograph.constant',
     'neograph.explore.controller',
+    'neograph.stateManager.service',
     'ui.bootstrap'
     ]);
 

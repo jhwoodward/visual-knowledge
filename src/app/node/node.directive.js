@@ -11,7 +11,7 @@
           onToggleEdit: '&?',
           onTabChanged: '&?'
         },
-        controller: 'NodeDirectiveCtrl as vm',
+        controller: 'NodeCtrl as vm',
         bindToController: true,
         replace: 'true',
         templateUrl: 'app/node/node.html',

@@ -11,19 +11,28 @@
         });
     },
     shortest: function(from, to) {
-
-    },
-    allShortest: function(from, to) {
       var params = {from: from, to: to};
-      return neoClient.relationship.allshortest(params)
+      return neoClient.relationship.shortest(params)
         .$promise.then(function (data) {
-          console.log(data,'returned');
           return utils.getTypes().then(function(types) {
             Object.keys(data.nodes).forEach(function(key) {
               var n = data.nodes[key];
               n.type = types[n.class];
             });
-          return data;
+          return data.toJSON();
+         });
+      });
+    },
+    allShortest: function(from, to) {
+      var params = {from: from, to: to};
+      return neoClient.relationship.allshortest(params)
+        .$promise.then(function (data) {
+          return utils.getTypes().then(function(types) {
+            Object.keys(data.nodes).forEach(function(key) {
+              var n = data.nodes[key];
+              n.type = types[n.class];
+            });
+          return data.toJSON();
          });
       });
     },

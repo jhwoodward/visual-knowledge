@@ -212,26 +212,26 @@
       var image;// = (type === 'Painting' || type === 'Picture') ? neoNode.temp.thumbUrl : null;
 
       node.color = {
-        background:'#5696ce',
+        background:'transparent',
         highlight: {
-          background: '#fff',
-          fontColor: '#fff'
+          background: '#fff'
         },
         border: 'transparent'
       }
 
       node.fontColor = '#3e82bd';
+      node.shape = 'box';
+      node.fontFill = '#8fb1ca';
 
       if (image) {
         node.image = image;
         node.shape = 'image';
-      } else if (type === 'Provenance') {
+      } else if (type === 'Provenance' || type === 'Period') {
         node.fontSize = 100;
-        node.fontColor = '#5696ce';
+        node.fontColor = '#76a1c5';
         node.color.background = 'transparent';
       } else if (type === 'Iconography' || type === 'Place') {
-        node.shape = 'ellipse';
-           node.fontColor = '#c5d9ec';
+       // node.fontColor = '#c5d9ec';
       } else if (type === 'Quotation') {
         node.shape = 'box';
         node.color.background = 'transparent';
@@ -246,24 +246,22 @@
       } else if (neoNode.isPerson()) {
        // node.size = node.status * 2;
         node.shape = 'dot';
+        node.color.background = '#5a9cd6',
         node.fontFill = '#8fb1ca';
       } else if (neoNode.isProperty()) {
         node.color.background = 'transparent';
        // node.shape = 'circle';
        // node.color = '#b3cae0';
-      } else {
-        node.shape = 'box';
-        node.fontColor = '#c5d9ec';
-        node.fontFill = node.color;
-      }
+      } 
 
       return node;
     };
 
     function graphEdgeFromNeoEdge(neoEdge) {
+
       var type = neoEdge.type;
       var symmetrical = type === 'ASSOCIATED_WITH';
-      var hideEdgeLabel =
+      var hideLabel =
               type === 'BY' ||
               type === 'INFLUENCES' ||
               type === 'INSPIRES' ||
@@ -283,42 +281,31 @@
               type === 'TEACHES' ||
               type === 'TEACHES_AT';
 
-      var colour;
+      var colour, fontColour;
       switch (type) {
         case 'FROM':
-          colour = '#EEE';
-          break;
-        case 'INFLUENCES':
-          colour = '#3e82bd';
-          break;
-        case 'TEACHES':
-        case 'TEACHES_AT':
-        case 'PROPERTY':
-          colour = 'green';
+        case 'ACTIVE_DURING':
+          colour = 'transparent';
           break;
         default:
-          colour = '#3e82bd';
+          colour = '#76a1c5';
+          fontColour = '#76a1c5';
       }
 
-      var hideEdge = type === 'FROM';
+      var hideEdge = type === 'FROM' || type === 'ACTIVE_DURING';
+
       var edge = {
         id: neoEdge.id,
         from: neoEdge.startNode,
         to: neoEdge.endNode,
-        label: (
-          type !== 'EXTENDS' &&
-          type !== 'PROPERTY' &&
-          type !== 'INFLUENCES' &&
-          type !== 'ASSOCIATED_WITH'
-          ) ? type.toLowerCase().replace(/_/g,'') : null,
-        fontColor: '#3e82bd',
+        label: hideLabel ? null : type.toLowerCase().replace(/_/g,' '),
+        fontColor: fontColour,
         color: {
           color: colour,
           highlight: '#fff'
-        }
-          ,
+        },
         fontFill: '#8fb1ca',
-        opacity: hideEdge ? 0 : 1, // type === "INFLUENCES" ? 1 : 0.7,
+        opacity: hideEdge ? 0 : 1, 
         style: symmetrical ? 'dash-line' : 'arrow', // arrow-center' ,
         type: ['curved'],
         labelAlignment: 'line-center'

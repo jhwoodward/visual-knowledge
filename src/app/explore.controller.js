@@ -1,7 +1,7 @@
 (function() {
 
   angular.module('neograph.explore.controller', [])
-    .controller('ExploreCtrl', function($scope, $state, nodeManager, modal, $timeout) {
+    .controller('ExploreCtrl', function($scope, $state, $stateParams, stateManager, modal, $timeout) {
       var vm = this;
       vm.leftPanelVisible = true;
       vm.node = undefined;
@@ -15,8 +15,6 @@
 
       vm.loadNode = loadNode;
       vm.loadComparison = loadComparison;
-      vm.graphSelectionChanged = graphSelectionChanged;
-      vm.nodeActivated = nodeActivated;
 
       vm.leftPanelHalf = false;
       vm.rightPanelHalf = false;
@@ -41,18 +39,17 @@
       }
       vm.viewImages = viewImages;
 
-      nodeManager.subscribe('loaded', function(state) {
-        vm.node = state.node;
 
+      stateManager.subscribe('loaded', function(state) {
+        vm.node = state.node;
         if (vm.node && vm.node.image) {
           vm.nodeImageUrl = vm.node.image.full.url;
         } else {
           vm.nodeImageUrl = blank;
         }
-    
       });
 
-      nodeManager.subscribe('comparison', function(state) {
+      stateManager.subscribe('comparison', function(state) {
         vm.comparison = state.comparison;
 
         if (vm.comparison && vm.comparison.image) {
@@ -63,21 +60,21 @@
         
       });
 
-      nodeManager.subscribe('tab', function(state) {
+      stateManager.subscribe('tab', function(state) {
         console.log(state,'tab');
         vm.comparisonActiveTab = state.comparisonActiveTab;
         vm.nodeActiveTab = state.nodeActiveTab;
       });
 
-      nodeManager.subscribe('editing', function(state) {
+      stateManager.subscribe('editing', function(state) {
         vm.leftPanelEditing = state.nodeEditing;
         vm.rightPanelEditing = state.comparisonEditing;
       });
 
-      nodeManager.subscribe('nodePictures', function(state) {
+      stateManager.subscribe('nodePictures', function(state) {
         vm.nodePictures = state.nodePictures;
       });
-      nodeManager.subscribe('comparisonPictures', function(state) {
+      stateManager.subscribe('comparisonPictures', function(state) {
         vm.comparisonPictures = state.comparisonPictures;
       });
 
@@ -152,49 +149,25 @@
       }
 
       function loadNode(node) {
-        if (node && node.label) {
-          $state.go('explore.node', { node: node.label });
-          nodeManager.clearComparison();
-        }
+        stateManager.go.node(node);
       }
 
       function loadComparison(node) {
-        if (node && node.label) {
-          $state.go('explore.node.compare', { comparison: node.label });
-        }
-      }
+        stateManager.go.comparison(node);
 
-      function graphSelectionChanged(node, edges) {
-        //load node into right panel
-        console.log(node, 'graph selection changed');
-        if (node) {
-          loadComparison(node)
-        } else {
-          loadNode(vm.node);
-        }
-     
       }
 
       function swapNodes() {
-        $state.go('explore.compare', { node: vm.comparison.label, comparison: vm.node.label });
-
-      }
-
-      function nodeActivated(node) {
-        $state.go('explore.node', { node: node.label});
-        nodeManager.clearComparison();
+        stateManager.go.swap();
       }
 
       function viewImages(node) {
-       
         if (vm.node && node.id === vm.node.id) {
           vm.leftPanelWide = !vm.leftPanelWide;
         }
-
         if (vm.comparison && node.id === vm.comparison.id) {
           vm.rightPanelWide = !vm.rightPanelWide;
         }
-       
       }
 
     });

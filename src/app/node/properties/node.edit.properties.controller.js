@@ -4,16 +4,12 @@
   angular.module('neograph.node.edit.properties.controller', [])
     .controller('EditPropertiesCtrl', controller);
 
-  function controller(utils, $scope, nodeManager) {
+  function controller(utils, $scope) {
 
     var vm = this;
     vm.node = {};
 
-    /*
-    nodeManager.subscribe('loaded', function(state) {
-      vm.node = state.node;
-    });
-    */
+ 
 
     vm.nodeTypes = [];
     // Can be called from clicking label,

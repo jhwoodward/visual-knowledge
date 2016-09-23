@@ -4,7 +4,7 @@
   angular.module('neograph.node.image.controller', [])
     .controller('NodeImageCtrl', controller);
 
-  function controller(nodeManager, neo, modal) {
+  function controller(neo, modal) {
 
     var vm = this;
     var modalId = 'node.images';
@@ -14,13 +14,7 @@
     vm.save = save;
     vm.revert = revert;
 
-/*
 
-    nodeManager.subscribe('loaded', function(state) {
-      vm.node = state.node;
-      vm.original = angular.copy(vm.node.image);
-    });
-*/
 
     function onSelected(picture) {
       vm.node.image = picture.image;

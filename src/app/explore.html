@@ -1,8 +1,6 @@
 ﻿<graph 
   node="vm.node" 
   comparison="vm.comparison"
-  on-selection-changed="vm.graphSelectionChanged(node, edges)"
-  on-node-activated="vm.nodeActivated(node)"
   class="map"
   />
 <button ng-show='vm.leftPanelFull || vm.rightPanelHalf' class="btn btn-close-pictures ion-close-round" 
@@ -66,28 +64,13 @@
         ng-click="vm.swapNodes()">
       </button> 
       <button 
-      class="btn ion-eye" 
-      ng-click='vm.viewPictures()'>
+        class="btn ion-eye" 
+        ng-click='vm.viewPictures()'>
       </button>
 
   </search>
 
 
-<!--
-
-  <div class="action-box" > 
-    <div class="action-box-inner">
-      <button 
-        class="btn ion-arrow-swap" 
-        ng-click="vm.swapNodes()">
-      </button> 
-      <button 
-      class="btn ion-eye" 
-      ng-click='vm.viewPictures()'>
-      </button>
-    </div>
-  </div>
--->
   <node-image-display url="vm.comparisonImageUrl">
   </node-image-display>
 

@@ -1,10 +1,10 @@
 (function() {
   'use strict';
 
-  angular.module('neograph.nodeManager.service',[])
-    .factory('nodeManager', service);
+  angular.module('neograph.stateManager.service',[])
+    .factory('stateManager', service);
 
-  function service(nodeService, neo) {
+  function service(nodeService, neo, $state) {
 
     var listeners = {};
     var state = {
@@ -39,6 +39,27 @@
     }
 
     var api = {
+      go: {
+        node: function (node) {
+          if (node && node.label) {
+            $state.go('explore.node', { node: node.label });
+          //  api.clearComparison();
+          } 
+        },
+        comparison: function (node) {
+          if (node && node.label) {
+            $state.go('explore.node.comparison', { comparison: node.label });
+          }
+        },
+        compare: function (node, comparison) {
+          $state.go('explore.compare', { node: node.label, comparison: comparison.label });
+        },
+        swap: function() {
+          if (state.node && state.comparison) {
+            $state.go('explore.compare', { node: state.comparison.label, comparison: state.node.label });
+          }
+        }
+      },
       load: function (id) {
         return nodeService.get(id).then(function (node) {
           state.node = node;

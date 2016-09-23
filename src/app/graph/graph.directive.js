@@ -5,10 +5,10 @@
   angular.module('neograph.graph.directive', [])
     .directive('graph', directive);
 
-  function directive(graphService, nodeManager, $window, $timeout, _) {
+  function directive(graphService, stateManager, $window, $timeout, _) {
    
     var options = {
-        edges: { widthSelectionMultiplier: 4 },
+        edges: { widthSelectionMultiplier: 1 },
         hierarchicalLayout: {
           enabled: false,
           levelSeparation: 10, // make this inversely proportional to number of nodes
@@ -57,9 +57,7 @@
       templateUrl: 'app/graph/graph.html',
       scope: {
         node: '=',
-        comparison: '=',
-        onSelectionChanged: '&',
-        onNodeActivated: '&?'
+        comparison: '='
       },
       controller: 'GraphCtrl as vm',
       bindToController: true,
@@ -69,17 +67,18 @@
     function linkFn(scope, element, attrs, vm) {
 
       options.onConnect = onNetworkConnect;
-      var network = new vis.Network(element[0], vm.graph, options);
+      var visNetwork = new vis.Network(element[0], vm.graph, options);
+
       $timeout(setGraphSize);
       $('.network-manipulationUI.connect').hide();
       // Add event listeners
     
-      nodeManager.subscribe('loaded', function(state) {
+      stateManager.subscribe('loaded', function(state) {
         focusNode(state.node);
       });
       angular.element($window).on('resize', setGraphSize);
-      network.on('resize', onNetworkResize);
-      network.on('select', onNetworkSelect);
+      visNetwork.on('resize', onNetworkResize);
+      visNetwork.on('select', onNetworkSelect);
       element.on('mousemove', onContainerMouseMove);
       vm.graph.nodes.on('*', onNodeDatasetChanged);
 
@@ -96,7 +95,7 @@
       }
 
       function getSelectedNodeId() {
-        var selectedNodes = network.getSelectedNodes();
+        var selectedNodes = visNetwork.getSelectedNodes();
         if (selectedNodes.length === 1) {
           return selectedNodes[0];
         }
@@ -111,8 +110,8 @@
 
           //      vm.data.nodes[key].fontSize = 100;
 
-                network.selectNodes([key]);
-                network.focusOnNode(key, {
+                visNetwork.selectNodes([key]);
+                visNetwork.focusOnNode(key, {
                   //scale: 1.5,
                   animation: {
                     duration: 1000,
@@ -126,12 +125,12 @@
       }
 
       function setGraphSize() { 
-        network.setSize($window.innerWidth + 'px', $window.innerHeight + 'px'); 
+        visNetwork.setSize($window.innerWidth + 'px', $window.innerHeight + 'px'); 
       }
 
       function onNetworkResize() {
         if (getSelectedNodeId()) {
-          network.focusOnNode(getSelectedNodeId(), {
+          visNetwork.focusOnNode(getSelectedNodeId(), {
             scale: 1,
             animation: {
               duration: 1000,
@@ -139,7 +138,7 @@
             }
           });
         } else {
-          network.zoomExtent({ duration: 1000, easingFunction: 'easeOutCubic' });
+          visNetwork.zoomExtent({ duration: 1000, easingFunction: 'easeOutCubic' });
         }
       }
 
@@ -149,16 +148,6 @@
         } else {
           $('.network-manipulationUI.connect').hide();
         }
-
-        var select = [];
-        if (vm.node && vm.graph.nodes.get(vm.node.id)) {
-          select.push(vm.node.id);
-        }
-        if (vm.comparison  && vm.graph.nodes.get(vm.comparison.id)) {
-          select.push(vm.comparison.id);
-        }
-        network.selectNodes(select, false);
-     
 
       }
 
@@ -191,7 +180,7 @@
       
       
       function onGlobalFocus(nodeid) {
-        network.focusOnNode(nodeid, {
+        visNetwork.focusOnNode(nodeid, {
           scale: 1,
           animation: {
             duration: 1000,
@@ -200,7 +189,7 @@
       }
 
       function onContainerMouseMove(event) {
-        var n = network._getNodeAt({
+        var n = visNetwork._getNodeAt({
           x: event.pageX,
           y: event.pageY
         });

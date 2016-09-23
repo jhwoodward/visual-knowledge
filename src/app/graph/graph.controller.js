@@ -4,7 +4,7 @@
   angular.module('neograph.graph.controller',['neograph.node.service', 'ui.router'])
     .controller('GraphCtrl', controller);
 
-  function controller($scope, $timeout, neo, neoClient, nodeManager, graphService) {
+  function controller($scope, $timeout, neo, neoClient, graphService, stateManager) {
 
     var vm = this;
 
@@ -29,49 +29,96 @@
     activate();
 
     function activate() {
-      $scope.$watch('vm.node', newNode);
-      $scope.$watch('vm.comparison', newComparison);
+      $scope.$watch('vm.node', loadNode);
+      $scope.$watch('vm.comparison', loadNode);
       $scope.$watch('vm.selectedGraph', onSelectedGraphChanged);
-      $scope.$watch('vm.selectedNode', onSelectedNodeChanged)
     }
 
-    function newComparison(comparison) {
-      console.log(comparison,'new comparison');
-      if (comparison && (!vm.selectedNode || comparison.id != vm.selectedNode.id)) {
-        vm.selectedNode = comparison;
-      }
-    }
-
-    function onSelectedNodeChanged(node) {
+    function loadNode(node) {
       if (node && node.id) {
-        console.log(node,'selected node');
-    //  if (node && (!vm.comparison || vm.comparison.id != node.id)) {
-        loadGraphData(node);
-        loadShortestPaths();
-   //   }
-       }
-    }
-
-    function newNode(node) {
-      if (node && node.id) {
-
-     
-     //   vm.selectedNode = undefined;
-     //   vm.selectedEdges = [];
         loadGraphData(node);
         loadShortestPaths();
       }
     }
 
     function loadShortestPaths() {
-      if (vm.node && vm.selectedNode) {
-        return neo.allShortest(vm.node.lookup, vm.selectedNode.lookup)
+      if (vm.node && vm.comparison) {
+        neo.allShortest(vm.node.lookup, vm.comparison.lookup)
           .then(function (data) {
-            console.log(data);
+            console.log(data,'all shortest');
             onInput(data);
           });
       }
-   
+    }
+
+    function highlightShortest() {
+      clearHighlight();
+      neo.allShortest(vm.node.lookup, vm.comparison.lookup)
+        .then(function(data) {
+          highlight(data, '#5696ce');
+
+          neo.shortest(vm.node.lookup, vm.comparison.lookup)
+            .then(function(data) {
+              highlight(data, '#3e82bd');
+            });
+
+        });
+
+    }
+
+    function clearHighlight() {
+       var highlightedNodes = vm.graph.nodes.get({filter: function(node) {return node.highlighted;}});
+      highlightedNodes.forEach(function(n) {
+        if (n.color.background != 'transparent') {
+          n.color = {
+            background: '#5696ce',
+            border: 'transparent'
+        };
+        }
+        n.fontColor = '#3e82bd';
+        n.fontSize = 16;
+        n.highlighted = false;
+        vm.graph.nodes.update(n);
+      });
+      var highlightedEdges = vm.graph.edges.get({filter: function(edge) {return edge.highlighted;}});
+      highlightedEdges.forEach(function(edge) {
+        edge.color = '#76a1c5';
+        edge.highlighted = false;
+        vm.graph.edges.update(edge);
+      });
+    }
+
+    function highlight(data, colour) {
+
+      Object.keys(data.nodes).forEach(function(node) {
+        var n = vm.graph.nodes.get(node);
+        if (n) {
+          if (n.color.background != 'transparent') {
+            n.color = { background:  colour };
+          }
+          n.fontColor = colour;
+
+          if (parseInt(n.id) === parseInt(vm.node.id) || 
+            parseInt(n.id) === parseInt(vm.comparison.id)) {
+              n.fontSize = 50;
+          }
+       
+          n.highlighted = true;
+          vm.graph.nodes.update(n);
+        }
+      });
+
+      Object.keys(data.edges).forEach(function(edge) {
+        var e = vm.graph.edges.get(edge);
+        if (e) {
+          e.color = colour;
+          e.highlighted = true;
+          vm.graph.edges.update(e);
+        }
+      });
+
+
+    //  vm.network.selectEdges(Object.keys(data.edges));
     }
     
 
@@ -129,26 +176,6 @@
       }
     }
 
-    /*
-    function onGlobalDeleted(params) {
-      if (params.selection.nodes && params.selection.nodes.length) {
-        var nodeids = params.selection.nodes.map(n => n.id);
-        graph.nodes.remove(nodeids);
-      }
-      if (params.selection.edges && params.selection.edges.length) {
-        var edgeids = params.selection.edges.map(n => n.id);
-        graph.edges.remove(edgeids);
-      }
-    }
-
-    function onGlobalDataUpdate(g) { 
-      _.extend(data.edges, g.edges);
-      _.extend(data.nodes, g.nodes);
-      var gArr = graphService.toGraphData(g);
-      graph.edges.update(gArr.edges);
-      graph.nodes.update(gArr.nodes);
-    }
-*/
     function addNewNodes() {
       console.log('new nodes');
       if (newnodes.length) {
@@ -166,6 +193,8 @@
       }
       if (newnodes.length) {
         $timeout(addNewNodes, 200);
+      } else {
+        highlightShortest();
       }
     }
 
@@ -232,28 +261,13 @@
     function onSelect(selection) {
       vm.selectedEdges = selection.edges;
       if (selection.node) {
-        if (vm.selectedNode && selection.node.id === vm.selectedNode.id) {
-          activateSelected();
-          return;
+        if (vm.comparison && parseInt(selection.node.id) === parseInt(vm.comparison.id)) {
+          stateManager.go.node(selection.node);
         } else {
-          vm.selectedNode = selection.node;
+          stateManager.go.comparison(selection.node);
         }
-      } else {
-        vm.selectedNode = undefined;
-      }
-      
-       if (vm.onSelectionChanged) {
-        vm.onSelectionChanged(selection);
-      }
+      } 
 
-    }
-
-  
-
-    function activateSelected() {
-      if (vm.onNodeActivated) {
-        vm.onNodeActivated({node: vm.selectedNode});
-      }
     }
 
   }
