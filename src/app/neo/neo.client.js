@@ -104,14 +104,12 @@
       save: {
         url: root + '/edge/save',
         method: 'POST'
-      }
-            ,
+      },
       del: {
         url: root + '/edge/delete',
         method: 'POST'
 
-      }
-            ,
+      },
       getImageRelationships: {
         url: root + '/edge/imagerelationships',
         method: 'POST'
@@ -163,6 +161,16 @@
       query: {
         url: root + '/graphql',
         method: 'POST'
+      }
+    }),
+    relationship:$resource(null, null, {
+      shortest: {
+        url: root + '/relationships/shortest/:from/:to',
+        method: 'GET'
+      },
+      allshortest: {
+        url: root + '/relationships/allshortest/:from/:to',
+        method: 'GET'
       }
     })
 

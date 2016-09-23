@@ -595,6 +595,10 @@ label {
   display:none;
 }
 
+.panel.panel-full .search-box, .panel.panel-half .search-box {
+  display:none;
+}
+
 .panel.panel-no-shadow {
   box-shadow:none;
 }

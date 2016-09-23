@@ -57,6 +57,7 @@
       templateUrl: 'app/graph/graph.html',
       scope: {
         node: '=',
+        comparison: '=',
         onSelectionChanged: '&',
         onNodeActivated: '&?'
       },
@@ -148,6 +149,17 @@
         } else {
           $('.network-manipulationUI.connect').hide();
         }
+
+        var select = [];
+        if (vm.node && vm.graph.nodes.get(vm.node.id)) {
+          select.push(vm.node.id);
+        }
+        if (vm.comparison  && vm.graph.nodes.get(vm.comparison.id)) {
+          select.push(vm.comparison.id);
+        }
+        network.selectNodes(select, false);
+     
+
       }
 
       function onNetworkSelect(params) {
@@ -176,7 +188,8 @@
        
       }
 
-
+      
+      
       function onGlobalFocus(nodeid) {
         network.focusOnNode(nodeid, {
           scale: 1,

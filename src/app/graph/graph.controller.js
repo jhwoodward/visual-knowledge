@@ -4,7 +4,7 @@
   angular.module('neograph.graph.controller',['neograph.node.service', 'ui.router'])
     .controller('GraphCtrl', controller);
 
-  function controller($scope, $timeout, neo, nodeManager, graphService) {
+  function controller($scope, $timeout, neo, neoClient, nodeManager, graphService) {
 
     var vm = this;
 
@@ -19,6 +19,7 @@
 
     vm.onSelect = onSelect;
     vm.node = {};
+    vm.comparison = {};
     vm.graphs = [];
     vm.selectedGraph = {};
     vm.selectedNode = undefined;
@@ -29,8 +30,50 @@
 
     function activate() {
       $scope.$watch('vm.node', newNode);
+      $scope.$watch('vm.comparison', newComparison);
       $scope.$watch('vm.selectedGraph', onSelectedGraphChanged);
+      $scope.$watch('vm.selectedNode', onSelectedNodeChanged)
     }
+
+    function newComparison(comparison) {
+      console.log(comparison,'new comparison');
+      if (comparison && (!vm.selectedNode || comparison.id != vm.selectedNode.id)) {
+        vm.selectedNode = comparison;
+      }
+    }
+
+    function onSelectedNodeChanged(node) {
+      if (node && node.id) {
+        console.log(node,'selected node');
+    //  if (node && (!vm.comparison || vm.comparison.id != node.id)) {
+        loadGraphData(node);
+        loadShortestPaths();
+   //   }
+       }
+    }
+
+    function newNode(node) {
+      if (node && node.id) {
+
+     
+     //   vm.selectedNode = undefined;
+     //   vm.selectedEdges = [];
+        loadGraphData(node);
+        loadShortestPaths();
+      }
+    }
+
+    function loadShortestPaths() {
+      if (vm.node && vm.selectedNode) {
+        return neo.allShortest(vm.node.lookup, vm.selectedNode.lookup)
+          .then(function (data) {
+            console.log(data);
+            onInput(data);
+          });
+      }
+   
+    }
+    
 
     function graphql() {
 
@@ -67,6 +110,8 @@
     var newedges = [];
 
     function onInput(inputData)  {
+      console.log(vm.data);
+
       _.extend(vm.data.nodes, inputData.nodes);
       _.extend(vm.data.edges, inputData.edges);
       var gArr = graphService.toVisNetworkData(vm.data);
@@ -105,6 +150,7 @@
     }
 */
     function addNewNodes() {
+      console.log('new nodes');
       if (newnodes.length) {
         var node = newnodes.pop();
         var edges = newedges.filter(function(e) { 
@@ -123,18 +169,14 @@
       }
     }
 
-    function newNode(node) {
-      console.log(node,'no node loaded');
-      if (node && node.id) {
-        vm.selectedNode = undefined;
-        vm.selectedEdges = [];
-        loadGraphData(node);
-      }
-    }
+ 
 
     function loadGraphData(node) {
       console.log(node,'load graph');
+
+      
       vm.graphs = graphService.getQueries(node);
+      console.dir(vm.graphs);
       if (vm.graphs && vm.graphs.length) {
         vm.selectedGraph = vm.graphs[0];
       }
@@ -195,19 +237,18 @@
           return;
         } else {
           vm.selectedNode = selection.node;
-          loadGraphData(vm.selectedNode);
         }
       } else {
         vm.selectedNode = undefined;
       }
-      raiseSelectionChanged(selection);
-    }
-
-    function raiseSelectionChanged(selection) {
-      if (vm.onSelectionChanged) {
+      
+       if (vm.onSelectionChanged) {
         vm.onSelectionChanged(selection);
       }
+
     }
+
+  
 
     function activateSelected() {
       if (vm.onNodeActivated) {

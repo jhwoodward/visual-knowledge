@@ -40,8 +40,9 @@
         $timeout(setImage);
 
         function setImage() {
-          loader.addClass('loading');
+        
           if (scope.url) {
+            loader.addClass('loading');
             image.attr('src', scope.url)
           } else {
             element.find('.image.layer').css({'opacity': 0});

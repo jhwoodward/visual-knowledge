@@ -1,4 +1,6 @@
-﻿<graph node="vm.node" 
+﻿<graph 
+  node="vm.node" 
+  comparison="vm.comparison"
   on-selection-changed="vm.graphSelectionChanged(node, edges)"
   on-node-activated="vm.nodeActivated(node)"
   class="map"
@@ -20,7 +22,7 @@
     
   <search on-selected="vm.loadNode(node)"  ng-class="{'search-box-shadow': !vm.node.id}"  >
 
-     <button 
+     <button ng-if="vm.node.id && vm.comparison.id"
         class="btn ion-arrow-swap" 
         ng-click="vm.swapNodes()">
       </button> 

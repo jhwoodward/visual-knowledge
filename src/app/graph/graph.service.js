@@ -200,10 +200,10 @@
       var node = {
         id: neoNode.id,
         label: neoNode.label || neoNode.lookup,
-        size: neoNode.status / 10,
+     //   size: neoNode.status * 2,
         group: neoNode.class,
         mass: type === 'Group' ? 0.5 : 1,
-        radius: neoNode.isPerson() ? neoNode.status : 1,
+        radius: neoNode.isPerson() ? (neoNode.status * 2) ^ 3 : 1,
         // for hiearchichal layout,
         level,
         borderWidth: 0
@@ -211,7 +211,15 @@
 
       var image;// = (type === 'Painting' || type === 'Picture') ? neoNode.temp.thumbUrl : null;
 
-      node.color = '#5696ce';
+      node.color = {
+        background:'#5696ce',
+        highlight: {
+          background: '#fff',
+          fontColor: '#fff'
+        },
+        border: 'transparent'
+      }
+
       node.fontColor = '#3e82bd';
 
       if (image) {
@@ -220,13 +228,13 @@
       } else if (type === 'Provenance') {
         node.fontSize = 100;
         node.fontColor = '#5696ce';
-        node.color = 'transparent';
+        node.color.background = 'transparent';
       } else if (type === 'Iconography' || type === 'Place') {
         node.shape = 'ellipse';
            node.fontColor = '#c5d9ec';
       } else if (type === 'Quotation') {
         node.shape = 'box';
-        node.color = 'transparent';
+        node.color.background = 'transparent';
         node.label = neoNode.text;
       } else if (type === 'User') {
         node.shape = 'star';
@@ -234,12 +242,13 @@
       } else if (type === 'Link') {
         node.label = neoNode.name;
         node.shape = 'box';
-        node.color = 'transparent';
+        node.color.background = 'transparent';
       } else if (neoNode.isPerson()) {
+       // node.size = node.status * 2;
         node.shape = 'dot';
         node.fontFill = '#8fb1ca';
       } else if (neoNode.isProperty()) {
-             node.color = 'transparent';
+        node.color.background = 'transparent';
        // node.shape = 'circle';
        // node.color = '#b3cae0';
       } else {
@@ -248,9 +257,6 @@
         node.fontFill = node.color;
       }
 
-      node.color = { background: node.color, border: 'transparent' };
-
- 
       return node;
     };
 
@@ -306,7 +312,11 @@
           type !== 'ASSOCIATED_WITH'
           ) ? type.toLowerCase().replace(/_/g,'') : null,
         fontColor: '#3e82bd',
-        color: colour,
+        color: {
+          color: colour,
+          highlight: '#fff'
+        }
+          ,
         fontFill: '#8fb1ca',
         opacity: hideEdge ? 0 : 1, // type === "INFLUENCES" ? 1 : 0.7,
         style: symmetrical ? 'dash-line' : 'arrow', // arrow-center' ,

@@ -1,7 +1,7 @@
 ﻿<div class="properties">
   <div class="form-group" ng-if="vm.node.id >-1 && vm.node.label && vm.node.temp.labelled">
     <label>Nodes labelled {{vm.node.label}}</label>
-    <labels navpath="/admin/node/{label}"  items="vm.node.temp.labelled"></labels>
+    <labels navpath="/explore/{label}"  items="vm.node.temp.labelled"></labels>
   </div>
 
   <div class="row" >
@@ -21,7 +21,7 @@
           ng-class="{'glyphicon-arrow-right':value.predicate.direction === 'out',
             'glyphicon-arrow-left':value.predicate.direction === 'in'}">
         </i>
-        <labels navpath="/admin/node/{label}" items="value.items"></labels>
+        <labels navpath="/explore/{label}" items="value.items"></labels>
       </div>
 
     </div>
