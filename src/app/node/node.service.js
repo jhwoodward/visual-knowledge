@@ -73,20 +73,32 @@
     Node.prototype.isDeleted = function () {
       return this.labels.indexOf('Deleted') > -1;
     };
+
+    Node.prototype.hasType = function(type) {
+      if (!this.type || this.class === 'Type') return false;
+      return this.type.lookup === type || this.type.subtypes.indexOf(type) > -1;
+    }
     
     Node.prototype.isPicture = function () {
-      return this.type ? this.type.subtypes.indexOf('Picture') > -1 : false;
+      return this.hasType('Picture');
     };
 
+    Node.prototype.isProvenance = function () {
+      return this.hasType('Provenance');
+    };
+
+    Node.prototype.isPeriod = function () {
+      return this.hasType('Period');
+    };
+ 
+
     Node.prototype.isPerson = function () {
-      return this.type ? this.type.subtypes.indexOf('Person') > -1 : false;
+      return this.hasType('Person');
     };
 
     Node.prototype.isProperty = function () {
-      return this.type ? this.type.lookup === 'Property' : false;
+      return this.hasType('Property');
     };
-
- 
 
     function create(nodeResponseData) {
       var node = nodeResponseData.toJSON();

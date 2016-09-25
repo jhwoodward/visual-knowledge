@@ -174,8 +174,11 @@
     }
     
     function graphNodeFromNeoNode(neoNode) {
-      neoNode = nodeService.create(neoNode);
-      var type = neoNode.class;
+ 
+      if (!(neoNode instanceof Node)) {
+        neoNode = nodeService.create(neoNode);
+      }
+
       var yf = parseInt(neoNode.yearFrom, 10);
       var yt = parseInt(neoNode.yearTo, 10);
       var y = yt;
@@ -197,63 +200,38 @@
       if (y > endYear) {
         level = cnt;
       }
+      
       var node = {
+        data: neoNode,
         id: neoNode.id,
-        label: neoNode.label || neoNode.lookup,
-     //   size: neoNode.status * 2,
-        group: neoNode.class,
-        mass: type === 'Group' ? 0.5 : 1,
+        label: neoNode.hasType('Quotation') ? neoNode.text : neoNode.label || neoNode.lookup,
+        mass: neoNode.hasType('Group') ? 0.5 : 1,
         radius: neoNode.isPerson() ? (neoNode.status * 2) ^ 3 : 1,
         // for hiearchichal layout,
-        level,
-        borderWidth: 0
+        //level,
+        group: neoNode.type ? neoNode.type.lookup : 'Type',
+        borderWidth: 0,
+        shape: neoNode.isPerson() ? 'dot' : 'box',
+        color: {
+          background: neoNode.isPerson() ? '#5a9cd6' : 'transparent',
+          highlight: {
+            background: '#fff'
+          },
+          border: 'transparent'
+        },
+        fontColor: (neoNode.isProvenance() || neoNode.isPeriod()) ? '#76a1c5' : '#3e82bd',
+        fontSize:  (neoNode.isProvenance() || neoNode.isPeriod()) ? 100 : 16,
+        fontFill: '#8fb1ca'
       };
 
+/*
       var image;// = (type === 'Painting' || type === 'Picture') ? neoNode.temp.thumbUrl : null;
 
-      node.color = {
-        background:'transparent',
-        highlight: {
-          background: '#fff'
-        },
-        border: 'transparent'
-      }
-
-      node.fontColor = '#3e82bd';
-      node.shape = 'box';
-      node.fontFill = '#8fb1ca';
-
-      if (image) {
-        node.image = image;
+      if (neoNode.isPicture()) {
+        node.image = neoNode.image;
         node.shape = 'image';
-      } else if (type === 'Provenance' || type === 'Period') {
-        node.fontSize = 100;
-        node.fontColor = '#76a1c5';
-        node.color.background = 'transparent';
-      } else if (type === 'Iconography' || type === 'Place') {
-       // node.fontColor = '#c5d9ec';
-      } else if (type === 'Quotation') {
-        node.shape = 'box';
-        node.color.background = 'transparent';
-        node.label = neoNode.text;
-      } else if (type === 'User') {
-        node.shape = 'star';
-        node.size = 20;
-      } else if (type === 'Link') {
-        node.label = neoNode.name;
-        node.shape = 'box';
-        node.color.background = 'transparent';
-      } else if (neoNode.isPerson()) {
-       // node.size = node.status * 2;
-        node.shape = 'dot';
-        node.color.background = '#5a9cd6',
-        node.fontFill = '#8fb1ca';
-      } else if (neoNode.isProperty()) {
-        node.color.background = 'transparent';
-       // node.shape = 'circle';
-       // node.color = '#b3cae0';
       } 
-
+      */
       return node;
     };
 
@@ -328,10 +306,15 @@
       // containing array of nodes and array of edges renderable by vis network
       toVisNetworkData: function(g) {
         return {
-          nodes: Object.keys(g.nodes).map(function(key) { return graphNodeFromNeoNode(g.nodes[key]); }),
-          edges: Object.keys(g.edges).map(function(key) { return graphEdgeFromNeoEdge(g.edges[key]); })
+          nodes: Object.keys(g.nodes).map(function(key) { 
+            return graphNodeFromNeoNode(g.nodes[key]); 
+          }),
+          edges: Object.keys(g.edges).map(function(key) { 
+            return graphEdgeFromNeoEdge(g.edges[key]); 
+          })
         };
-      }
+      },
+      graphNodeFromNeoNode: graphNodeFromNeoNode
     };
   }
 

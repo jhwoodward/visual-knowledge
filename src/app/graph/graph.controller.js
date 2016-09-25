@@ -69,15 +69,7 @@
     function clearHighlight() {
        var highlightedNodes = vm.graph.nodes.get({filter: function(node) {return node.highlighted;}});
       highlightedNodes.forEach(function(n) {
-        if (n.color.background != 'transparent') {
-          n.color = {
-            background: '#5696ce',
-            border: 'transparent'
-        };
-        }
-        n.fontColor = '#3e82bd';
-        n.fontSize = 16;
-        n.highlighted = false;
+        _.extend(n,graphService.graphNodeFromNeoNode(n.data));
         vm.graph.nodes.update(n);
       });
       var highlightedEdges = vm.graph.edges.get({filter: function(edge) {return edge.highlighted;}});
@@ -93,14 +85,14 @@
       Object.keys(data.nodes).forEach(function(node) {
         var n = vm.graph.nodes.get(node);
         if (n) {
-          if (n.color.background != 'transparent') {
+          if (n.data.isPerson()) {
             n.color = { background:  colour };
           }
           n.fontColor = colour;
 
           if (parseInt(n.id) === parseInt(vm.node.id) || 
             parseInt(n.id) === parseInt(vm.comparison.id)) {
-              n.fontSize = 50;
+              n.fontSize = 24;
           }
        
           n.highlighted = true;
