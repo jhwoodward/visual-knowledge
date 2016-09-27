@@ -87,6 +87,10 @@
 
       stateManager.subscribe('pairedPictures', function(state) {
         vm.pairedPictures = state.pairedPictures;
+        nodeSlideShowOn = false;
+        comparisonSlideShowOn = false;
+        pairedSlideShowOn = true;
+        showNextPair();
       });
 
 
@@ -105,6 +109,7 @@
         vm.rightPanelHalf = false;
         vm.leftPanelFull = false;
 
+/*
         if (vm.node && vm.node.image) {
           vm.nodeImageUrl = vm.node.image.full.url;
         } else {
@@ -116,6 +121,8 @@
         } else {
           vm.comparisonImageUrl = blank;
         }
+*/
+
       }
 
       function viewPictures() {
@@ -147,7 +154,7 @@
 
       var currentPairedIndex = 0;
       function showNextPair() {
-        if (pairedSlideShowOn) {
+        if (pairedSlideShowOn && vm.pairedPictures.length) {
           if (currentPairedIndex > vm.pairedPictures.length -1) {
             currentPairedIndex = 0;
           }
@@ -155,6 +162,8 @@
           vm.comparisonImageUrl = vm.pairedPictures[currentNodeImageIndex].to.image.full.url;
           currentPairedIndex += 1;
           $timeout(showNextPair, slideInterval);
+        } else {
+          pairedSlideShowOn = false;
         }
       }
 

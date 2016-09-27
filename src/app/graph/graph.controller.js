@@ -34,17 +34,18 @@
         if (node && node.id && node.id != vm.loadedComparison.id) {
           vm.loadedComparison = node;
           loadNode(node);
+          loadConnections();
         }
       });
         
     }
 
     function loadNode(node) {
-      $timeout(function() {
+     
         console.log(node.lookup,'load')
         loadGraphData(node);
-        loadConnections();
-      })
+     //   loadConnections();
+      
   
     }
 
@@ -85,7 +86,8 @@
                   loadedConnection = [vm.node.id, vm.comparison.id];
 
 
-                  $timeout(function(){
+                  $timeout(function() {
+                    console.log(vm.comparison.lookup,'focus');
                     focus(vm.comparison);
                   // fit(graphAll.nodes);
                     },800);
@@ -286,7 +288,11 @@
           
 
           if (query.name === 'Creation relation') {
-            networkData.edges = networkData.nodes.map(function(n) {
+            networkData.edges = networkData.nodes
+            .filter(function(n) {
+              return parseInt(n.id) !== parseInt(node.id);
+            })
+            .map(function(n) {
               var pseudoEdge = { 
                 id: node.id + '-' + n.id,
                 startNode: node.id.toString(),
@@ -294,6 +300,7 @@
                 type: "CREATION"
               };
               return graphService.graphEdgeFromNeoEdge(pseudoEdge);
+
             });
           }
 

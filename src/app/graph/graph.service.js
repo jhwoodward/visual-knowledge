@@ -66,7 +66,7 @@
 
         queries.push({
           name: 'Creation relation',
-            q: ` match (n:Person {Label:'${label}'}) <- [:BY] - (c1:Creation) - [r] - (c2:Creation) - [:BY] -> (m:Person)
+            q: ` match (n:Person {Lookup:'${label}'}) <- [:BY] - (c1:Creation) - [r] - (c2:Creation) - [:BY] -> (m:Person)
                   return n,m `
         });
 
@@ -176,12 +176,12 @@
 
       queries.push({
         name: 'All immediate relationships',
-        q: `MATCH (c)-[r]-(d:Label) where ID(c) = ${node.id} return c,d,r`
+        q: `MATCH (c)-[r]-(d:Label) where ID(c) = ${node.id} and type(r) <> 'INSTANCE_OF' return c,d,r`
       });
 
       queries.push({
         name: 'Self',
-        q: `MATCH (c:${label})-[r]-(d:${label}) return c,d,r`
+        q: `MATCH (c:${label})-[r]-(d:${label}) WHERE  type(r) <> 'INSTANCE_OF' return c,d,r`
       });
 
       return queries;
@@ -238,6 +238,7 @@
         color: {
           background: neoNode.isPerson() ? '#5a9cd6' : 'transparent',
           highlight: neoNode.isPerson() ? '#fff' : 'transparent',
+          hover:  neoNode.isPerson() ? '#fff' : 'transparent',
           border: 'transparent'
         },
         labelHighlightBold: false,
@@ -305,6 +306,7 @@
       var edge = {
         data: neoEdge,
         id: neoEdge.id,
+        width: 1,
         title: label,
         from: neoEdge.startNode,
         to: neoEdge.endNode,
@@ -317,7 +319,8 @@
         color: {
           color: colour,
           opacity: 0.5,
-          highlight: '#fff'
+          highlight: '#fff',
+          hover: '#fff'
         },
         hidden: hidden, 
         arrows: directional ? 'to' : undefined,

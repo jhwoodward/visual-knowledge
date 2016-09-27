@@ -31,7 +31,7 @@
             });
 
             $timeout(function() {
-              element.find('.complete').remove();
+             // element.find('.complete').remove();
               element.find('.image.layer').addClass('complete');
             }, 1000);
           });

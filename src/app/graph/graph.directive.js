@@ -8,32 +8,37 @@
   function directive(graphService, stateManager, $window, $timeout, _) {
    
     var options = {
-      configure: {enabled:true},
-
-        edges: { hoverWidth: function (width) {return width+4;}
-          },
-
-        layout: {
-          improvedLayout:true,
-          hierarchical: {
+      configure: { enabled: true },
+      interaction: {
+        hover: true,
+        hoverConnectedEdges:true
+      },
+      edges: { 
+        hoverWidth: function (width) {
+          return width + 5;
+        }
+      },
+      layout: {
+        improvedLayout: true,
+        hierarchical: {
           enabled: false,
           levelSeparation: 10, // make this inversely proportional to number of nodes
           nodeSpacing: 200,
           direction: 'UD', //LR
                   //    layout: "hubsize"
         }
-        },
-        manipulation: {
-          enabled: true,
-          initiallyActive: true
-        },
-        physics: {
-             minVelocity:0.2,
-             maxVelocity:10,
-             barnesHut: {
-               damping:0.2
-             }
-         }
+      },
+      manipulation: {
+        enabled: true,
+        initiallyActive: true
+      },
+      physics: {
+            minVelocity:0.2,
+            maxVelocity:10,
+            barnesHut: {
+              damping:0.2
+            }
+        }
               // stabilize: true,
               // stabilizationIterations: 1000,
               /*
@@ -105,6 +110,7 @@
       }
 
       function focus() {
+        console.log('resize focus');
         vm.focus(vm.comparison || vm.node);
       }
 
