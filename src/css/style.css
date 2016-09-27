@@ -562,29 +562,44 @@ label {
   left: 0;
 }
 
-.panel, .panel .image, .panel .nav-tabs {
+.panel, .panel .image, 
+.panel .nav-tabs {
   width: 408px;
 }
 
-.panel.panel-wide, .panel.panel-wide .image, .panel.panel-wide .nav-tabs {
+.panel.panel-wide, 
+.panel.panel-wide .image, 
+.panel.panel-wide .nav-tabs {
   width: 33.3vw;
 }
-.panel.panel-wide .search-box,.panel.panel-wide .search-box-inner  {
+.panel.panel-wide .search-box,
+.panel.panel-wide .search-box-inner  {
    width: calc(33.3vw - 18px);
 }
 
-.panel.panel-half, .panel.panel-half .image, .panel.panel-half .nav-tabs,  .panel.panel-half .search-box  {
+.panel.panel-half, 
+.panel.panel-half .image, 
+.panel.panel-half .nav-tabs,  
+.panel.panel-half .search-box  {
   width: 50vw;
 }
 
-.panel.panel-half .search-box-inner,.panel.panel-half .search-box   {
+.panel.panel-half .panel-toggle-button-container {
+  display: none;
+}
+
+.panel.panel-half .search-box-inner,
+.panel.panel-half .search-box   {
   width: calc(50vw - 18px);
 }
 
-.panel.panel-full, .panel.panel-full .image, .panel.panel-full .nav-tabs {
+.panel.panel-full, 
+.panel.panel-full .image, 
+.panel.panel-full .nav-tabs {
   width: 100vw;
 }
-.panel.panel-full .search-box, .panel.panel-full .search-box-inner {
+.panel.panel-full .search-box, 
+.panel.panel-full .search-box-inner {
   width: calc(100vw - 18px);
 }
 
@@ -595,7 +610,8 @@ label {
   display:none;
 }
 
-.panel.panel-full .search-box, .panel.panel-half .search-box {
+.panel.panel-full .search-box,
+.panel.panel-half .search-box {
   display:none;
 }
 
@@ -651,8 +667,10 @@ label {
     -webkit-transform: translateX(100vw);
     transform: translateX(100vw);
 }
-
-.panel-collapsed .panel-toggle-button {
+ .panel-toggle-button i {
+   display:block;
+ }
+.panel-collapsed .panel-toggle-button i {
     -webkit-transform: scaleX(-1);
     transform: scaleX(-1);
 }
@@ -667,9 +685,7 @@ label {
     transition: 200ms opacity linear;
 }
 
-.panel-toggle-button-container.right {
-    left:0;
-}
+
 
 .panel-toggle-button {
     width: 23px;
@@ -686,8 +702,18 @@ label {
     opacity:0.8;
     color:#999;
     outline: none;
-
 }
+
+.panel-slide-right .panel-toggle-button-container {
+    left:-23px;
+}
+
+.panel-slide-right .panel-toggle-button {
+    border-radius: 2px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
 .search-box-container {
     top: 0;
     position: absolute;

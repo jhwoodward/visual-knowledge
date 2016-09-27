@@ -63,6 +63,13 @@
       }
 
      if (labels.indexOf('Person') > -1) {
+
+        queries.push({
+          name: 'Creation relation',
+            q: ` match (n:Person {Label:'${label}'}) <- [:BY] - (c1:Creation) - [r] - (c2:Creation) - [:BY] -> (m:Person)
+                  return n,m `
+        });
+
         queries.push({
           name: 'Outbound Influence',
           /*
@@ -73,20 +80,27 @@
               where  type(s) = 'INFLUENCES'  OR type(s) = 'INSPIRES'    
               return c,d,r,s,e `,*/
            q: `
-            MATCH (c {Label:'${label}'})-[r]->(d:Label)
+            MATCH (c:Person {Label:'${label}'})-[r]->(d:Label)
               where  type(r) = 'INFLUENCES'  OR type(r) = 'INSPIRES'   
-            return c,d,r `,
+              
+            return c,d,r limit 5 `,
           connectAll: false
         });
         queries.push({
           name: 'Inbound Influence',
+          /*
           q: `
             MATCH (c {Label:'${label}'})<-[r]-(d:Label) 
               where  type(r) = 'INFLUENCES'  OR type(r) = 'INSPIRES'  
             with c,d,r optional  match(d) <-[s]-(e:Label)   
               where  type(s) = 'INFLUENCES'  OR type(s) = 'INSPIRES'  
               return c,d,r,s,e 
-            `,
+            `,*/
+          q: `
+            MATCH (c:Person {Label:'${label}'})<-[r]-(d:Label) 
+              where  type(r) = 'INFLUENCES'  OR type(r) = 'INSPIRES'  
+           
+             return c,d,r limit 5 `,
           connectAll: false
         });
       }
@@ -200,28 +214,38 @@
       if (y > endYear) {
         level = cnt;
       }
+
+      var largeText = neoNode.isProvenance() || 
+                    neoNode.isPeriod() || 
+                    neoNode.hasType('Group') || 
+                    neoNode.hasType('Iconography') || 
+                    neoNode.hasType('Theme');
       
       var node = {
+        largeText: largeText,
         data: neoNode,
         id: neoNode.id,
         label: neoNode.hasType('Quotation') ? neoNode.text : neoNode.label || neoNode.lookup,
-        mass: neoNode.hasType('Group') ? 0.5 : 1,
-        radius: neoNode.isPerson() ? (neoNode.status * 2) ^ 3 : 1,
+        mass:  largeText ? 2 : 1,//increase value to increase repulsion
+        size: neoNode.isPerson() ? (neoNode.status * 2) ^ 3 : 1,
+        title:  neoNode.label,
         // for hiearchichal layout,
         //level,
-        group: neoNode.type ? neoNode.type.lookup : 'Type',
+    //    group: neoNode.type ? neoNode.type.lookup : 'Type',
         borderWidth: 0,
-        shape: neoNode.isPerson() ? 'dot' : 'box',
+        borderWidthSelected: 0,
+        shape: neoNode.isPerson() ? 'dot': 'box',
         color: {
           background: neoNode.isPerson() ? '#5a9cd6' : 'transparent',
-          highlight: {
-            background: '#fff'
-          },
+          highlight: neoNode.isPerson() ? '#fff' : 'transparent',
           border: 'transparent'
         },
-        fontColor: (neoNode.isProvenance() || neoNode.isPeriod()) ? '#76a1c5' : '#3e82bd',
-        fontSize:  (neoNode.isProvenance() || neoNode.isPeriod()) ? 100 : 16,
-        fontFill: '#8fb1ca'
+        labelHighlightBold: false,
+        font: {
+          color: largeText ? '#76a1c5' : '#3e82bd',
+          size:  largeText ? 30 : 16
+          ,background: largeText ? 'transparent' : '#8fb1ca' 
+        }
       };
 
 /*
@@ -238,8 +262,9 @@
     function graphEdgeFromNeoEdge(neoEdge) {
 
       var type = neoEdge.type;
-      var symmetrical = type === 'ASSOCIATED_WITH';
+      var directional = type === 'INFLUENCES' || type === 'INSPIRES' || type === 'TEACHES';
       var hideLabel =
+              type === 'CREATION' ||
               type === 'BY' ||
               type === 'INFLUENCES' ||
               type === 'INSPIRES' ||
@@ -261,32 +286,48 @@
 
       var colour, fontColour;
       switch (type) {
+        case 'CREATION':
+          colour = '#fff';
+          break;
         case 'FROM':
         case 'ACTIVE_DURING':
           colour = 'transparent';
           break;
         default:
-          colour = '#76a1c5';
-          fontColour = '#76a1c5';
+          colour = '#3e82bd';
+          fontColour = '#3e82bd';
       }
 
-      var hideEdge = type === 'FROM' || type === 'ACTIVE_DURING';
+      var hidden = type === 'FROM' || type === 'ACTIVE_DURING';
+     
 
+      var label = type.toLowerCase().replace(/_/g,' ')
       var edge = {
+        data: neoEdge,
         id: neoEdge.id,
+        title: label,
         from: neoEdge.startNode,
         to: neoEdge.endNode,
-        label: hideLabel ? null : type.toLowerCase().replace(/_/g,' '),
-        fontColor: fontColour,
+        label: hideLabel ? undefined : label,
+        font: {
+          color: fontColour,
+          background: '#8fb1ca',
+          strokeWidth: 0
+        },
         color: {
           color: colour,
+          opacity: 0.5,
           highlight: '#fff'
         },
-        fontFill: '#8fb1ca',
-        opacity: hideEdge ? 0 : 1, 
-        style: symmetrical ? 'dash-line' : 'arrow', // arrow-center' ,
-        type: ['curved'],
-        labelAlignment: 'line-center'
+        hidden: hidden, 
+        arrows: directional ? 'to' : undefined,
+        arrowStrikethrough: false,
+        dashes: !directional, // arrow-center' ,
+        smooth: {
+          type: 'dynamic'
+        },
+        labelHighlightBold: false
+
       };
       return edge;
     };
@@ -314,7 +355,8 @@
           })
         };
       },
-      graphNodeFromNeoNode: graphNodeFromNeoNode
+      graphNodeFromNeoNode: graphNodeFromNeoNode,
+      graphEdgeFromNeoEdge: graphEdgeFromNeoEdge
     };
   }
 

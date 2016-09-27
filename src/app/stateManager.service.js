@@ -38,12 +38,22 @@
         });
     }
 
+    function getComparisons() {
+      if (state.node && state.comparison) {
+        neo.getVisual(state.node, state.comparison)
+          .then(function(comparisons) {
+            state.pairedPictures = comparisons;
+            raiseEvent('pairedPictures');
+          });
+      }
+    }
+
     var api = {
       go: {
         node: function (node) {
           if (node && node.label) {
             $state.go('explore.node', { node: node.label });
-          //  api.clearComparison();
+            api.clearComparison();
           } 
         },
         comparison: function (node) {
@@ -69,6 +79,23 @@
           getPictures(node).then(function(pictures) {
             state.nodePictures = pictures;
             raiseEvent('nodePictures');
+            getComparisons();
+          });
+
+        
+
+          return node;
+        });
+      },
+      compare: function(id) {
+        return nodeService.get(id).then(function (node) {
+          state.comparison = node;
+          raiseEvent('comparison');
+
+          getPictures(node).then(function(pictures) {
+            state.comparisonPictures = pictures;
+            raiseEvent('comparisonPictures');
+            getComparisons();
           });
 
           return node;
@@ -94,18 +121,7 @@
         state.comparisonEditing = editing;
         raiseEvent('editing');
       },
-      compare: function(id) {
-        return nodeService.get(id).then(function (node) {
-           state.comparison = node;
-           raiseEvent('comparison');
-
-          getPictures(node).then(function(pictures) {
-            state.comparisonPictures = pictures;
-            raiseEvent('comparisonPictures');
-          });
-           return node;
-        });
-      },
+     
       new: function () {
         state.node = nodeService.create();
         state.nodeEditing = true;

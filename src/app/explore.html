@@ -24,17 +24,21 @@
         class="btn ion-arrow-swap" 
         ng-click="vm.swapNodes()">
       </button> 
-      <button 
-      class="btn ion-eye" 
-      ng-click='vm.viewPictures()'>
+      <button ng-class="{
+        'ion-code': vm.pairedPictures.length,
+        'ion-eye': !vm.pairedPictures.length
+        }"
+        class="btn" 
+        ng-click='vm.viewPictures()'>
       </button>
 
   </search>
 
   <div class="panel-toggle-button-container"> 
     <button 
-      class="panel-toggle-button ion-arrow-left-b" 
+      class="panel-toggle-button" 
       ng-click="vm.toggleLeftPanel()">
+      <i class="ion-arrow-left-b"></i>
     </button> 
   </div>
 
@@ -48,7 +52,7 @@
 
 <div class="panel panel-slide-right" 
     ng-class="{
-    'panel-collapsed': !vm.comparison.id,
+    'panel-collapsed': !(vm.rightPanelVisible),
     'panel-editing': vm.rightPanelEditing,
     'panel-tabs-active' :vm.comparisonActiveTab != undefined,
     'panel-half' : vm.rightPanelHalf,
@@ -63,8 +67,11 @@
         class="btn ion-arrow-swap" 
         ng-click="vm.swapNodes()">
       </button> 
-      <button 
-        class="btn ion-eye" 
+      <button  ng-class="{
+        'ion-code': vm.pairedPictures.length,
+        'ion-eye': !vm.pairedPictures.length
+        }"
+        class="btn" 
         ng-click='vm.viewPictures()'>
       </button>
 
@@ -74,7 +81,13 @@
   <node-image-display url="vm.comparisonImageUrl">
   </node-image-display>
 
-
+  <div class="panel-toggle-button-container"> 
+      <button 
+        class="panel-toggle-button" 
+        ng-click="vm.toggleRightPanel()">   
+        <i class="ion-arrow-right-b"></i>
+      </button> 
+    </div>
 
 
   <ui-view name="rightpanel"></ui-view>

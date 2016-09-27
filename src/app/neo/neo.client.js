@@ -114,8 +114,7 @@
         url: root + '/edge/imagerelationships',
         method: 'POST'
       }
-    })
-        ,
+    }),
     user:$resource(null, null, {
       saveFavourite: {
         url: root + '/user/saveFavourite',
@@ -127,23 +126,19 @@
         url: root + '/user/:user',
         method: 'GET'
       }
-    })
-        ,
+    }),
     graph: $resource(null, null, {
       get: {
         url: root + '/graph',
-
         method: 'POST'
       }
-    })
-            ,
+    }),
     type: $resource(null, null, {
       getAll: {
         url: root + '/types',
         method: 'GET'
       }
-    })
-        ,
+    }),
     predicate: $resource(null, null, {
       getAll: {
         url: root + '/predicates',
@@ -171,7 +166,12 @@
       allshortest: {
         url: root + '/relationships/allshortest/:from/:to',
         method: 'GET'
-      }
+      },
+      visual: {
+        url: root + '/relationships/visual/:from/:to',
+        method: 'GET',
+        isArray:true
+      },
     })
 
   };

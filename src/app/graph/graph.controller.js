@@ -12,105 +12,146 @@
       nodes: new vis.DataSet(),
       edges: new vis.DataSet()
     };
-    vm.data = {
-      nodes: {},
-      edges: {}
-    };
 
     vm.onSelect = onSelect;
-    vm.node = {};
-    vm.comparison = {};
-    vm.graphs = [];
-    vm.selectedGraph = {};
-    vm.selectedNode = undefined;
-    vm.selectedEdges = [];
+    vm.loadedNode = {};
+    vm.loadedComparison = {};
     vm.graphql = graphql;
+    vm.focus = focus;
+
 
     activate();
 
     function activate() {
-      $scope.$watch('vm.node', loadNode);
-      $scope.$watch('vm.comparison', loadNode);
-      $scope.$watch('vm.selectedGraph', onSelectedGraphChanged);
+      $scope.$watch('vm.node', function(node) {
+        if (node && node.id && node.id != vm.loadedNode.id) {
+          vm.loadedNode = node;
+          loadNode(node);
+        }
+      });
+
+      $scope.$watch('vm.comparison', function(node) {
+        if (node && node.id && node.id != vm.loadedComparison.id) {
+          vm.loadedComparison = node;
+          loadNode(node);
+        }
+      });
+        
     }
 
     function loadNode(node) {
-      if (node && node.id) {
+      $timeout(function() {
+        console.log(node.lookup,'load')
         loadGraphData(node);
-        loadShortestPaths();
-      }
+        loadConnections();
+      })
+  
     }
 
-    function loadShortestPaths() {
-      if (vm.node && vm.comparison) {
-        neo.allShortest(vm.node.lookup, vm.comparison.lookup)
-          .then(function (data) {
-            console.log(data,'all shortest');
-            onInput(data);
-          });
-      }
-    }
 
-    function highlightShortest() {
-      clearHighlight();
-      neo.allShortest(vm.node.lookup, vm.comparison.lookup)
-        .then(function(data) {
-          highlight(data, '#5696ce');
-
-          neo.shortest(vm.node.lookup, vm.comparison.lookup)
-            .then(function(data) {
-              highlight(data, '#3e82bd');
-            });
-
+    function focus(node) {
+      if (node) {
+        vm.vis.focus(node.id, {
+          //scale: 1.5,
+          animation: {
+            duration: 2000,
+            easingFunction: 'easeInOutCubic'
+          }
         });
+      }
+    }
 
+    var darkBlue = '#1a5d98';
+
+    var loadedConnection=[];
+
+    function loadConnections() {
+      if (vm.node && vm.comparison) {
+
+        if (loadedConnection.indexOf(vm.node.id) === -1 || 
+          loadedConnection.indexOf(vm.comparison.id) === -1) {
+
+          neo.allShortest(vm.node.lookup, vm.comparison.lookup)
+            .then(function(all) {
+          
+              neo.shortest(vm.node.lookup, vm.comparison.lookup)
+                .then(function(shortest) {
+                  clearHighlight();
+                  var graphAll = graphService.toVisNetworkData(all);
+                  highlight(graphAll, '#3373ab');//#5696ce
+                  highlight(graphService.toVisNetworkData(shortest), darkBlue);//#3e82bd
+
+
+                  loadedConnection = [vm.node.id, vm.comparison.id];
+
+
+                  $timeout(function(){
+                    focus(vm.comparison);
+                  // fit(graphAll.nodes);
+                    },800);
+                });
+            });
+        }
+      }
+    }
+
+    function fit(nodes) {
+      vm.vis.fit({
+        nodes: nodes.map(function(n){return n.id;}),
+        //optionally supply array of node ids
+        animation: {
+              duration: 2000, easingFunction: 'easeInOutCubic'
+        }
+      
+      });
     }
 
     function clearHighlight() {
-       var highlightedNodes = vm.graph.nodes.get({filter: function(node) {return node.highlighted;}});
-      highlightedNodes.forEach(function(n) {
-        _.extend(n,graphService.graphNodeFromNeoNode(n.data));
-        vm.graph.nodes.update(n);
+      var highlightedNodes = vm.graph.nodes.get({filter: function(node) {return node.highlighted;}});
+      highlightedNodes.forEach(function(node) {
+        node.highlighted = false;
+        _.extend(node,graphService.graphNodeFromNeoNode(node.data));
+        vm.graph.nodes.update(node);
       });
       var highlightedEdges = vm.graph.edges.get({filter: function(edge) {return edge.highlighted;}});
       highlightedEdges.forEach(function(edge) {
-        edge.color = '#76a1c5';
         edge.highlighted = false;
+        _.extend(edge, graphService.graphEdgeFromNeoEdge(edge.data));
         vm.graph.edges.update(edge);
       });
     }
 
     function highlight(data, colour) {
 
-      Object.keys(data.nodes).forEach(function(node) {
-        var n = vm.graph.nodes.get(node);
-        if (n) {
-          if (n.data.isPerson()) {
-            n.color = { background:  colour };
-          }
-          n.fontColor = colour;
-
-          if (parseInt(n.id) === parseInt(vm.node.id) || 
-            parseInt(n.id) === parseInt(vm.comparison.id)) {
-              n.fontSize = 24;
-          }
-       
-          n.highlighted = true;
-          vm.graph.nodes.update(n);
-        }
+      data.nodes.forEach(function(node) {
+        highlightNode(node, colour);
+        vm.graph.nodes.update(node);
       });
 
-      Object.keys(data.edges).forEach(function(edge) {
-        var e = vm.graph.edges.get(edge);
-        if (e) {
-          e.color = colour;
-          e.highlighted = true;
-          vm.graph.edges.update(e);
-        }
+      data.edges.forEach(function(edge) {
+        edge.color = colour;
+        edge.highlighted = true;
+        vm.graph.edges.update(edge);
       });
 
+    }
 
-    //  vm.network.selectEdges(Object.keys(data.edges));
+    function highlightNode(node, colour) {
+      if (node.data.isPerson()) {
+        node.color = { background:  colour };
+      }
+      if (!node.largeText) {
+        node.font.color = colour;
+      } else {
+        node.font.color = '#5696ce';
+      }
+    
+      if (parseInt(node.id) === parseInt(vm.node.id) || 
+        parseInt(node.id) === parseInt(vm.comparison.id)) {
+          node.font.size = 24;
+      }
+      node.highlighted = true;
+      return node;
     }
     
 
@@ -145,78 +186,129 @@
       });
     }
 
-    var newnodes = [];
-    var newedges = [];
+ 
+  
 
-    function onInput(inputData)  {
-      console.log(vm.data);
+    function onInput(graph)  {
 
-      _.extend(vm.data.nodes, inputData.nodes);
-      _.extend(vm.data.edges, inputData.edges);
-      var gArr = graphService.toVisNetworkData(vm.data);
-      if (vm.graph.nodes && vm.graph.nodes.length) {
-        newnodes = gArr.nodes.filter(function(node) {
-          return !vm.graph.nodes._getItem(node.id);
-        });
-        newedges = gArr.edges.filter(function(edge) {
-          return !vm.graph.edges._getItem(edge.id);
-        });
-        addNewNodes();
-      } else {
-        vm.graph.nodes.add(gArr.nodes);
-        vm.graph.edges.add(gArr.edges);
+      if (!vm.graph.nodes.length) {
+        vm.graph.nodes.add(graph.nodes);
+        vm.graph.edges.add(graph.edges);
+
+        var currentNode = vm.graph.nodes.get({ 
+          filter: function(node) { 
+          return parseInt(vm.node.id) == parseInt(node.id); } 
+        })[0];
+        highlightNode(currentNode, darkBlue);
+        vm.graph.nodes.update(currentNode);
+
+        return;
       }
+
+      new Queue(vm.graph, graph).next();
+
     }
 
-    function addNewNodes() {
-      console.log('new nodes');
-      if (newnodes.length) {
-        var node = newnodes.pop();
-        var edges = newedges.filter(function(e) { 
+    function Queue(existing, adding) {
+      this.adding = adding;
+      this.existing = existing;
+      this.newnodes = adding.nodes.filter(function(node) {
+        return !existing.nodes.get(node.id);
+      });
+      this.newedges = adding.edges.filter(function(edge) {
+        return !existing.edges.get(edge.id);
+      });
+    }
+    Queue.prototype.next = function() {
+      if (this.newnodes.length) {
+        var node = this.newnodes.pop();
+        var edges = this.newedges.filter(function(e) { 
+
+//really need to be able to make the spring slacker to avoid reshaping the graph to much when new nodes are added that link to existing ones
+/*
+          if (vm.graph.nodes.get(e.from) || vm.graph.nodes.get(e.to) ) {
+            console.log('setting length');
+            e.length = 3;
+          } else {
+            e.length  =1;
+          }
+*/
           return e.from === node.id || e.to === node.id;
         });
-        newedges = newedges.filter(function(e) {
+
+        if (this.adding.sourceType === 'node') {
+          node.source = this.adding.source.id;
+          var pos = vm.vis.getPositions([node.source]);
+          if (pos && pos[node.source]) {
+            node.x = pos[node.source].x;
+            node.y = pos[node.source].y;
+          }
+        }
+
+       
+
+        this.existing.nodes.update(node);
+        this.existing.edges.update(edges);
+        this.newedges = this.newedges.filter(function(e) {
           return  e.from !== node.id && e.to !== node.id;
         });
-        vm.graph.nodes.add(node);
-        vm.graph.edges.add(edges);
-      } else if (newedges.length) {
-          vm.graph.edges.add(newedges);
-      }
-      if (newnodes.length) {
-        $timeout(addNewNodes, 200);
+        $timeout(this.next.bind(this),200);
       } else {
-        highlightShortest();
+        this.existing.edges.update(this.newedges);
       }
     }
 
- 
 
     function loadGraphData(node) {
-      console.log(node,'load graph');
-
-      
-      vm.graphs = graphService.getQueries(node);
-      console.dir(vm.graphs);
-      if (vm.graphs && vm.graphs.length) {
-        vm.selectedGraph = vm.graphs[0];
+      var queries = graphService.getQueries(node);
+      if (queries && queries.length) {
+        executeQuery(node, queries, 0);
       }
     }
 
+    function executeQuery(node, queries, index) {
 
-    function onSelectedGraphChanged(graph) {
-      if (graph) {
-        getData(graph).then(function(newData) {
-          if (Object.keys(newData.nodes).length === 0) {
-            console.log('no results for ' + graph.q);
-            tryNextGraph();
-          } else {
-            onInput(newData);
-          }
+      if (index > queries.length -1) {
+        return;
+      }
+
+      var query = queries[index];
+
+      getData(query).then(function(data) {
+
+        var networkData = graphService.toVisNetworkData(data);
+
+        var newnodes = networkData.nodes.filter(function(node) {
+          return !vm.graph.nodes.get(node.id.toString());
         });
-      }
-    }
 
+        if (newnodes.length) {
+          
+
+          if (query.name === 'Creation relation') {
+            networkData.edges = networkData.nodes.map(function(n) {
+              var pseudoEdge = { 
+                id: node.id + '-' + n.id,
+                startNode: node.id.toString(),
+                endNode: n.id.toString(),
+                type: "CREATION"
+              };
+              return graphService.graphEdgeFromNeoEdge(pseudoEdge);
+            });
+          }
+
+          var graph = {
+            sourceType: 'node',
+            source: graphService.graphNodeFromNeoNode(node),
+            nodes: networkData.nodes,
+            edges: networkData.edges
+          };
+          onInput(graph);
+        } else {
+          executeQuery(node, queries, index + 1);
+        }
+      });
+    }
 
     function tryNextGraph() {
       var currentGraphIndex = -1;
@@ -240,8 +332,9 @@
     }
 
     function getData(query) {
-      return neo.getGraph(query.q, false)
+      return neo.getGraph(query.q, false, 3)
         .then(function(data) {
+
           if (query.connectAll) {
             return connectAll(data);
           } else {
@@ -255,10 +348,15 @@
       if (selection.node) {
         if (vm.comparison && parseInt(selection.node.id) === parseInt(vm.comparison.id)) {
           stateManager.go.node(selection.node);
-        } else {
+        } else if (parseInt(selection.node.id) !== parseInt(vm.node.id)){
           stateManager.go.comparison(selection.node);
         }
-      } 
+      } else {
+        if (selection.edges && selection.edges.length === 1) {
+          stateManager.go.compare(selection.edges[0].from, selection.edges[0].to);
+        }
+      }
+    
 
     }
 

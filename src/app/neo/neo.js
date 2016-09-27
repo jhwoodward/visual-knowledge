@@ -51,6 +51,7 @@
                 n.type = types[n.class];
               });
             }
+            console.log(out);
             return out;
           });
         });
@@ -77,6 +78,13 @@
       return neoClient.node.getRelationships({ id: id })
         .$promise.then(function (data) {
           return data.toJSON();
+        });
+    },
+    getVisual: function (from, to) {
+      return neoClient.relationship.visual({ from:from.lookup, to: to.lookup })
+        .$promise.then(function (data) {
+          
+          return data;
         });
     },
     searchPictures : function(query, options) {
