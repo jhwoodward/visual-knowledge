@@ -11,11 +11,11 @@
       configure: { enabled: true },
       interaction: {
         hover: true,
-        hoverConnectedEdges:true
+        hoverConnectedEdges:false
       },
       edges: { 
         hoverWidth: function (width) {
-          return width + 5;
+          return width + 2;
         }
       },
       layout: {
@@ -34,7 +34,7 @@
       },
       physics: {
             minVelocity:0.2,
-            maxVelocity:10,
+            maxVelocity:5,
             barnesHut: {
               damping:0.2
             }
@@ -95,6 +95,7 @@
       angular.element($window).on('resize', setGraphSize);
       vm.vis.on('resize', focus);
       vm.vis.on('select', onSelect);
+      vm.vis.on('hoverNode', onHoverNode);
 
       function getSelectedNodeId() {
         var selectedNodes = vm.vis.getSelectedNodes();
@@ -124,7 +125,6 @@
           selection.edges = [];
           params.edges.forEach(function(id) {
             var edge = vm.graph.edges.get(id);
-            console.log(edge);
             var from = vm.graph.nodes.get(edge.from);
             var to = vm.graph.nodes.get(edge.to);
             selection.edges.push({
@@ -143,7 +143,13 @@
        
       }
 
-      
+      function onHoverNode(n) {
+       
+        var node = vm.getGraphNode(n.node);
+        console.log(node.queries);
+
+
+      }
       
       
 

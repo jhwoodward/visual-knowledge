@@ -244,8 +244,8 @@
         labelHighlightBold: false,
         font: {
           color: largeText ? '#76a1c5' : '#3e82bd',
-          size:  largeText ? 30 : 16
-          ,background: largeText ? 'transparent' : '#8fb1ca' 
+          size:  largeText ? 30 : 16,
+          background: largeText ? 'transparent' : '#8fb1ca'
         }
       };
 

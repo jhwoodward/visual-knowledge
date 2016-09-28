@@ -51,7 +51,6 @@
                 n.type = types[n.class];
               });
             }
-            console.log(out);
             return out;
           });
         });
