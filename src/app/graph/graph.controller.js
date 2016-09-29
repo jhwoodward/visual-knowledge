@@ -534,7 +534,7 @@
           return;
         }
 
-        if (selection.edges[0].from == vm.comparison.id) {
+        if (vm.comparison && selection.edges[0].from == vm.comparison.id) {
           stateManager.go.node(selection.edges[0].to);
           return;
         }
@@ -544,7 +544,7 @@
           return;
         }
 
-        if (selection.edges[0].to == vm.comparison.id) {
+        if (vm.comparison && selection.edges[0].to == vm.comparison.id) {
           stateManager.go.node(selection.edges[0].from);
           return;
         }
