@@ -1,40 +1,40 @@
 0 info it worked if it ends with ok
-1 verbose cli [ 'K:\\Program Files\\nodejs\\node.exe',
-1 verbose cli   'K:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli [ '/usr/local/Cellar/node/6.7.0/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
 1 verbose cli   'run',
 1 verbose cli   'dev' ]
-2 info using npm@3.6.0
-3 info using node@v5.7.0
+2 info using npm@3.10.7
+3 info using node@v6.7.0
 4 verbose run-script [ 'predev', 'dev', 'postdev' ]
 5 info lifecycle neograph-old@1.0.0~predev: neograph-old@1.0.0
 6 verbose lifecycle neograph-old@1.0.0~predev: unsafe-perm in lifecycle true
-7 verbose lifecycle neograph-old@1.0.0~predev: PATH: K:\Program Files\nodejs\node_modules\npm\bin\node-gyp-bin;K:\Dev\neograph\Neograph.Angular\node_modules\.bin;C:\Users\Julian\bin;K:\Program Files\Git\mingw64\bin;K:\Program Files\Git\usr\local\bin;K:\Program Files\Git\usr\bin;K:\Program Files\Git\usr\bin;K:\Program Files\Git\mingw64\bin;K:\Program Files\Git\usr\bin;C:\Users\Julian\bin;C:\ProgramData\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Microsoft Shared\Windows Live;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Program Files (x86)\ATI Technologies\ATI.ACE\Core-Static;C:\Program Files\Intel\DMIX;C:\Program Files (x86)\Microsoft ASP.NET\ASP.NET Web Pages\v1.0;C:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn;C:\Program Files\Microsoft SQL Server\100\Tools\Binn;C:\Program Files\Microsoft SQL Server\100\DTS\Binn;C:\Program Files\Common Files\Autodesk Shared;C:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\VSShell\Common7\IDE;C:\Program Files (x86)\Microsoft SQL Server\100\DTS\Binn;C:\Program Files\Microsoft SQL Server\110\Tools\Binn;C:\Program Files (x86)\Microsoft SQL Server\110\Tools\Binn;C:\Program Files\Microsoft SQL Server\110\DTS\Binn;C:\Program Files (x86)\Microsoft SQL Server\110\Tools\Binn\ManagementStudio;C:\Program Files (x86)\Microsoft SQL Server\110\DTS\Binn;C:\Program Files (x86)\QuickTime\QTSystem;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Skype\Phone;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\Program Files\Microsoft\Web Platform Installer;C:\Program Files (x86)\Autodesk\Backburner;K:\Program Files (x86)\Brackets\command;K:\Program Files\nodejs;C:\Users\Julian\.dnx\bin;C:\Program Files\Microsoft DNX\Dnvm;K:\Program Files\Git\cmd;C:\Users\Julian\.dnx\bin;C:\Program Files\Common Files\Microsoft Shared\Windows Live;K:\Java\bin;K:\Program Files (x86)\Microsoft VS Code\bin;K:\AppData\Roaming\npm;K:\Program Files\Git\cmd;K:\Program Files (x86)\Microsoft VS Code Insiders\bin;K:\Program Files\Git\usr\bin\vendor_perl;K:\Program Files\Git\usr\bin\core_perl
-8 verbose lifecycle neograph-old@1.0.0~predev: CWD: K:\Dev\neograph\Neograph.Angular
-9 silly lifecycle neograph-old@1.0.0~predev: Args: [ '/d /s /c', 'gulp build' ]
+7 verbose lifecycle neograph-old@1.0.0~predev: PATH: /usr/local/lib/node_modules/npm/bin/node-gyp-bin:/Users/julian/Documents/dev/neograph/angular/node_modules/.bin:/usr/local/Cellar/node/6.7.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/neo4j/bin
+8 verbose lifecycle neograph-old@1.0.0~predev: CWD: /Users/julian/Documents/dev/neograph/angular
+9 silly lifecycle neograph-old@1.0.0~predev: Args: [ '-c', 'gulp build' ]
 10 silly lifecycle neograph-old@1.0.0~predev: Returned: code: 0  signal: null
 11 info lifecycle neograph-old@1.0.0~dev: neograph-old@1.0.0
 12 verbose lifecycle neograph-old@1.0.0~dev: unsafe-perm in lifecycle true
-13 verbose lifecycle neograph-old@1.0.0~dev: PATH: K:\Program Files\nodejs\node_modules\npm\bin\node-gyp-bin;K:\Dev\neograph\Neograph.Angular\node_modules\.bin;C:\Users\Julian\bin;K:\Program Files\Git\mingw64\bin;K:\Program Files\Git\usr\local\bin;K:\Program Files\Git\usr\bin;K:\Program Files\Git\usr\bin;K:\Program Files\Git\mingw64\bin;K:\Program Files\Git\usr\bin;C:\Users\Julian\bin;C:\ProgramData\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Microsoft Shared\Windows Live;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Program Files (x86)\ATI Technologies\ATI.ACE\Core-Static;C:\Program Files\Intel\DMIX;C:\Program Files (x86)\Microsoft ASP.NET\ASP.NET Web Pages\v1.0;C:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn;C:\Program Files\Microsoft SQL Server\100\Tools\Binn;C:\Program Files\Microsoft SQL Server\100\DTS\Binn;C:\Program Files\Common Files\Autodesk Shared;C:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\VSShell\Common7\IDE;C:\Program Files (x86)\Microsoft SQL Server\100\DTS\Binn;C:\Program Files\Microsoft SQL Server\110\Tools\Binn;C:\Program Files (x86)\Microsoft SQL Server\110\Tools\Binn;C:\Program Files\Microsoft SQL Server\110\DTS\Binn;C:\Program Files (x86)\Microsoft SQL Server\110\Tools\Binn\ManagementStudio;C:\Program Files (x86)\Microsoft SQL Server\110\DTS\Binn;C:\Program Files (x86)\QuickTime\QTSystem;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Skype\Phone;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\Program Files\Microsoft\Web Platform Installer;C:\Program Files (x86)\Autodesk\Backburner;K:\Program Files (x86)\Brackets\command;K:\Program Files\nodejs;C:\Users\Julian\.dnx\bin;C:\Program Files\Microsoft DNX\Dnvm;K:\Program Files\Git\cmd;C:\Users\Julian\.dnx\bin;C:\Program Files\Common Files\Microsoft Shared\Windows Live;K:\Java\bin;K:\Program Files (x86)\Microsoft VS Code\bin;K:\AppData\Roaming\npm;K:\Program Files\Git\cmd;K:\Program Files (x86)\Microsoft VS Code Insiders\bin;K:\Program Files\Git\usr\bin\vendor_perl;K:\Program Files\Git\usr\bin\core_perl
-14 verbose lifecycle neograph-old@1.0.0~dev: CWD: K:\Dev\neograph\Neograph.Angular
-15 silly lifecycle neograph-old@1.0.0~dev: Args: [ '/d /s /c', 'gulp watch' ]
+13 verbose lifecycle neograph-old@1.0.0~dev: PATH: /usr/local/lib/node_modules/npm/bin/node-gyp-bin:/Users/julian/Documents/dev/neograph/angular/node_modules/.bin:/usr/local/Cellar/node/6.7.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/neo4j/bin
+14 verbose lifecycle neograph-old@1.0.0~dev: CWD: /Users/julian/Documents/dev/neograph/angular
+15 silly lifecycle neograph-old@1.0.0~dev: Args: [ '-c', 'gulp watch' ]
 16 silly lifecycle neograph-old@1.0.0~dev: Returned: code: 1  signal: null
 17 info lifecycle neograph-old@1.0.0~dev: Failed to exec dev script
 18 verbose stack Error: neograph-old@1.0.0 dev: `gulp watch`
 18 verbose stack Exit status 1
-18 verbose stack     at EventEmitter.<anonymous> (K:\Program Files\nodejs\node_modules\npm\lib\utils\lifecycle.js:232:16)
-18 verbose stack     at emitTwo (events.js:100:13)
-18 verbose stack     at EventEmitter.emit (events.js:185:7)
-18 verbose stack     at ChildProcess.<anonymous> (K:\Program Files\nodejs\node_modules\npm\lib\utils\spawn.js:24:14)
-18 verbose stack     at emitTwo (events.js:100:13)
-18 verbose stack     at ChildProcess.emit (events.js:185:7)
-18 verbose stack     at maybeClose (internal/child_process.js:827:16)
-18 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:211:5)
+18 verbose stack     at EventEmitter.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/lifecycle.js:255:16)
+18 verbose stack     at emitTwo (events.js:106:13)
+18 verbose stack     at EventEmitter.emit (events.js:191:7)
+18 verbose stack     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/spawn.js:40:14)
+18 verbose stack     at emitTwo (events.js:106:13)
+18 verbose stack     at ChildProcess.emit (events.js:191:7)
+18 verbose stack     at maybeClose (internal/child_process.js:877:16)
+18 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:226:5)
 19 verbose pkgid neograph-old@1.0.0
-20 verbose cwd K:\Dev\neograph\Neograph.Angular
-21 error Windows_NT 10.0.10586
-22 error argv "K:\\Program Files\\nodejs\\node.exe" "K:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "run" "dev"
-23 error node v5.7.0
-24 error npm  v3.6.0
+20 verbose cwd /Users/julian/Documents/dev/neograph/angular
+21 error Darwin 15.6.0
+22 error argv "/usr/local/Cellar/node/6.7.0/bin/node" "/usr/local/bin/npm" "run" "dev"
+23 error node v6.7.0
+24 error npm  v3.10.7
 25 error code ELIFECYCLE
 26 error neograph-old@1.0.0 dev: `gulp watch`
 26 error Exit status 1

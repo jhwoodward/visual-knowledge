@@ -23,7 +23,6 @@
     node:$resource(null, null, {
       search: {
         url: root + '/search',
-
         method: 'POST',
         isArray: true
       },
@@ -34,19 +33,6 @@
       getWithRels: {
         url: root + '/node/getWithRels/:id',
         method: 'GET',
-      } ,
-      getRelationships: {
-        url: root + '/node/relationships/:id',
-        method: 'GET',
-      },
-      getOne: {
-        url: root + '/node/single',
-        method: 'POST',
-      },
-      getList: {
-        url: root + '/node/list',
-        method: 'POST',
-        isArray:true
       },
       save: {
         url: root + '/node/save',
@@ -83,10 +69,6 @@
       restore: {
         url: root + '/node/restore',
         method: 'POST'
-      },
-      getProps: {
-        url: root + '/node/getProps',
-        method: 'POST'
       }
 
     }),
@@ -109,10 +91,6 @@
         url: root + '/edge/delete',
         method: 'POST'
 
-      },
-      getImageRelationships: {
-        url: root + '/edge/imagerelationships',
-        method: 'POST'
       }
     }),
     user:$resource(null, null, {
@@ -127,6 +105,12 @@
         method: 'GET'
       }
     }),
+     utils:$resource(null, null, {
+      getDistinctLabels: {
+        url: root + '/labels/distinct',
+        method: 'POST'
+      }
+    }),
     graph: $resource(null, null, {
       get: {
         url: root + '/graph',
@@ -135,7 +119,7 @@
     }),
     type: $resource(null, null, {
       getAll: {
-        url: root + '/types',
+        url: root + '/type/getall',
         method: 'GET'
       }
     }),
@@ -146,12 +130,6 @@
       }
     })
     ,
-    utils:$resource(null, null, {
-      getDistinctLabels: {
-        url: root + '/labels/distinct',
-        method: 'POST'
-      }
-    }) ,
     graphql:$resource(null, null, {
       query: {
         url: root + '/graphql',
@@ -160,15 +138,15 @@
     }),
     relationship:$resource(null, null, {
       shortest: {
-        url: root + '/relationships/shortest/:from/:to',
+        url: root + '/relationship/shortest/:from/:to',
         method: 'GET'
       },
       allshortest: {
-        url: root + '/relationships/allshortest/:from/:to',
+        url: root + '/relationship/allshortest/:from/:to',
         method: 'GET'
       },
       visual: {
-        url: root + '/relationships/visual/:from/:to',
+        url: root + '/relationship/visual/:from/:to',
         method: 'GET',
         isArray:true
       },

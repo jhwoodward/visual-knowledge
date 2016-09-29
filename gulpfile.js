@@ -15,6 +15,7 @@ gulp.task('build',['app-js','lib-js','lib-css','fonts','css','html-templates']);
   
 gulp.task('browser-sync', function() {
   browserSync.init({
+    browser: 'google chrome',
     server: {
       baseDir: 'dist'
     },

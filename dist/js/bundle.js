@@ -306,6 +306,7 @@
           vm.onToggleEdit = onToggleEdit;
 
           stateManager.load($stateParams.node).then(function(node) {
+            console.log(node);
             vm.node = node;
           });
 
@@ -519,6 +520,81 @@
 (function() {
 
   angular.module('templates', []);
+
+})();
+(function() {
+
+    controller.$inject = ["$scope"];
+    childController.$inject = ["$scope", "$stateParams"];
+  angular.module('neograph.edge.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
+    .controller('EdgeCtrl', controller)
+    .controller('ChildEdgeCtrl', childController);
+
+    function controller ($scope) {
+      var vm = this;
+      vm.tabs = ['Properties'];
+      vm.selectedTab = 'Properties';
+      vm.selectTab = function (tab) {
+        vm.selectedTab = tab;
+      };
+    }
+
+    function childController ($scope, $stateParams) {
+      var vm = this;
+      if ($stateParams.edge) {
+        vm.edge = JSON.parse($stateParams.edge);
+      }
+    }
+
+  })();
+
+(function() {
+
+  angular.module('neograph.edge', [
+    'neograph.edge.routes', 
+    'neograph.edge.controller',
+    'neograph.edge.edit.properties.controller'
+  ]);
+
+
+})();
+   
+(function() {
+
+  angular.module('neograph.edge.routes', ['neograph.neo', 'neograph.utils', 'ui.router'])
+    .config(["$stateProvider", function ($stateProvider) {
+      $stateProvider
+      .state('admin.edge', {
+        url:'/edge/:edge',
+        views: {
+          'panel@admin':{
+            templateUrl:'app/edge/edge.html',
+            controller: 'EdgeCtrl as vm'
+          },
+          'header@admin.edge':{
+            templateUrl:'app/edge/edge.header.html',
+            controller: 'EdgeCtrl as vm'
+          },
+          'properties@admin.edge':{
+            templateUrl:'app/edge/properties/edge.properties.html',
+            controller: 'ChildEdgeCtrl as vm'
+          }
+        }
+      })
+      .state('admin.edge.edit', {
+          url:'/edit',
+          views: {
+            'header@admin.edge':{
+              templateUrl:'app/edge/edge.edit.header.html',
+              controller: 'EdgeCtrl as vm'
+            },
+            'properties@admin.edge':{
+              templateUrl:'app/edge/properties/edge.edit.properties.html',
+              controller:'EditEdgeCtrl as vm'
+            }
+          }
+        });
+    }]);
 
 })();
 (function () {
@@ -1493,81 +1569,6 @@ angular.module('neograph.common.typeaheadSimple', [])
   };
 }]);
 
-(function() {
-
-    controller.$inject = ["$scope"];
-    childController.$inject = ["$scope", "$stateParams"];
-  angular.module('neograph.edge.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
-    .controller('EdgeCtrl', controller)
-    .controller('ChildEdgeCtrl', childController);
-
-    function controller ($scope) {
-      var vm = this;
-      vm.tabs = ['Properties'];
-      vm.selectedTab = 'Properties';
-      vm.selectTab = function (tab) {
-        vm.selectedTab = tab;
-      };
-    }
-
-    function childController ($scope, $stateParams) {
-      var vm = this;
-      if ($stateParams.edge) {
-        vm.edge = JSON.parse($stateParams.edge);
-      }
-    }
-
-  })();
-
-(function() {
-
-  angular.module('neograph.edge', [
-    'neograph.edge.routes', 
-    'neograph.edge.controller',
-    'neograph.edge.edit.properties.controller'
-  ]);
-
-
-})();
-   
-(function() {
-
-  angular.module('neograph.edge.routes', ['neograph.neo', 'neograph.utils', 'ui.router'])
-    .config(["$stateProvider", function ($stateProvider) {
-      $stateProvider
-      .state('admin.edge', {
-        url:'/edge/:edge',
-        views: {
-          'panel@admin':{
-            templateUrl:'app/edge/edge.html',
-            controller: 'EdgeCtrl as vm'
-          },
-          'header@admin.edge':{
-            templateUrl:'app/edge/edge.header.html',
-            controller: 'EdgeCtrl as vm'
-          },
-          'properties@admin.edge':{
-            templateUrl:'app/edge/properties/edge.properties.html',
-            controller: 'ChildEdgeCtrl as vm'
-          }
-        }
-      })
-      .state('admin.edge.edit', {
-          url:'/edit',
-          views: {
-            'header@admin.edge':{
-              templateUrl:'app/edge/edge.edit.header.html',
-              controller: 'EdgeCtrl as vm'
-            },
-            'properties@admin.edge':{
-              templateUrl:'app/edge/properties/edge.edit.properties.html',
-              controller:'EditEdgeCtrl as vm'
-            }
-          }
-        });
-    }]);
-
-})();
 (function() {
   'use strict';
   
@@ -3090,7 +3091,6 @@ angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
     node:$resource(null, null, {
       search: {
         url: root + '/search',
-
         method: 'POST',
         isArray: true
       },
@@ -3101,19 +3101,6 @@ angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
       getWithRels: {
         url: root + '/node/getWithRels/:id',
         method: 'GET',
-      } ,
-      getRelationships: {
-        url: root + '/node/relationships/:id',
-        method: 'GET',
-      },
-      getOne: {
-        url: root + '/node/single',
-        method: 'POST',
-      },
-      getList: {
-        url: root + '/node/list',
-        method: 'POST',
-        isArray:true
       },
       save: {
         url: root + '/node/save',
@@ -3150,10 +3137,6 @@ angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
       restore: {
         url: root + '/node/restore',
         method: 'POST'
-      },
-      getProps: {
-        url: root + '/node/getProps',
-        method: 'POST'
       }
 
     }),
@@ -3176,10 +3159,6 @@ angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
         url: root + '/edge/delete',
         method: 'POST'
 
-      },
-      getImageRelationships: {
-        url: root + '/edge/imagerelationships',
-        method: 'POST'
       }
     }),
     user:$resource(null, null, {
@@ -3194,6 +3173,12 @@ angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
         method: 'GET'
       }
     }),
+     utils:$resource(null, null, {
+      getDistinctLabels: {
+        url: root + '/labels/distinct',
+        method: 'POST'
+      }
+    }),
     graph: $resource(null, null, {
       get: {
         url: root + '/graph',
@@ -3202,7 +3187,7 @@ angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
     }),
     type: $resource(null, null, {
       getAll: {
-        url: root + '/types',
+        url: root + '/type/getall',
         method: 'GET'
       }
     }),
@@ -3213,12 +3198,6 @@ angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
       }
     })
     ,
-    utils:$resource(null, null, {
-      getDistinctLabels: {
-        url: root + '/labels/distinct',
-        method: 'POST'
-      }
-    }) ,
     graphql:$resource(null, null, {
       query: {
         url: root + '/graphql',
@@ -3227,15 +3206,15 @@ angular.module('neograph.neo.client', ['ngResource', 'neograph.settings'])
     }),
     relationship:$resource(null, null, {
       shortest: {
-        url: root + '/relationships/shortest/:from/:to',
+        url: root + '/relationship/shortest/:from/:to',
         method: 'GET'
       },
       allshortest: {
-        url: root + '/relationships/allshortest/:from/:to',
+        url: root + '/relationship/allshortest/:from/:to',
         method: 'GET'
       },
       visual: {
-        url: root + '/relationships/visual/:from/:to',
+        url: root + '/relationship/visual/:from/:to',
         method: 'GET',
         isArray:true
       },
@@ -4289,119 +4268,6 @@ angular.module('neograph.queryInput',
 
 
 (function() {
-    'use strict';
-  angular.module('neograph.node.multiple', ['neograph.neo', 'neograph.utils'])
-      .directive('multiple', ['neo', 'utils', function (neo, utils) {
-        return {
-          restrict: 'E',
-          templateUrl: 'app/node/multiple/node.multiple.html',
-          scope: {
-            nodes: '='
-          },
-          link: function ($scope) {
-
-            $scope.$watch('nodes', function (nodes) {
-
-              if (nodes) {
-                var allLabels = nodes.map(function (node) {
-                  return node.labels;
-                });
-
-                $scope.labels = allLabels.shift().filter(function (v) {
-                  return allLabels.every(function (a) {
-                    return a.indexOf(v) !== -1;
-                  });
-                });
-
-                $scope.originalLabels = angular.copy($scope.labels);// store for saving so we know what to change
-
-              }
-
-            });
-
-            $scope.addLabel = function (item) {
-
-              if ($scope.labels.indexOf(item.Label) === -1) {
-                $scope.labels.push(item.Label);
-              }
-            };
-            $scope.removeLabel = function (label) {
-
-              var ind = $scope.labels.indexOf(label);
-              if (ind > -1) {
-                $scope.labels.splice(ind, 1);
-              }
-
-            };
-
-            $scope.save = function () {
-              neo.saveMultiple({
-                nodes: $scope.nodes,
-                labels: $scope.labels,
-                originalLabels: $scope.originalLabels
-              });
-            };
-
-            $scope.restore = function () {
-              var restored = [];
-              angular.forEach($scope.nodes, function (node) {
-                neo.restoreNode(node).then(function () {
-                  restored.push(node);
-                  if (restored.length === $scope.nodes.length) {
-                    $scope.publish('restored', { selection: { nodes: restored } });
-                    $scope.selection.multiple = undefined;
-                    $scope.tabs = [];
-                  }
-                });
-              });
-            };
-
-            $scope.delete = function () {
-              var deleted = [];
-              angular.forEach($scope.nodes, function (node) {
-                neo.deleteNode(node).then(function () {
-                  deleted.push(node);
-                  if (deleted.length === $scope.nodes.length) {
-                    $scope.publish('deleted', { selection: { nodes: deleted } });
-                    $scope.selection.multiple = undefined;
-                    $scope.tabs = [];
-                  }
-                });
-              });
-            };
-
-            $scope.destroy = function () {
-              var deleted = [];
-              angular.forEach($scope.nodes, function (node) {
-                neo.destroyNode(node).then(function () {
-                  deleted.push(node);
-                  if (deleted.length === $scope.nodes.length) {
-                    $scope.publish('deleted', { selection: { nodes: deleted } });
-                    $scope.selection.multiple = undefined;
-                    $scope.tabs = [];
-                  }
-                });
-              });
-            };
-
-
-              // $scope.selection.multiple = new (function (nodes, labels) {
-              //    var self = this;
-              //    this.nodes = nodes;
-              //    this.labels = labels;
-
-
-
-
-
-              // })(params.selection.nodes, labels);
-
-          }
-        };
-      }]);
-})();
-
-(function() {
   'use strict';
 
   controller.$inject = ["neo", "modal"];
@@ -4650,6 +4516,119 @@ angular.module('neograph.queryInput',
     }
 
   }
+})();
+
+(function() {
+    'use strict';
+  angular.module('neograph.node.multiple', ['neograph.neo', 'neograph.utils'])
+      .directive('multiple', ['neo', 'utils', function (neo, utils) {
+        return {
+          restrict: 'E',
+          templateUrl: 'app/node/multiple/node.multiple.html',
+          scope: {
+            nodes: '='
+          },
+          link: function ($scope) {
+
+            $scope.$watch('nodes', function (nodes) {
+
+              if (nodes) {
+                var allLabels = nodes.map(function (node) {
+                  return node.labels;
+                });
+
+                $scope.labels = allLabels.shift().filter(function (v) {
+                  return allLabels.every(function (a) {
+                    return a.indexOf(v) !== -1;
+                  });
+                });
+
+                $scope.originalLabels = angular.copy($scope.labels);// store for saving so we know what to change
+
+              }
+
+            });
+
+            $scope.addLabel = function (item) {
+
+              if ($scope.labels.indexOf(item.Label) === -1) {
+                $scope.labels.push(item.Label);
+              }
+            };
+            $scope.removeLabel = function (label) {
+
+              var ind = $scope.labels.indexOf(label);
+              if (ind > -1) {
+                $scope.labels.splice(ind, 1);
+              }
+
+            };
+
+            $scope.save = function () {
+              neo.saveMultiple({
+                nodes: $scope.nodes,
+                labels: $scope.labels,
+                originalLabels: $scope.originalLabels
+              });
+            };
+
+            $scope.restore = function () {
+              var restored = [];
+              angular.forEach($scope.nodes, function (node) {
+                neo.restoreNode(node).then(function () {
+                  restored.push(node);
+                  if (restored.length === $scope.nodes.length) {
+                    $scope.publish('restored', { selection: { nodes: restored } });
+                    $scope.selection.multiple = undefined;
+                    $scope.tabs = [];
+                  }
+                });
+              });
+            };
+
+            $scope.delete = function () {
+              var deleted = [];
+              angular.forEach($scope.nodes, function (node) {
+                neo.deleteNode(node).then(function () {
+                  deleted.push(node);
+                  if (deleted.length === $scope.nodes.length) {
+                    $scope.publish('deleted', { selection: { nodes: deleted } });
+                    $scope.selection.multiple = undefined;
+                    $scope.tabs = [];
+                  }
+                });
+              });
+            };
+
+            $scope.destroy = function () {
+              var deleted = [];
+              angular.forEach($scope.nodes, function (node) {
+                neo.destroyNode(node).then(function () {
+                  deleted.push(node);
+                  if (deleted.length === $scope.nodes.length) {
+                    $scope.publish('deleted', { selection: { nodes: deleted } });
+                    $scope.selection.multiple = undefined;
+                    $scope.tabs = [];
+                  }
+                });
+              });
+            };
+
+
+              // $scope.selection.multiple = new (function (nodes, labels) {
+              //    var self = this;
+              //    this.nodes = nodes;
+              //    this.labels = labels;
+
+
+
+
+
+              // })(params.selection.nodes, labels);
+
+          }
+        };
+      }]);
 })();
 
 (function() {

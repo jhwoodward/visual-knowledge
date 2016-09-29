@@ -66,6 +66,7 @@
           vm.onToggleEdit = onToggleEdit;
 
           stateManager.load($stateParams.node).then(function(node) {
+            console.log(node);
             vm.node = node;
           });
 
