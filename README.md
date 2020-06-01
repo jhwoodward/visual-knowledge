@@ -2,6 +2,7 @@
 
 Visual knowledge management system
 
-http://52.56.227.23:50008/#/explore/corot
+http://art.visualsystems.org/#/explore/corot
 
+The images are temporarily unavailable pending a permissions issue.
 
