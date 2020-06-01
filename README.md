@@ -1,6 +1,6 @@
 # Visual Knowledge
 
-Visual knowledge management system
+A node graph GUI for exploring relatinships between artists and their influencers.
 
 http://art.visualsystems.org/#/explore/corot
 
