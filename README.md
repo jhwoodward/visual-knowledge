@@ -1,6 +1,6 @@
 # Visual Knowledge
 
-A node graph GUI for exploring relatinships between artists and their influencers.
+A node graph GUI for exploring relationships between artists and their influencers.
 
 http://art.visualsystems.org/#/explore/corot
 
