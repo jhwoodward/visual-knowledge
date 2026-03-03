@@ -1,61 +1,54 @@
 var gulp = require('gulp'),
     concat = require('gulp-concat'),
-    minify = require('gulp-minify-css'),
+    cleanCSS = require('gulp-clean-css'),
     uglify = require('gulp-uglify'),
     rename = require('gulp-rename'),
     sourcemaps = require('gulp-sourcemaps'),
     templateCache = require('gulp-angular-templatecache'),
     ngAnnotate = require('gulp-ng-annotate'),
-    babel = require('gulp-babel'),
-    runSequence = require('run-sequence');
-    
- var browserSync = require('browser-sync').create();
+    babel = require('gulp-babel');
 
-gulp.task('build',['app-js','lib-js','lib-css','fonts','css','html-templates']);
-  
-gulp.task('browser-sync', function() {
+var browserSync = require('browser-sync').create();
+
+function browserSyncTask(done) {
   browserSync.init({
     browser: 'google chrome',
     server: {
       baseDir: 'dist'
     },
-  })
-});
+  });
+  done();
+}
 
-gulp.task('watch',['browser-sync'],function(){
-  gulp.watch('src/app/**/*.js',['app-js']);
-  gulp.watch(['./src/css/style.css','./src/css/vis-custom.css'],['css']);
-  gulp.watch('src/**/*.html',['html-templates']);
-});
+function watchTask() {
+  gulp.watch('src/app/**/*.js', appJs);
+  gulp.watch(['./src/css/style.css', './src/css/vis-custom.css'], css);
+  gulp.watch('src/**/*.html', htmlTemplates);
+}
 
-gulp.task('clean',function(callback){
-    del(['./dist/css'],{force:true}).then(function(){
-      del(['./dist/js'],{force:true}).then(function(){
-          callback();
-       });
+function clean(callback) {
+  var del = require('del');
+  del(['./dist/css'], { force: true }).then(function () {
+    del(['./dist/js'], { force: true }).then(function () {
+      callback();
     });
-});
+  });
+}
 
-gulp.task('app-js', function(cb){
+function appJs() {
   return gulp.src('src/app/**/*.js')
-  // .pipe(sourcemaps.init())
-  //  .pipe(babel({presets: ['es2015']}))
     .pipe(ngAnnotate())
     .pipe(concat('bundle.js'))
-  //  .pipe(uglify())
-  //  .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./dist/js'))
     .pipe(browserSync.reload({
-    stream: true
-  }))
-});
+      stream: true
+    }));
+}
 
-
-gulp.task('lib-js', function(){
+function libJs() {
   return gulp.src([
     './lib/jquery/dist/jquery.js',
     './lib/bootstrap-typeahead.js',
-    
     './lib/vis/dist/vis.js',
     './lib/lodash/dist/lodash.js',
     './lib/angular/angular.js',
@@ -63,52 +56,53 @@ gulp.task('lib-js', function(){
     './lib/angular-sanitize/angular-sanitize.js',
     './lib/angular-animate/angular-animate.js',
     './lib/angular-ui-router/release/angular-ui-router.js',
-    './lib/angular-bootstrap/ui-bootstrap.js',
     './lib/angular-bootstrap/ui-bootstrap-tpls.js',
     './lib/jquery.debouncedresize/js/jquery.debouncedresize.js',
     './lib/jquery.masonry/jquery.masonry.js',
     './lib/jquery-ui/jquery-ui.js'
-    ])
-   // .pipe(sourcemaps.init())
+  ])
     .pipe(concat('bundle-lib.js'))
-   // .pipe(uglify())
-  //  .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./dist/js'));
-});
+}
 
-gulp.task('css', function(cb){
-  return gulp.src(['./src/css/style.css','./src/css/vis-custom.css'])
-    .pipe(minify())
+function css() {
+  return gulp.src(['./src/css/style.css', './src/css/vis-custom.css'])
+    .pipe(cleanCSS())
     .pipe(concat('bundle.css'))
     .pipe(gulp.dest('./dist/css'))
     .pipe(browserSync.reload({
       stream: true
-    }))
-});
+    }));
+}
 
-gulp.task('lib-css', function(cb){
+function libCss() {
   return gulp.src([
     './lib/bootstrap/dist/css/bootstrap.css',
     './lib/Ionicons/css/ionicons.css'
   ])
-    .pipe(minify())
+    .pipe(cleanCSS())
     .pipe(concat('bundle-lib.css'))
     .pipe(gulp.dest('./dist/css'));
-});
+}
 
-gulp.task('fonts', function() {
+function fonts() {
   return gulp.src([
     './lib/Ionicons/fonts/ionicons.*'
-    ])
+  ])
     .pipe(gulp.dest('./dist/fonts/'));
-});
+}
 
-gulp.task('html-templates', function () {
+function htmlTemplates() {
   return gulp.src('src/**/*.html')
-    .pipe(templateCache())
+    .pipe(templateCache({ module: 'templates', standalone: true, base: function(file) {
+      return file.relative;
+    }}))
     .pipe(gulp.dest('./dist/js'))
     .pipe(browserSync.reload({
       stream: true
     }));
-});
+}
 
+gulp.task('build', gulp.parallel(appJs, libJs, libCss, fonts, css, htmlTemplates));
+gulp.task('watch', gulp.series(browserSyncTask, watchTask));
+gulp.task('clean', clean);

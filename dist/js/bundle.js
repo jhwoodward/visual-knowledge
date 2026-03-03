@@ -355,7 +355,7 @@
     .factory('settings', function() { 
       
       return {
-        apiRoot: 'http://localhost:1337' 
+        apiRoot: 'https://graph.vsys.co.uk' 
       };
     
     });
@@ -520,81 +520,6 @@
 (function() {
 
   angular.module('templates', []);
-
-})();
-(function() {
-
-    controller.$inject = ["$scope"];
-    childController.$inject = ["$scope", "$stateParams"];
-  angular.module('neograph.edge.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
-    .controller('EdgeCtrl', controller)
-    .controller('ChildEdgeCtrl', childController);
-
-    function controller ($scope) {
-      var vm = this;
-      vm.tabs = ['Properties'];
-      vm.selectedTab = 'Properties';
-      vm.selectTab = function (tab) {
-        vm.selectedTab = tab;
-      };
-    }
-
-    function childController ($scope, $stateParams) {
-      var vm = this;
-      if ($stateParams.edge) {
-        vm.edge = JSON.parse($stateParams.edge);
-      }
-    }
-
-  })();
-
-(function() {
-
-  angular.module('neograph.edge', [
-    'neograph.edge.routes', 
-    'neograph.edge.controller',
-    'neograph.edge.edit.properties.controller'
-  ]);
-
-
-})();
-   
-(function() {
-
-  angular.module('neograph.edge.routes', ['neograph.neo', 'neograph.utils', 'ui.router'])
-    .config(["$stateProvider", function ($stateProvider) {
-      $stateProvider
-      .state('admin.edge', {
-        url:'/edge/:edge',
-        views: {
-          'panel@admin':{
-            templateUrl:'app/edge/edge.html',
-            controller: 'EdgeCtrl as vm'
-          },
-          'header@admin.edge':{
-            templateUrl:'app/edge/edge.header.html',
-            controller: 'EdgeCtrl as vm'
-          },
-          'properties@admin.edge':{
-            templateUrl:'app/edge/properties/edge.properties.html',
-            controller: 'ChildEdgeCtrl as vm'
-          }
-        }
-      })
-      .state('admin.edge.edit', {
-          url:'/edit',
-          views: {
-            'header@admin.edge':{
-              templateUrl:'app/edge/edge.edit.header.html',
-              controller: 'EdgeCtrl as vm'
-            },
-            'properties@admin.edge':{
-              templateUrl:'app/edge/properties/edge.edit.properties.html',
-              controller:'EditEdgeCtrl as vm'
-            }
-          }
-        });
-    }]);
 
 })();
 (function () {
@@ -1569,71 +1494,6 @@ angular.module('neograph.common.typeaheadSimple', [])
   };
 }]);
 
-(function() {
-  'use strict';
-  
-  angular
-    .module('common.filters.capitalize', [])
-    .filter('capitalize', filterFunc);
-
-  function filterFunc() {
-    return function (input) {
-      if (input != null) {
-        input = input.toLowerCase();
-        return input.substring(0, 1).toUpperCase() + input.substring(1);
-      } else {
-        return null;
-      }
-    };
-  }
-
-})();
-(function() {
-  'use strict';
-  angular.module('common.filters', [
-    'common.filters.startcase',
-    'common.filters.capitalize'
-  ])
-  .filter('checkmark', function () {
-    return function (input) {
-      return input ? '\u2713' : '\u2718';
-    };
-  })
-  .filter('predicate', function () {
-    return function (input) {
-      return input ? '\u2713' : '\u2718';
-    };
-  })
-  .filter('lowercase', function() {
-    return function (input) {
-      if (input) {
-        return input.toLowerCase().replace(/_/g,' ')
-      } else {
-        return null;
-      }
-      
-    };
-  })
-  ;
-})();
-(function() {
-  'use strict';
-
-  filterFunc.$inject = ["_"];
-  angular
-    .module('common.filters.startcase', [])
-    .filter('startcase', filterFunc);
-
-  function filterFunc(_) {
-    return function (input) {
-      if (input != null) {
-        return _.startCase(input);
-      } else {
-        return null;
-      }
-    };
-  }
-})();
 (function() {
   'use strict';
     
@@ -2855,144 +2715,146 @@ angular.module('neograph.interaction.selectable', [])
 
 
 
-angular.module('neograph.layout', [])
-.directive('tabs', function () {
-  return {
-    restrict: 'E',
-    transclude: true,
-    scope: {
-      tabs:'=', // required to remove panes no longer available
-      selected: '=?'
-    },
-    controller: ["$scope", function ($scope) {
-      var panes = $scope.panes = [];
-      var self = this;
+(function() {
 
-      $scope.select = function (pane) {
-        angular.forEach(panes, function (pane) {
-          pane.selected = false;
-        });
-        pane.selected = true;
-        $scope.selected = pane.key;
+    controller.$inject = ["$scope"];
+    childController.$inject = ["$scope", "$stateParams"];
+  angular.module('neograph.edge.controller', ['neograph.neo', 'neograph.utils', 'ui.router'])
+    .controller('EdgeCtrl', controller)
+    .controller('ChildEdgeCtrl', childController);
+
+    function controller ($scope) {
+      var vm = this;
+      vm.tabs = ['Properties'];
+      vm.selectedTab = 'Properties';
+      vm.selectTab = function (tab) {
+        vm.selectedTab = tab;
       };
+    }
 
-      this.add = function (pane) {
-        if (panes.length === 0) {
-          $scope.select(pane);
+    function childController ($scope, $stateParams) {
+      var vm = this;
+      if ($stateParams.edge) {
+        vm.edge = JSON.parse($stateParams.edge);
+      }
+    }
+
+  })();
+
+(function() {
+
+  angular.module('neograph.edge', [
+    'neograph.edge.routes', 
+    'neograph.edge.controller',
+    'neograph.edge.edit.properties.controller'
+  ]);
+
+
+})();
+   
+(function() {
+
+  angular.module('neograph.edge.routes', ['neograph.neo', 'neograph.utils', 'ui.router'])
+    .config(["$stateProvider", function ($stateProvider) {
+      $stateProvider
+      .state('admin.edge', {
+        url:'/edge/:edge',
+        views: {
+          'panel@admin':{
+            templateUrl:'app/edge/edge.html',
+            controller: 'EdgeCtrl as vm'
+          },
+          'header@admin.edge':{
+            templateUrl:'app/edge/edge.header.html',
+            controller: 'EdgeCtrl as vm'
+          },
+          'properties@admin.edge':{
+            templateUrl:'app/edge/properties/edge.properties.html',
+            controller: 'ChildEdgeCtrl as vm'
+          }
         }
-        panes.push(pane);
-      };
-
-      this.remove = function (pane) {
-                // console.log('remove')
-                // console.log(pane);
-        angular.forEach(panes, function (p, i) {
-          if (pane.key == p.key) {
-            panes.splice(i, 1);
-            if (pane.selected) {
-              pane.selected = false;
-              $scope.select($scope.panes[0]);
+      })
+      .state('admin.edge.edit', {
+          url:'/edit',
+          views: {
+            'header@admin.edge':{
+              templateUrl:'app/edge/edge.edit.header.html',
+              controller: 'EdgeCtrl as vm'
+            },
+            'properties@admin.edge':{
+              templateUrl:'app/edge/properties/edge.edit.properties.html',
+              controller:'EditEdgeCtrl as vm'
             }
-
-
           }
         });
+    }]);
 
-      };
+})();
+(function() {
+  'use strict';
+  
+  angular
+    .module('common.filters.capitalize', [])
+    .filter('capitalize', filterFunc);
 
-      $scope.$watch('selected', function (key) { // the title of the selected pane
+  function filterFunc() {
+    return function (input) {
+      if (input != null) {
+        input = input.toLowerCase();
+        return input.substring(0, 1).toUpperCase() + input.substring(1);
+      } else {
+        return null;
+      }
+    };
+  }
 
-        if (key) {
-          angular.forEach(panes, function (pane) {
+})();
+(function() {
+  'use strict';
+  angular.module('common.filters', [
+    'common.filters.startcase',
+    'common.filters.capitalize'
+  ])
+  .filter('checkmark', function () {
+    return function (input) {
+      return input ? '\u2713' : '\u2718';
+    };
+  })
+  .filter('predicate', function () {
+    return function (input) {
+      return input ? '\u2713' : '\u2718';
+    };
+  })
+  .filter('lowercase', function() {
+    return function (input) {
+      if (input) {
+        return input.toLowerCase().replace(/_/g,' ')
+      } else {
+        return null;
+      }
+      
+    };
+  })
+  ;
+})();
+(function() {
+  'use strict';
 
-            pane.selected = pane.key === key;
-          });
-        }
+  filterFunc.$inject = ["_"];
+  angular
+    .module('common.filters.startcase', [])
+    .filter('startcase', filterFunc);
 
-      });
-
-
-            // remove tabs not in list (child pane only adds them)
-      $scope.$watch('tabs', function (tabs) { // the title of the selected pane
-
-        if (tabs) {
-          angular.forEach(panes, function (pane) {
-
-            if (tabs.indexOf(pane.key) === -1) {
-
-              self.remove(pane);
-            }
-          });
-        }
-
-      });
-
-
-    }],
-    templateUrl: 'app/layout/tabs.html'
-  };
-})
-.directive('tabPane', function () {
-  return {
-    require: '^tabs',
-    restrict: 'E',
-    transclude: true,
-    scope: {
-      key:'@',
-      title: '=',
-      visible: '=',
-      active: '=?',
-      window:'='
-    },
-    link: function ($scope, element, attrs, tabsCtrl) {
-
-
-      tabsCtrl.add($scope);
-
-
-            // $scope.$watch('visible', function (visible) {
-
-            //    if (visible) {
-            //        tabsCtrl.addPane($scope);
-            //    }
-            //    else {
-            //        tabsCtrl.removePane($scope);
-
-            //    }
-
-            // });
-
-
-      $scope.$watch('active', function (active) { // the title of the selected pane
-
-        $scope.selected = active;
-
-      });
-
-
-    },
-    templateUrl: 'app/layout/tabPane.html'
-  };
-})
-.directive('noBubble', function () {
-  return {
-
-    link: function ($scope, element, attrs, tabsCtrl) {
-
-
-
-      $(element).on('keydown', function (event) {
-
-        event.stopPropagation();
-      });
-
-    },
-    templateUrl: 'app/layout/tabPane.html'
-  };
-
-
-});
-
+  function filterFunc(_) {
+    return function (input) {
+      if (input != null) {
+        return _.startCase(input);
+      } else {
+        return null;
+      }
+    };
+  }
+})();
   angular.module('neograph.models.predicate', [])
   .factory('predicateFactory', function () {
 
@@ -4213,6 +4075,144 @@ angular.module('neograph.queryInput',
   ]);
 
 })();
+angular.module('neograph.layout', [])
+.directive('tabs', function () {
+  return {
+    restrict: 'E',
+    transclude: true,
+    scope: {
+      tabs:'=', // required to remove panes no longer available
+      selected: '=?'
+    },
+    controller: ["$scope", function ($scope) {
+      var panes = $scope.panes = [];
+      var self = this;
+
+      $scope.select = function (pane) {
+        angular.forEach(panes, function (pane) {
+          pane.selected = false;
+        });
+        pane.selected = true;
+        $scope.selected = pane.key;
+      };
+
+      this.add = function (pane) {
+        if (panes.length === 0) {
+          $scope.select(pane);
+        }
+        panes.push(pane);
+      };
+
+      this.remove = function (pane) {
+                // console.log('remove')
+                // console.log(pane);
+        angular.forEach(panes, function (p, i) {
+          if (pane.key == p.key) {
+            panes.splice(i, 1);
+            if (pane.selected) {
+              pane.selected = false;
+              $scope.select($scope.panes[0]);
+            }
+
+
+          }
+        });
+
+      };
+
+      $scope.$watch('selected', function (key) { // the title of the selected pane
+
+        if (key) {
+          angular.forEach(panes, function (pane) {
+
+            pane.selected = pane.key === key;
+          });
+        }
+
+      });
+
+
+            // remove tabs not in list (child pane only adds them)
+      $scope.$watch('tabs', function (tabs) { // the title of the selected pane
+
+        if (tabs) {
+          angular.forEach(panes, function (pane) {
+
+            if (tabs.indexOf(pane.key) === -1) {
+
+              self.remove(pane);
+            }
+          });
+        }
+
+      });
+
+
+    }],
+    templateUrl: 'app/layout/tabs.html'
+  };
+})
+.directive('tabPane', function () {
+  return {
+    require: '^tabs',
+    restrict: 'E',
+    transclude: true,
+    scope: {
+      key:'@',
+      title: '=',
+      visible: '=',
+      active: '=?',
+      window:'='
+    },
+    link: function ($scope, element, attrs, tabsCtrl) {
+
+
+      tabsCtrl.add($scope);
+
+
+            // $scope.$watch('visible', function (visible) {
+
+            //    if (visible) {
+            //        tabsCtrl.addPane($scope);
+            //    }
+            //    else {
+            //        tabsCtrl.removePane($scope);
+
+            //    }
+
+            // });
+
+
+      $scope.$watch('active', function (active) { // the title of the selected pane
+
+        $scope.selected = active;
+
+      });
+
+
+    },
+    templateUrl: 'app/layout/tabPane.html'
+  };
+})
+.directive('noBubble', function () {
+  return {
+
+    link: function ($scope, element, attrs, tabsCtrl) {
+
+
+
+      $(element).on('keydown', function (event) {
+
+        event.stopPropagation();
+      });
+
+    },
+    templateUrl: 'app/layout/tabPane.html'
+  };
+
+
+});
+
 (function() {
 
     editController.$inject = ["neo", "utils", "$stateParams", "$scope"];
@@ -4266,6 +4266,119 @@ angular.module('neograph.queryInput',
 })();
 
 
+
+(function() {
+    'use strict';
+  angular.module('neograph.node.multiple', ['neograph.neo', 'neograph.utils'])
+      .directive('multiple', ['neo', 'utils', function (neo, utils) {
+        return {
+          restrict: 'E',
+          templateUrl: 'app/node/multiple/node.multiple.html',
+          scope: {
+            nodes: '='
+          },
+          link: function ($scope) {
+
+            $scope.$watch('nodes', function (nodes) {
+
+              if (nodes) {
+                var allLabels = nodes.map(function (node) {
+                  return node.labels;
+                });
+
+                $scope.labels = allLabels.shift().filter(function (v) {
+                  return allLabels.every(function (a) {
+                    return a.indexOf(v) !== -1;
+                  });
+                });
+
+                $scope.originalLabels = angular.copy($scope.labels);// store for saving so we know what to change
+
+              }
+
+            });
+
+            $scope.addLabel = function (item) {
+
+              if ($scope.labels.indexOf(item.Label) === -1) {
+                $scope.labels.push(item.Label);
+              }
+            };
+            $scope.removeLabel = function (label) {
+
+              var ind = $scope.labels.indexOf(label);
+              if (ind > -1) {
+                $scope.labels.splice(ind, 1);
+              }
+
+            };
+
+            $scope.save = function () {
+              neo.saveMultiple({
+                nodes: $scope.nodes,
+                labels: $scope.labels,
+                originalLabels: $scope.originalLabels
+              });
+            };
+
+            $scope.restore = function () {
+              var restored = [];
+              angular.forEach($scope.nodes, function (node) {
+                neo.restoreNode(node).then(function () {
+                  restored.push(node);
+                  if (restored.length === $scope.nodes.length) {
+                    $scope.publish('restored', { selection: { nodes: restored } });
+                    $scope.selection.multiple = undefined;
+                    $scope.tabs = [];
+                  }
+                });
+              });
+            };
+
+            $scope.delete = function () {
+              var deleted = [];
+              angular.forEach($scope.nodes, function (node) {
+                neo.deleteNode(node).then(function () {
+                  deleted.push(node);
+                  if (deleted.length === $scope.nodes.length) {
+                    $scope.publish('deleted', { selection: { nodes: deleted } });
+                    $scope.selection.multiple = undefined;
+                    $scope.tabs = [];
+                  }
+                });
+              });
+            };
+
+            $scope.destroy = function () {
+              var deleted = [];
+              angular.forEach($scope.nodes, function (node) {
+                neo.destroyNode(node).then(function () {
+                  deleted.push(node);
+                  if (deleted.length === $scope.nodes.length) {
+                    $scope.publish('deleted', { selection: { nodes: deleted } });
+                    $scope.selection.multiple = undefined;
+                    $scope.tabs = [];
+                  }
+                });
+              });
+            };
+
+
+              // $scope.selection.multiple = new (function (nodes, labels) {
+              //    var self = this;
+              //    this.nodes = nodes;
+              //    this.labels = labels;
+
+
+
+
+
+              // })(params.selection.nodes, labels);
+
+          }
+        };
+      }]);
+})();
 
 (function() {
   'use strict';
@@ -4519,119 +4632,6 @@ angular.module('neograph.queryInput',
 })();
 
 (function() {
-    'use strict';
-  angular.module('neograph.node.multiple', ['neograph.neo', 'neograph.utils'])
-      .directive('multiple', ['neo', 'utils', function (neo, utils) {
-        return {
-          restrict: 'E',
-          templateUrl: 'app/node/multiple/node.multiple.html',
-          scope: {
-            nodes: '='
-          },
-          link: function ($scope) {
-
-            $scope.$watch('nodes', function (nodes) {
-
-              if (nodes) {
-                var allLabels = nodes.map(function (node) {
-                  return node.labels;
-                });
-
-                $scope.labels = allLabels.shift().filter(function (v) {
-                  return allLabels.every(function (a) {
-                    return a.indexOf(v) !== -1;
-                  });
-                });
-
-                $scope.originalLabels = angular.copy($scope.labels);// store for saving so we know what to change
-
-              }
-
-            });
-
-            $scope.addLabel = function (item) {
-
-              if ($scope.labels.indexOf(item.Label) === -1) {
-                $scope.labels.push(item.Label);
-              }
-            };
-            $scope.removeLabel = function (label) {
-
-              var ind = $scope.labels.indexOf(label);
-              if (ind > -1) {
-                $scope.labels.splice(ind, 1);
-              }
-
-            };
-
-            $scope.save = function () {
-              neo.saveMultiple({
-                nodes: $scope.nodes,
-                labels: $scope.labels,
-                originalLabels: $scope.originalLabels
-              });
-            };
-
-            $scope.restore = function () {
-              var restored = [];
-              angular.forEach($scope.nodes, function (node) {
-                neo.restoreNode(node).then(function () {
-                  restored.push(node);
-                  if (restored.length === $scope.nodes.length) {
-                    $scope.publish('restored', { selection: { nodes: restored } });
-                    $scope.selection.multiple = undefined;
-                    $scope.tabs = [];
-                  }
-                });
-              });
-            };
-
-            $scope.delete = function () {
-              var deleted = [];
-              angular.forEach($scope.nodes, function (node) {
-                neo.deleteNode(node).then(function () {
-                  deleted.push(node);
-                  if (deleted.length === $scope.nodes.length) {
-                    $scope.publish('deleted', { selection: { nodes: deleted } });
-                    $scope.selection.multiple = undefined;
-                    $scope.tabs = [];
-                  }
-                });
-              });
-            };
-
-            $scope.destroy = function () {
-              var deleted = [];
-              angular.forEach($scope.nodes, function (node) {
-                neo.destroyNode(node).then(function () {
-                  deleted.push(node);
-                  if (deleted.length === $scope.nodes.length) {
-                    $scope.publish('deleted', { selection: { nodes: deleted } });
-                    $scope.selection.multiple = undefined;
-                    $scope.tabs = [];
-                  }
-                });
-              });
-            };
-
-
-              // $scope.selection.multiple = new (function (nodes, labels) {
-              //    var self = this;
-              //    this.nodes = nodes;
-              //    this.labels = labels;
-
-
-
-
-
-              // })(params.selection.nodes, labels);
-
-          }
-        };
-      }]);
-})();
-
-(function() {
   'use strict';
 
   controller.$inject = ["utils", "$scope"];
@@ -4778,6 +4778,213 @@ angular.module('neograph.queryInput',
     'neograph.node.edit.references.controller',
     'neograph.node.references.directive'
     ]);
+})();
+
+(function() {
+  'use strict';
+    
+  angular.module('neograph.node.wikipedia', ['neograph.neo'])
+      .factory('wikiservice', () => {
+        const wikiTabs = (data, page) => {
+          let tabs = [];
+          if (data.parse) {
+            const $wikiDOM = $(`<document>${data.parse.text['*']}</document>`);
+            // Handle redirects
+            if ($wikiDOM.find('ul.redirectText').length > 0) {
+              tabs = { redirect: $wikiDOM.find('ul.redirectText li a').attr('title') };
+            } else {
+              const images = $('<div></div>');
+              $wikiDOM.find('.image').each((i, e) => {
+                $(e).
+                  attr('href', $(e).attr('href').
+                    replace('/wiki/', `https://en.wikipedia.org/wiki/${page.replace(' ', '_')}#/media/`)).
+                  attr('target', '_blank').css({ 'padding-right': '5px', 'padding-bottom': '5px' });
+              });
+              $wikiDOM.find('.image').appendTo(images);
+              $wikiDOM.find('p').css({ 'margin-bottom': '4px', 'clear': 'left' });
+              $wikiDOM.find('p,.thumb,.thumbinner').css({ 'width': '100%' });
+              $wikiDOM.find('h2,h3,h4').css({ 'margin-top': '4px', 'margin-bottom': '2px', 'float': 'left', 'clear': 'left', 'width': '100%', 'overflow': 'hidden' });
+              $wikiDOM.find('#toc').remove();
+              $wikiDOM.find('.editsection').remove();
+              $wikiDOM.find('.magnify').remove();
+              $wikiDOM.find('.reflist').remove();
+              $wikiDOM.find('img').css({ 'display': 'block', 'float': 'left', 'margin-right': '3px', 'margin-bottom': '3px' });
+              $wikiDOM.find('.thumb,.thumbinner').css({ 'float': 'left', 'margin-right': '3px', 'margin-bottom': '3px' });
+              $wikiDOM.find('.thumbcaption').css({ 'font-size': '11px' });
+              $wikiDOM.find('.plainlinks').remove();
+              $wikiDOM.find('#navbox').remove();
+              $wikiDOM.find('.rellink').remove();
+              $wikiDOM.find('.references').remove();
+              $wikiDOM.find('.IPA').remove();
+              $wikiDOM.find('sup').remove();
+              $wikiDOM.find('dd,blockquote').css({ 'margin': '0px', 'width': '', 'font-size': '11px', 'margin-bottom': '10px', 'margin-top': '7px' });
+              $wikiDOM.find('blockquote p').css({ 'font-size': '11px' });
+              // NB this has interesting stuff in it
+              $wikiDOM.find('.navbox, .vertical-navbox').remove();
+              $wikiDOM.find('#persondata').remove();
+              $wikiDOM.find('#Footnotes').parent().remove();
+              $wikiDOM.find('#References').parent().remove();
+              $wikiDOM.find('#Bibliography').parent().remove();
+              $wikiDOM.find('.refbegin').remove();
+              $wikiDOM.find('.dablink').remove();
+              // A bit too radical?
+              $wikiDOM.find('small').remove();
+              $wikiDOM.find("img[alt='Wikisource-logo.svg'], img[alt='About this sound'], img[alt='Listen']").remove();
+              $wikiDOM.find('.mediaContainer').remove();
+              // Remove links - (leave external links ?)
+              $wikiDOM.find('a').each(() => { $(this).replaceWith($(this).html()); });
+              $wikiDOM.find('.gallery').find('p').css({ 'width': '', 'font-size': '11px', 'float': 'left', 'clear': 'left' });
+              $wikiDOM.find('.gallery').find('.thumb').css({ 'width': '' });
+              $wikiDOM.find('.gallerybox').css('height', '220px');
+              $wikiDOM.find('.gallerybox').css('float', 'left');
+              $wikiDOM.find('table').css({ 'background': 'none', 'width': '', 'max-width': '', 'color': '' });
+              $wikiDOM.find('.gallery').remove();
+              $wikiDOM.find('#gallery').parent().remove();
+              $wikiDOM.find('#notes').parent().remove();
+              $wikiDOM.find('#sources').parent().remove();
+              // Radical - remove all tables
+              $wikiDOM.find('table').remove();
+              $wikiDOM.find('h1,h2,h3,h4').next().css({ 'clear': 'left' });
+              $wikiDOM.find('dl').remove();
+              $wikiDOM.find('.thumb').remove();
+              $wikiDOM.find('ul,.cquote').css({ 'float': 'left', 'clear': 'left' });
+              $wikiDOM.find('.infobox, .vcard').remove();
+              $wikiDOM.find('.thumbimage').css({ 'max-width': '150px', 'height': 'auto' });
+              $wikiDOM.find('.mw-editsection').remove();
+              $wikiDOM.html($wikiDOM.html().replace('()', ''));
+              $wikiDOM.html($wikiDOM.html().replace('(; ', '('));
+              $wikiDOM.find('h2').css({ 'cursor': 'pointer', 'color': 'rgba(0,85,128,1)', 'font-size': '20px' });
+              $wikiDOM.find('h3').css({ 'font-size': '18px' });
+              $wikiDOM.find('#Gallery').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#See_also').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#Notes').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#External_links').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#Selected_works').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#Sources').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#Other_reading').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#Further_reading').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#Resources').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#Further_reading_and_sources').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#List_of_paintings').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#Self-portraits').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#Selected_paintings').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#References_and_sources').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#Partial_list_of_works').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('#Notes_and_references').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('[id^=Selected_works]').parent().nextUntil('h2').andSelf().remove();
+              $wikiDOM.find('[id^=Books]').parent().nextUntil('h2').andSelf().remove();
+
+              const $introTab = $('<div></div>');
+              $wikiDOM.find('p:first').nextUntil('h2').andSelf().appendTo($introTab);
+              if ($introTab.text().indexOf('Redirect') === -1 && $introTab.text().indexOf('may refer to') === -1) {
+                $introTab.find('ul').remove();
+              }
+              if ($introTab.html()) {
+                tabs.push({
+                  header: 'Summary',
+                  content: $introTab.html().replace('/; /g', '')
+                });
+              }
+
+              $wikiDOM.find('h2').each((i, e) => {
+                const $tab = $('<div></div>');
+                $(e).nextUntil('h2').appendTo($tab);
+                if ($tab.html()) {
+                  tabs.push({
+                    header: $(e).text(),
+                    content: $tab.html()
+                  });
+                }
+              });
+
+              if (images.html()) {
+                images.find('img').css({ 'width': '250px', 'marginBottom': '5px' });
+                tabs.push({
+                  header: 'Images',
+                  content: images.html()
+                });
+              }
+            }
+          }
+          return tabs;
+        };
+
+        const getWiki = (page, callback) => {
+          $.getJSON('http://en.wikipedia.org/w/api.php?action=parse&format=json&callback=?',
+            {
+              page,
+              prop: 'text',
+              uselang: 'en'
+            },
+              data => {
+                const tabs = wikiTabs(data, page);
+                if (tabs.redirect) {
+                  getWiki(tabs.redirect, callback);
+                } else {
+                  callback(tabs);
+                }
+              });
+        };
+
+        return {
+          getPage: (page, callback) => getWiki(page, callback)
+        };
+      })
+      .directive('wikipedia', (wikiservice, neo) => (
+        {
+          restrict: 'E',
+          templateUrl: 'app/node/wikipedia/node.wikipedia.html',
+          scope: {
+            node: '=',
+            window: '=',
+            active: '='
+          },
+          link: ($scope, $element) => {
+            $scope.tabs = [];
+
+            $scope.setActiveTab = tab => {
+              $scope.activeTab = tab;
+            };
+
+            let loaded = false;
+            $scope.$watch('node', node => {
+              if (node) {
+                loaded = false;
+                $scope.page = node.Wikipagename || node.Name || node.Title;
+              }
+            });
+
+            $scope.savePage = () => {
+              $scope.node.Wikipagename = $scope.page;
+              neo.saveWikipagename($scope.node).then(node => $scope.page = node.Wikipagename);
+            };
+
+            const getPage = () => {
+              wikiservice.getPage($scope.page, tabs => {
+                $scope.tabs = tabs;
+                $scope.activeTab = $scope.tabs[0];
+                $scope.$digest();
+                $($element).find('.wikidropdown').dropdown();
+                loaded = true;
+              }); };
+
+            $scope.$watch('page', page => {
+              if (page && $scope.active) {
+                getPage();
+              }
+              else {
+                $scope.tabs = [];
+              }
+            });
+
+            $scope.$watch('active', active => {
+              if ($scope.page && active && !loaded) {
+                getPage();
+              }
+            });
+          }
+        })
+  );
 })();
 
 (function() {
@@ -5158,210 +5365,3 @@ angular.module('neograph.query.generator', [
   'neograph.query.generator.nodeFilter',
   'neograph.query.generator.nodeGraph',
 ]);
-
-(function() {
-  'use strict';
-    
-  angular.module('neograph.node.wikipedia', ['neograph.neo'])
-      .factory('wikiservice', () => {
-        const wikiTabs = (data, page) => {
-          let tabs = [];
-          if (data.parse) {
-            const $wikiDOM = $(`<document>${data.parse.text['*']}</document>`);
-            // Handle redirects
-            if ($wikiDOM.find('ul.redirectText').length > 0) {
-              tabs = { redirect: $wikiDOM.find('ul.redirectText li a').attr('title') };
-            } else {
-              const images = $('<div></div>');
-              $wikiDOM.find('.image').each((i, e) => {
-                $(e).
-                  attr('href', $(e).attr('href').
-                    replace('/wiki/', `https://en.wikipedia.org/wiki/${page.replace(' ', '_')}#/media/`)).
-                  attr('target', '_blank').css({ 'padding-right': '5px', 'padding-bottom': '5px' });
-              });
-              $wikiDOM.find('.image').appendTo(images);
-              $wikiDOM.find('p').css({ 'margin-bottom': '4px', 'clear': 'left' });
-              $wikiDOM.find('p,.thumb,.thumbinner').css({ 'width': '100%' });
-              $wikiDOM.find('h2,h3,h4').css({ 'margin-top': '4px', 'margin-bottom': '2px', 'float': 'left', 'clear': 'left', 'width': '100%', 'overflow': 'hidden' });
-              $wikiDOM.find('#toc').remove();
-              $wikiDOM.find('.editsection').remove();
-              $wikiDOM.find('.magnify').remove();
-              $wikiDOM.find('.reflist').remove();
-              $wikiDOM.find('img').css({ 'display': 'block', 'float': 'left', 'margin-right': '3px', 'margin-bottom': '3px' });
-              $wikiDOM.find('.thumb,.thumbinner').css({ 'float': 'left', 'margin-right': '3px', 'margin-bottom': '3px' });
-              $wikiDOM.find('.thumbcaption').css({ 'font-size': '11px' });
-              $wikiDOM.find('.plainlinks').remove();
-              $wikiDOM.find('#navbox').remove();
-              $wikiDOM.find('.rellink').remove();
-              $wikiDOM.find('.references').remove();
-              $wikiDOM.find('.IPA').remove();
-              $wikiDOM.find('sup').remove();
-              $wikiDOM.find('dd,blockquote').css({ 'margin': '0px', 'width': '', 'font-size': '11px', 'margin-bottom': '10px', 'margin-top': '7px' });
-              $wikiDOM.find('blockquote p').css({ 'font-size': '11px' });
-              // NB this has interesting stuff in it
-              $wikiDOM.find('.navbox, .vertical-navbox').remove();
-              $wikiDOM.find('#persondata').remove();
-              $wikiDOM.find('#Footnotes').parent().remove();
-              $wikiDOM.find('#References').parent().remove();
-              $wikiDOM.find('#Bibliography').parent().remove();
-              $wikiDOM.find('.refbegin').remove();
-              $wikiDOM.find('.dablink').remove();
-              // A bit too radical?
-              $wikiDOM.find('small').remove();
-              $wikiDOM.find("img[alt='Wikisource-logo.svg'], img[alt='About this sound'], img[alt='Listen']").remove();
-              $wikiDOM.find('.mediaContainer').remove();
-              // Remove links - (leave external links ?)
-              $wikiDOM.find('a').each(() => { $(this).replaceWith($(this).html()); });
-              $wikiDOM.find('.gallery').find('p').css({ 'width': '', 'font-size': '11px', 'float': 'left', 'clear': 'left' });
-              $wikiDOM.find('.gallery').find('.thumb').css({ 'width': '' });
-              $wikiDOM.find('.gallerybox').css('height', '220px');
-              $wikiDOM.find('.gallerybox').css('float', 'left');
-              $wikiDOM.find('table').css({ 'background': 'none', 'width': '', 'max-width': '', 'color': '' });
-              $wikiDOM.find('.gallery').remove();
-              $wikiDOM.find('#gallery').parent().remove();
-              $wikiDOM.find('#notes').parent().remove();
-              $wikiDOM.find('#sources').parent().remove();
-              // Radical - remove all tables
-              $wikiDOM.find('table').remove();
-              $wikiDOM.find('h1,h2,h3,h4').next().css({ 'clear': 'left' });
-              $wikiDOM.find('dl').remove();
-              $wikiDOM.find('.thumb').remove();
-              $wikiDOM.find('ul,.cquote').css({ 'float': 'left', 'clear': 'left' });
-              $wikiDOM.find('.infobox, .vcard').remove();
-              $wikiDOM.find('.thumbimage').css({ 'max-width': '150px', 'height': 'auto' });
-              $wikiDOM.find('.mw-editsection').remove();
-              $wikiDOM.html($wikiDOM.html().replace('()', ''));
-              $wikiDOM.html($wikiDOM.html().replace('(; ', '('));
-              $wikiDOM.find('h2').css({ 'cursor': 'pointer', 'color': 'rgba(0,85,128,1)', 'font-size': '20px' });
-              $wikiDOM.find('h3').css({ 'font-size': '18px' });
-              $wikiDOM.find('#Gallery').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#See_also').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#Notes').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#External_links').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#Selected_works').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#Sources').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#Other_reading').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#Further_reading').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#Resources').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#Further_reading_and_sources').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#List_of_paintings').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#Self-portraits').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#Selected_paintings').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#References_and_sources').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#Partial_list_of_works').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('#Notes_and_references').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('[id^=Selected_works]').parent().nextUntil('h2').andSelf().remove();
-              $wikiDOM.find('[id^=Books]').parent().nextUntil('h2').andSelf().remove();
-
-              const $introTab = $('<div></div>');
-              $wikiDOM.find('p:first').nextUntil('h2').andSelf().appendTo($introTab);
-              if ($introTab.text().indexOf('Redirect') === -1 && $introTab.text().indexOf('may refer to') === -1) {
-                $introTab.find('ul').remove();
-              }
-              if ($introTab.html()) {
-                tabs.push({
-                  header: 'Summary',
-                  content: $introTab.html().replace('/; /g', '')
-                });
-              }
-
-              $wikiDOM.find('h2').each((i, e) => {
-                const $tab = $('<div></div>');
-                $(e).nextUntil('h2').appendTo($tab);
-                if ($tab.html()) {
-                  tabs.push({
-                    header: $(e).text(),
-                    content: $tab.html()
-                  });
-                }
-              });
-
-              if (images.html()) {
-                images.find('img').css({ 'width': '250px', 'marginBottom': '5px' });
-                tabs.push({
-                  header: 'Images',
-                  content: images.html()
-                });
-              }
-            }
-          }
-          return tabs;
-        };
-
-        const getWiki = (page, callback) => {
-          $.getJSON('http://en.wikipedia.org/w/api.php?action=parse&format=json&callback=?',
-            {
-              page,
-              prop: 'text',
-              uselang: 'en'
-            },
-              data => {
-                const tabs = wikiTabs(data, page);
-                if (tabs.redirect) {
-                  getWiki(tabs.redirect, callback);
-                } else {
-                  callback(tabs);
-                }
-              });
-        };
-
-        return {
-          getPage: (page, callback) => getWiki(page, callback)
-        };
-      })
-      .directive('wikipedia', (wikiservice, neo) => (
-        {
-          restrict: 'E',
-          templateUrl: 'app/node/wikipedia/node.wikipedia.html',
-          scope: {
-            node: '=',
-            window: '=',
-            active: '='
-          },
-          link: ($scope, $element) => {
-            $scope.tabs = [];
-
-            $scope.setActiveTab = tab => {
-              $scope.activeTab = tab;
-            };
-
-            let loaded = false;
-            $scope.$watch('node', node => {
-              if (node) {
-                loaded = false;
-                $scope.page = node.Wikipagename || node.Name || node.Title;
-              }
-            });
-
-            $scope.savePage = () => {
-              $scope.node.Wikipagename = $scope.page;
-              neo.saveWikipagename($scope.node).then(node => $scope.page = node.Wikipagename);
-            };
-
-            const getPage = () => {
-              wikiservice.getPage($scope.page, tabs => {
-                $scope.tabs = tabs;
-                $scope.activeTab = $scope.tabs[0];
-                $scope.$digest();
-                $($element).find('.wikidropdown').dropdown();
-                loaded = true;
-              }); };
-
-            $scope.$watch('page', page => {
-              if (page && $scope.active) {
-                getPage();
-              }
-              else {
-                $scope.tabs = [];
-              }
-            });
-
-            $scope.$watch('active', active => {
-              if ($scope.page && active && !loaded) {
-                getPage();
-              }
-            });
-          }
-        })
-  );
-})();

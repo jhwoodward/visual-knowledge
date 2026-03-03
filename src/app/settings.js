@@ -4,7 +4,7 @@
     .factory('settings', function() { 
       
       return {
-        apiRoot: 'http://localhost:1337' 
+        apiRoot: 'https://graph.vsys.co.uk' 
       };
     
     });
